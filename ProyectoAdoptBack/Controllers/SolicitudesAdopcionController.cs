@@ -5,28 +5,28 @@ namespace ProyectoAdoptBack.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CitasController : ControllerBase
+    public class SolicitudesAdopcionController : ControllerBase
     {
         [HttpGet]
-        public ActionResult<List<CitasDTO>> GetAll()
+        public ActionResult<List<SolicitudAdopcionDTO>> GetAll()
         {
-            return Ok(new List<CitasDTO>());
+            return Ok(new List<SolicitudAdopcionDTO>());
         }
 
         [HttpGet("{id}")]
-        public ActionResult<CitasDTO> GetById(int id)
+        public ActionResult<SolicitudAdopcionDTO> GetById(int id)
         {
             return NotFound();
         }
 
         [HttpPost]
-        public ActionResult<CitasDTO> Create([FromBody] CreateCitasDTO dto)
+        public ActionResult<SolicitudAdopcionDTO> Create([FromBody] CreateSolicitudAdopcionDTO dto)
         {
-            return Ok(new CitasDTO());
+            return Ok(new SolicitudAdopcionDTO());
         }
 
         [HttpPut("{id}")]
-        public ActionResult Update(int id, [FromBody] UpdateCitasDTO dto)
+        public ActionResult Update(int id, [FromBody] UpdateSolicitudAdopcionDTO dto)
         {
             return NoContent();
         }

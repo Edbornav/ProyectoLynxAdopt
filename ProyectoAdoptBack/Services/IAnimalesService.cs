@@ -1,6 +1,6 @@
 namespace ProyectoAdoptBack.Services
 {
-    public class IUsuarioService
+    public class IAnimalesService
     {
     }
 }

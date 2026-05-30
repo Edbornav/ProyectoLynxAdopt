@@ -1,4 +1,4 @@
-﻿namespace ProyectoAdoptBack.Services
+namespace ProyectoAdoptBack.Services
 {
     public class IAdoptanteService
     {

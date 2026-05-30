@@ -5,28 +5,28 @@ namespace ProyectoAdoptBack.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EspecieController : ControllerBase
+    public class RazasController : ControllerBase
     {
         [HttpGet]
-        public ActionResult<List<EspecieDTO>> GetAll()
+        public ActionResult<List<RazaDTO>> GetAll()
         {
-            return Ok(new List<EspecieDTO>());
+            return Ok(new List<RazaDTO>());
         }
 
         [HttpGet("{id}")]
-        public ActionResult<EspecieDTO> GetById(int id)
+        public ActionResult<RazaDTO> GetById(int id)
         {
             return NotFound();
         }
 
         [HttpPost]
-        public ActionResult<EspecieDTO> Create([FromBody] CreateEspecieDTO dto)
+        public ActionResult<RazaDTO> Create([FromBody] CreateRazaDTO dto)
         {
-            return Ok(new EspecieDTO());
+            return Ok(new RazaDTO());
         }
 
         [HttpPut("{id}")]
-        public ActionResult Update(int id, [FromBody] UpdateEspecieDTO dto)
+        public ActionResult Update(int id, [FromBody] UpdateRazaDTO dto)
         {
             return NoContent();
         }
