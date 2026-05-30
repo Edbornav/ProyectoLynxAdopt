@@ -1,4 +1,4 @@
-﻿namespace ProyectoAdoptBack.Repositories
+namespace ProyectoAdoptBack.Repositories
 {
     public class IUsuarioRepository
     {
