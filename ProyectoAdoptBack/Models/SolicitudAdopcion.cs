@@ -3,9 +3,10 @@
     public class SolicitudAdopcion
     {
         public int SolicitudID { get; set; }
+        public int RefugioID { get; set; }
         public int AdoptanteID { get; set; }
-        public int AnimalID { get; set; }
-        public DateTime FechaSolicitud { get; set; }
-        public string Estado { get; set; } = string.Empty;
+        public string MensajeAdoptante { get; set; } = string.Empty;
+        public string Estatus { get; set; } = string.Empty;
+        public DateTime FechaRegistro { get; set; }
     }
 }
