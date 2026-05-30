@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LynxAdopt – Agregar Mascota</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <style>
+    body { min-height: 100vh; }
+
+    .page-wrap { padding: 20px 40px 48px; max-width: 960px; margin: 0 auto; }
+
+    .back-title-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .back-title-row h1 { font-family: 'Fredoka One', cursive; font-size: 2rem; color: white; }
+
+    .form-card {
+      background: var(--beige-card);
+      border-radius: 28px;
+      overflow: hidden;
+      display: flex;
+      box-shadow: var(--shadow-lg);
+      animation: fadeInUp 0.4s ease both;
+      min-height: 560px;
+    }
+
+    .img-col {
+      width: 320px;
+      background: var(--beige);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-shrink: 0;
+      padding: 32px 24px;
+    }
+
+    .img-placeholder {
+      width: 220px; height: 220px;
+      border-radius: var(--radius);
+      background: rgba(0,0,0,0.06);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 5rem;
+      border: 3px dashed var(--orange-light);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .img-placeholder:hover { background: rgba(0,0,0,0.1); }
+
+    .img-hint { font-size: 0.82rem; font-weight: 600; color: var(--text-mid); text-align: center; }
+
+    .form-col { flex: 1; padding: 36px 40px; display: flex; flex-direction: column; }
+
+    .form-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: 2rem;
+      color: var(--text-dark);
+      margin-bottom: 24px;
+      border-bottom: 2px solid var(--beige);
+      padding-bottom: 12px;
+    }
+
+    .editable-title { outline: none; border-bottom: 2px solid var(--orange-light); }
+    .editable-title:empty::before { content: 'Nombre de la mascota'; color: var(--text-mid); font-style: italic; }
+
+    .health-checks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .health-check {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--beige);
+      border-radius: var(--radius-pill);
+      padding: 7px 14px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .health-check input { accent-color: var(--orange); }
+    .health-check:has(input:checked) { background: var(--green); color: white; }
+
+    .form-footer {
+      grid-column: 1/-1;
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 12px;
+      padding-top: 16px;
+      border-top: 2px solid var(--beige);
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="06_inicio_refugio.html" class="navbar-logo">🐾 LynxAdopt</a>
+    <div class="navbar-links">
+      <a href="06_inicio_refugio.html">🏠 Inicio</a>
+      <a href="07_solicitudes_refugio.html">📋 Solicitudes</a>
+      <a href="10_agregar_mascota.html" class="active">➕ Agregar mascota</a>
+    </div>
+    <div class="navbar-bell">🔔<span class="badge" id="notifBadge">0</span></div>
+  </nav>
+
+  <div class="page-wrap">
+    <div class="back-title-row">
+      <button class="back-btn" onclick="history.back()">◀</button>
+      <h1>Agregar mascota</h1>
+    </div>
+
+    <div class="form-card">
+
+      <div class="img-col">
+        <div class="img-placeholder" onclick="triggerUpload()" id="imgPlaceholder">📷</div>
+        <p class="img-hint">Haz clic para subir<br>una foto de la mascota</p>
+        <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="previewImg(event)"/>
+        <button class="btn btn-orange btn-sm" onclick="triggerUpload()">📂 Agregar imagen</button>
+      </div>
+
+      <div class="form-col">
+        <div class="form-title editable-title" contenteditable="true" id="petNameTitle">Nombre de la mascota</div>
+
+        <div class="form-grid">
+          <div class="fg">
+            <label>Especie</label>
+            <select id="petEspecie" onchange="cargarRazas()">
+              <option value="">Selecciona especie</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Raza</label>
+            <select id="petRaza">
+              <option value="">Selecciona raza</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Sexo</label>
+            <select id="petSexo">
+              <option value="Macho">Macho</option>
+              <option value="Hembra">Hembra</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Fecha de nacimiento</label>
+            <input type="date" id="petFechaNacimiento"/>
+          </div>
+          <div class="fg">
+            <label>Color</label>
+            <input type="text" id="petColor" placeholder="Ej. Dorado"/>
+          </div>
+          <div class="fg">
+            <label>Estatus</label>
+            <select id="petEstatus">
+              <option value="Disponible">Disponible</option>
+              <option value="En Proceso">En Proceso</option>
+              <option value="Adoptado">Adoptado</option>
+            </select>
+          </div>
+
+          <div class="fg full-col">
+            <label>Personalidad y comportamiento</label>
+            <input type="text" id="petPersonalidad" placeholder="Ej. Juguetón, amigable con niños, tranquilo..."/>
+          </div>
+
+          <div class="fg full-col">
+            <label>Estado de salud</label>
+            <div class="health-checks">
+              <label class="health-check"><input type="checkbox" id="healthVacunas" value="vacunas"/> Vacunas al día</label>
+              <label class="health-check"><input type="checkbox" id="healthEsterilizado" value="esterilizado"/> Esterilizado/a</label>
+              <label class="health-check"><input type="checkbox" id="healthDesparasitado" value="desparasitado"/> Desparasitado/a</label>
+              <label class="health-check"><input type="checkbox" id="healthMicrochip" value="microchip"/> Microchip</label>
+              <label class="health-check"><input type="checkbox" id="healthRevision" value="revision"/> Revisión veterinaria</label>
+            </div>
+          </div>
+
+          <div class="fg full-col">
+            <label>Descripción / Historia</label>
+            <textarea id="petDescripcion" placeholder="Cuéntanos la historia de esta mascota y por qué busca un hogar..."></textarea>
+          </div>
+
+          <div class="form-footer">
+            <button class="btn btn-light" onclick="history.back()">Cancelar</button>
+            <button class="btn btn-primary" onclick="publishPet()">📢 Publicar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function triggerUpload() {
+      document.getElementById('fileInput').click();
+    }
+
+    function previewImg(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      const ph = document.getElementById('imgPlaceholder');
+      ph.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;"/>`;
+    }
+
+    function cargarEspecies() {
+      // TODO: GET /api/especies → llenar <select id="petEspecie">
+      //   <option value="EspecieID">🐶 Nombre</option>
+      //   (EspecieID, Nombre)
+    }
+
+    function cargarRazas() {
+      const especieId = document.getElementById('petEspecie').value;
+      // TODO: GET /api/razas?especieId={especieId} → llenar <select id="petRaza">
+      //   <option value="RazaID">Nombre</option>
+      //   (RazaID, Nombre)
+    }
+
+    function publishPet() {
+      const data = {
+        nombre: document.getElementById('petNameTitle').textContent,
+        especieId: document.getElementById('petEspecie').value,
+        razaId: document.getElementById('petRaza').value,
+        sexo: document.getElementById('petSexo').value,
+        fechaNacimiento: document.getElementById('petFechaNacimiento').value,
+        color: document.getElementById('petColor').value,
+        estatus: document.getElementById('petEstatus').value,
+        personalidad: document.getElementById('petPersonalidad').value,
+        descripcion: document.getElementById('petDescripcion').value,
+        salud: {
+          vacunas: document.getElementById('healthVacunas').checked,
+          esterilizado: document.getElementById('healthEsterilizado').checked,
+          desparasitado: document.getElementById('healthDesparasitado').checked,
+          microchip: document.getElementById('healthMicrochip').checked,
+          revision: document.getElementById('healthRevision').checked
+        }
+      };
+      // TODO: POST /api/animales { refugioId, razaId, nombre, sexo, fechaNacimiento, descripcion, estatus, color, personalidad, fechaRegistro }
+    }
+
+    document.addEventListener('DOMContentLoaded', cargarEspecies);
+  </script>
+</body>
+</html>

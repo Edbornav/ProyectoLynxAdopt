@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LynxAdopt – Mi Perfil</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <style>
+    body { min-height: 100vh; }
+
+    .profile-wrap { padding: 28px 40px; max-width: 900px; margin: 0 auto; }
+
+    .profile-card {
+      background: var(--beige-card);
+      border-radius: 28px;
+      overflow: hidden;
+      display: flex;
+      box-shadow: var(--shadow-lg);
+      animation: fadeInUp 0.4s ease both;
+    }
+
+    .profile-left {
+      background: var(--white);
+      width: 260px;
+      flex-shrink: 0;
+      padding: 40px 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .avatar-wrap { position: relative; }
+    .avatar-big {
+      width: 130px; height: 130px;
+      border-radius: 50%;
+      background: var(--orange-light);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3.5rem;
+      border: 4px solid var(--orange);
+    }
+    .avatar-edit {
+      position: absolute;
+      bottom: 4px; right: 4px;
+      background: var(--orange);
+      color: white;
+      border-radius: 50%;
+      width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem;
+      cursor: pointer;
+      border: 2px solid white;
+    }
+
+    .profile-name { font-family: 'Fredoka One', cursive; font-size: 1.3rem; color: var(--text-dark); text-align: center; }
+    .profile-role-tag {
+      background: var(--orange);
+      color: white;
+      border-radius: var(--radius-pill);
+      padding: 5px 16px;
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .profile-stat { text-align: center; }
+    .profile-stat .num { font-family: 'Fredoka One', cursive; font-size: 1.8rem; color: var(--orange); }
+    .profile-stat .lbl { font-size: 0.82rem; font-weight: 700; color: var(--text-mid); }
+    .stats-row { display: flex; gap: 20px; }
+
+    .divider { width: 100%; height: 1px; background: var(--beige); margin: 4px 0; }
+
+    .profile-right { flex: 1; padding: 36px 40px; }
+
+    .section-head {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.3rem;
+      color: var(--text-dark);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px 24px;
+      margin-bottom: 28px;
+    }
+
+    .info-item label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--text-mid);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .info-item .val { font-weight: 700; font-size: 0.95rem; color: var(--text-dark); }
+
+    .perfil-card {
+      background: var(--beige);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 16px;
+    }
+    .perfil-card .q { font-size: 0.8rem; font-weight: 800; color: var(--text-mid); margin-bottom: 3px; }
+    .perfil-card .a { font-size: 0.93rem; font-weight: 700; color: var(--text-dark); }
+
+    .edit-btn-row { display: flex; gap: 12px; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="03_catalogo_adoptante.html" class="navbar-logo">🐾 LynxAdopt</a>
+    <div class="navbar-links">
+      <a href="03_catalogo_adoptante.html">🐾 Catálogo</a>
+      <a href="08_mis_solicitudes.html">📋 Solicitudes</a>
+      <a href="09_perfil_adoptante.html" class="active">👤 Mi perfil</a>
+    </div>
+    <div class="navbar-bell">🔔<span class="badge" id="notifBadge">0</span></div>
+  </nav>
+
+  <div class="profile-wrap">
+
+    <div class="profile-card">
+
+      <div class="profile-left">
+        <div class="avatar-wrap">
+          <div class="avatar-big">👤</div>
+          <div class="avatar-edit">✏️</div>
+        </div>
+        <div class="profile-name" id="profileName">--</div>
+        <span class="profile-role-tag" id="profileRole">Adoptante</span>
+        <div class="divider"></div>
+
+        <div class="stats-row">
+          <div class="profile-stat">
+            <div class="num" id="statSolicitudes">0</div>
+            <div class="lbl">Solicitudes</div>
+          </div>
+          <div class="profile-stat">
+            <div class="num" id="statAdoptados">0</div>
+            <div class="lbl">Adoptados</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <button class="btn btn-orange btn-sm" style="width:100%"
+                onclick="window.location.href='04b_test_perfil.html'">
+          ✏️ Editar perfil
+        </button>
+        <button class="btn btn-light btn-sm" style="width:100%"
+                onclick="window.location.href='01_seleccion_rol.html'">
+          Cerrar sesión
+        </button>
+      </div>
+
+      <div class="profile-right">
+        <div class="section-head">📋 Información personal</div>
+        <div class="info-grid" id="profileInfoGrid"></div>
+
+        <div class="section-head">🐾 Perfil del adoptante</div>
+        <div id="profilePerfilSection"></div>
+
+        <div class="edit-btn-row">
+          <button class="btn btn-primary" onclick="guardarCambios()">💾 Guardar cambios</button>
+          <button class="btn btn-light">Cancelar</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function loadProfile() {
+      // TODO: GET /api/adoptante (datos del adoptante logueado)
+      //   JOIN: Adoptante + Usuarios + PerfilAdoptante
+      //   Poblar:
+      //     #profileName         → Adoptante.Nombre + ApellidoPaterno + ApellidoMaterno
+      //     #profileRole         → 'Adoptante'
+      //     #statSolicitudes     → COUNT(SolicitudAdopcion WHERE AdoptanteID = X)
+      //     #statAdoptados       → COUNT(SolicitudAdopcion WHERE AdoptanteID = X AND Estatus = 'Aprobada')
+      //
+      //     #profileInfoGrid     → grid de info-items:
+      //       Correo:           Usuarios.Correo
+      //       Teléfono:         Adoptante.Telefono
+      //       Fecha de nac.:    Adoptante.FechaNacimiento
+      //       Miembro desde:    Usuarios.FechaRegistro
+      //
+      //     #profilePerfilSection → PerfilAdoptante:
+      //       <div class="perfil-card">
+      //         <div class="q">¿Cómo es tu casa?</div>
+      //         <div class="a">PerfilAdoptante.DescripcionCasa</div>
+      //       </div>
+      //       (x3: DescripcionCasa, DescripcionMascotas, DescripcionExperienciaConMascotas)
+    }
+
+    function guardarCambios() {
+      // TODO: PUT /api/adoptante
+    }
+
+    document.addEventListener('DOMContentLoaded', loadProfile);
+  </script>
+</body>
+</html>

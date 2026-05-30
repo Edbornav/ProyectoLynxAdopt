@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LynxAdopt – ¿Quién eres?</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .paw-deco {
+      position: absolute;
+      font-size: 320px;
+      opacity: 0.12;
+      color: var(--beige);
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -55%);
+      pointer-events: none;
+      line-height: 1;
+    }
+
+    .logo {
+      font-family: 'Fredoka One', cursive;
+      font-size: 3.2rem;
+      color: var(--white);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: fadeInUp 0.5s ease both;
+    }
+
+    .logo-sub {
+      color: var(--beige-light);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 48px;
+      animation: fadeInUp 0.5s 0.1s ease both;
+    }
+
+    .question {
+      font-family: 'Fredoka One', cursive;
+      font-size: 2.6rem;
+      color: var(--white);
+      text-align: center;
+      margin-bottom: 52px;
+      animation: fadeInUp 0.5s 0.15s ease both;
+    }
+
+    .roles {
+      display: flex;
+      gap: 48px;
+      align-items: flex-end;
+      animation: fadeInUp 0.5s 0.25s ease both;
+    }
+
+    .role-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.25s ease;
+    }
+    .role-card:hover { transform: translateY(-8px); }
+
+    .role-icon {
+      font-size: 4.5rem;
+      width: 100px; height: 100px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .role-label {
+      background: var(--beige-light);
+      color: var(--text-dark);
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.3rem;
+      padding: 12px 36px;
+      border-radius: var(--radius-pill);
+      box-shadow: var(--shadow);
+      white-space: nowrap;
+    }
+
+    .role-card.admin .role-label {
+      background: var(--brown);
+      color: var(--white);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="paw-deco">🐾</div>
+
+  <div class="logo">🐾 LynxAdopt</div>
+  <p class="logo-sub">Conectando corazones con patitas</p>
+
+  <h1 class="question">¿Qué rol cumples?</h1>
+
+  <div class="roles">
+    <a href="02_inicio_sesion.html?rol=adoptante" class="role-card">
+      <div class="role-icon">👤</div>
+      <div class="role-label">Adoptante</div>
+    </a>
+
+    <a href="02_inicio_sesion.html?rol=administrador" class="role-card admin">
+      <div class="role-icon">🏠</div>
+      <div class="role-label">Administrador</div>
+    </a>
+  </div>
+
+  <p style="color:var(--beige-light);margin-top:40px;font-size:0.9rem;animation:fadeInUp 0.5s 0.35s ease both;">
+    ¿No tienes cuenta? <a href="04_registro.html" style="color:white;font-weight:800;">Regístrate aquí</a>
+  </p>
+
+</body>
+</html>

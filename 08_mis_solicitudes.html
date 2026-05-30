@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LynxAdopt – Mis Solicitudes</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <style>
+    body { min-height: 100vh; }
+
+    .page-wrap { padding: 28px 40px; max-width: 900px; margin: 0 auto; }
+
+    .page-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: 2.2rem;
+      color: var(--white);
+      margin-bottom: 24px;
+    }
+
+    .solicitud-row {
+      background: var(--beige-card);
+      border-radius: var(--radius-pill);
+      padding: 14px 22px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+      animation: fadeInUp 0.4s ease both;
+      transition: transform 0.2s;
+    }
+    .solicitud-row:hover { transform: translateX(4px); }
+
+    .sol-avatar {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: var(--orange-light);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+      flex-shrink: 0;
+    }
+
+    .sol-name { font-family: 'Fredoka One', cursive; font-size: 1.2rem; color: var(--text-dark); flex: 1; }
+    .sol-refugio { font-size: 0.82rem; font-weight: 600; color: var(--text-mid); }
+
+    .sol-actions { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+
+    .table-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 22px 10px;
+      font-weight: 800;
+      font-size: 0.88rem;
+      color: var(--white);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .th-name { flex: 1; }
+    .th-right { margin-left: auto; display: flex; gap: 80px; }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 0;
+      color: var(--beige-light);
+    }
+    .empty-state .emoji { font-size: 4rem; display: block; margin-bottom: 12px; }
+    .empty-state p { font-weight: 600; font-size: 1.1rem; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="03_catalogo_adoptante.html" class="navbar-logo">🐾 LynxAdopt</a>
+    <div class="navbar-links">
+      <a href="03_catalogo_adoptante.html">🐾 Catálogo</a>
+      <a href="08_mis_solicitudes.html" class="active">📋 Solicitudes</a>
+      <a href="09_perfil_adoptante.html">👤 Mi perfil</a>
+    </div>
+    <div class="navbar-bell">🔔<span class="badge" id="notifBadge">0</span></div>
+  </nav>
+
+  <div class="page-wrap">
+
+    <h1 class="page-title">Mis solicitudes</h1>
+
+    <div class="table-header">
+      <div style="width:52px;"></div>
+      <div class="th-name">Mascota</div>
+      <div class="th-right">
+        <span>Detalles</span>
+        <span>Estatus</span>
+      </div>
+    </div>
+
+    <div id="solicitudesList"></div>
+
+  </div>
+
+  <script>
+    function loadSolicitudes() {
+      const list = document.getElementById('solicitudesList');
+      // TODO: GET /api/mis-solicitudes?adoptanteId=X
+      //   (JOIN SolicitudAdopcion, SolicitudAnimales, Animales, Refugio)
+      //   Renderizar en #solicitudesList:
+      //   <div class="solicitud-row">
+      //     <div class="sol-avatar">🐾</div>
+      //     <div>
+      //       <div class="sol-name">Animales.Nombre</div>
+      //       <div class="sol-refugio">Refugio.Nombre</div>
+      //     </div>
+      //     <div class="sol-actions">
+      //       <a href="05_detalle_mascota.html?id=ANIMALID" class="btn btn-light btn-sm">Ver detalles</a>
+      //       <span class="status-badge status-pending">Pendiente</span>
+      //     </div>
+      //   </div>
+      //
+      //   Si vacío: list.innerHTML = '<div class="empty-state"><span class="emoji">🐾</span>
+      //     <p>Aún no has enviado solicitudes.<br>¡Explora el catálogo y encuentra a tu compañero ideal!</p></div>'
+    }
+
+    document.addEventListener('DOMContentLoaded', loadSolicitudes);
+  </script>
+</body>
+</html>
