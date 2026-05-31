@@ -140,14 +140,14 @@
   let solicitudActualId = null;
 
   function loadSolicitudes() {
-    // TODO: GET /api/SolicitudAdopcion?refugioId=X
+    // TODO: GET /SolicitudAdopcion?refugioId=X
     //   (JOIN Adoptante, Animales)
     //   Renderizar en #solicitudesList
   }
 
   function openModal(solicitudId) {
     solicitudActualId = solicitudId;
-    // TODO: GET /api/SolicitudAdopcion/{solicitudId}
+    // TODO: GET /SolicitudAdopcion/{solicitudId}
     //   Poblar: #modalName, #modalStatus, #modalInfoGrid, #modalMensaje (con PerfilAdoptante.MotivoAdopcion)
     document.getElementById('modalOverlay').classList.add('open');
   }
@@ -156,13 +156,13 @@
 
   function aprobarSolicitud(id) {
     const sid = id || solicitudActualId;
-    // TODO: PATCH /api/SolicitudAdopcion/{sid} { Estado: 'Aprobada' }
+    // TODO: PATCH /SolicitudAdopcion/{sid} { Estado: 'Aprobada' }
     cerrarModalPerfil();
   }
 
   function rechazarSolicitud(id) {
     const sid = id || solicitudActualId;
-    // TODO: PATCH /api/SolicitudAdopcion/{sid} { Estado: 'Rechazada' }
+    // TODO: PATCH /SolicitudAdopcion/{sid} { Estado: 'Rechazada' }
     cerrarModalPerfil();
   }
 

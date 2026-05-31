@@ -152,7 +152,7 @@
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
     const rol = routeParams.rol || 'adoptante';
-    // TODO: POST /api/Usuario/Login { Email, ContrasenaHash }
+    // TODO: POST /Usuario/Login { Email, ContrasenaHash }
     //   Response: { usuarioId, email, rol ("Adoptante"|"Administrador") }
     //   Según rol redirigir con redirect():
     //     "Adoptante"     -> redirect('03_catalogo_adoptante')

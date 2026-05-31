@@ -130,20 +130,20 @@
 
 <script>
   function loadEspecies() {
-    // TODO: GET /api/Especie → llenar #especiesFiltros con checkboxes
+    // TODO: GET /Especie → llenar #especiesFiltros con checkboxes
     //   <div class="filter-option"><input type="checkbox" value="EspecieID"/> Nombre</div>
   }
   function loadRefugios() {
-    // TODO: GET /api/Refugio → llenar #refugioSelector con chips
+    // TODO: GET /Refugio → llenar #refugioSelector con chips
     //   <div class="refugio-chip" onclick="navigate('#11_perfil_refugio?id=REFUGIOID')">Nombre</div>
   }
   function loadAnimales() {
-    // TODO: GET /api/Animales?Estado=Disponible → renderizar en #petsGrid
+    // TODO: GET /Animales?Estado=Disponible → renderizar en #petsGrid
     //   <a class="pet-card fade-in" href="#05_detalle_mascota?id=ANIMALID">...</a>
     //   Incluir nombre del refugio como enlace: <a href="#11_perfil_refugio?id=REFUGIOID" style="color:var(--brown);font-weight:800;">Refugio.Nombre</a>
   }
   function aplicarFiltros() {
-    // TODO: GET /api/Animales?especieID=...&tamano=...&edadMax=...
+    // TODO: GET /Animales?especieID=...&tamano=...&edadMax=...
   }
   loadEspecies(); loadRefugios(); loadAnimales();
 </script>

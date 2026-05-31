@@ -158,11 +158,11 @@
     if (rolSeleccionado === 'Adoptante') {
       perfilData.fechaNacimiento = document.getElementById('regFechaNacimiento').value;
     }
-    // TODO: POST /api/Usuario { Email, ContrasenaHash, Rol, FechaRegistro }
+    // TODO: POST /Usuario { Email, ContrasenaHash, Rol, FechaRegistro }
     //   Response: usuarioId
     //   Según rol:
-    //     POST /api/Adoptante { UsuarioID, Nombre, ApellidoPaterno, ApellidoMaterno, Telefono, FechaNacimiento }
-    //     POST /api/Administrador { UsuarioID, Nombre, ApellidoPaterno, ApellidoMaterno, Telefono }
+    //     POST /Adoptante { UsuarioID, Nombre, ApellidoPaterno, ApellidoMaterno, Telefono, FechaNacimiento }
+    //     POST /Administrador { UsuarioID, Nombre, ApellidoPaterno, ApellidoMaterno, Telefono }
     //   Redirigir con redirect():
     //     Adoptante     -> redirect('04b_test_perfil')
     //     Administrador -> redirect('06_inicio_refugio')

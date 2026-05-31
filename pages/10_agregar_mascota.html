@@ -116,12 +116,12 @@
   }
 
   function cargarEspecies() {
-    // TODO: GET /api/Especie → llenar #petEspecie
+    // TODO: GET /Especie → llenar #petEspecie
   }
 
   function cargarRazas() {
     const especieId = document.getElementById('petEspecie').value;
-    // TODO: GET /api/Raza?especieID={especieId} → llenar #petRaza
+    // TODO: GET /Raza?especieID={especieId} → llenar #petRaza
   }
 
   function publishPet() {
@@ -135,7 +135,7 @@
       estado: document.getElementById('petEstado').value,
       descripcion: document.getElementById('petDescripcion').value
     };
-    // TODO: POST /api/Animales { RefugioID, EspecieID, RazaID, Nombre, Edad, Sexo, Tamano, Descripcion, Estado, FechaIngreso }
+    // TODO: POST /Animales { RefugioID, EspecieID, RazaID, Nombre, Edad, Sexo, Tamano, Descripcion, Estado, FechaIngreso }
     //   redirect('06_inicio_refugio')
   }
 
