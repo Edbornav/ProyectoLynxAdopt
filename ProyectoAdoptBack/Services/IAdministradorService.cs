@@ -1,90 +1,113 @@
-using Dapper;
-using System.Data.SqlClient;
-using ProyectoAdoptBack.Repositories;
 using ProyectoAdoptBack.DTOs;
 using ProyectoAdoptBack.Models;
+using ProyectoAdoptBack.Repositories;
 
 namespace ProyectoAdoptBack.Services
 {
-
     public interface IAdministradorService
     {
-        Task<IEnumerable<AdministradorDTO>> GetAllsync();
+        Task<List<AdministradorDTO>> GetAllAsync();
         Task<AdministradorDTO?> GetByIdAsync(int id);
-        Task<AdministradorDTO> CreateAsync(CreateAdministradorDTO dto);
-        Task<AdministradorDTO> UpdateAsync(int id, UpdateAdministradorDTO dto);
+        Task CreateAsync(CreateAdministradorDTO dto);
+        Task UpdateAsync(int id, UpdateAdministradorDTO dto);
         Task DesactivarAsync(int id);
     }
 
     public class AdministradorService : IAdministradorService
     {
-        private readonly IAdministradorRepository _repo;
+        private readonly IAdministradorRepository _repository;
 
-        public AdministradorService(IAdministradorRepository repo)
+        public AdministradorService(IAdministradorRepository repository)
         {
-            _repo = repo;
+            _repository = repository;
         }
 
-        public async Task<IEnumerable<AdministradorDTO>> GetAllAsync()
+        public async Task<List<AdministradorDTO>> GetAllAsync()
         {
-            var admins = await _repo.GetAllAsync();
-            return admins.Select(a => ToDTO(a));
+            var administradores = await _repository.GetAllAsync();
+            return administradores.Select(MapToDto).ToList();
         }
 
         public async Task<AdministradorDTO?> GetByIdAsync(int id)
         {
-            var admin = await _repo.GetByIdAsync(id);
-            if (admin == null) return null;
-            return ToDTO(admin);
+            var administrador = await _repository.GetByIdAsync(id);
+            return administrador is null ? null : MapToDto(administrador);
         }
 
-        public async Task<AdministradorDTO> CreateAsync(CreateAdministradorDTO dto)
+        public async Task CreateAsync(CreateAdministradorDTO dto)
         {
-            var admin = new Administrador
+            ValidateCreate(dto);
+
+            var model = new Administrador
             {
                 UsuarioID = dto.UsuarioID,
-                Nombre = dto.Nombre,
-                ApellidoPaterno = dto.ApellidoPaterno,
-                ApellidoMaterno = dto.ApellidoMaterno,
-                Telefono = dto.Telefono
+                Nombre = dto.Nombre.Trim(),
+                ApellidoPaterno = dto.ApellidoPaterno.Trim(),
+                ApellidoMaterno = dto.ApellidoMaterno.Trim(),
+                Telefono = dto.Telefono.Trim()
             };
 
-            var creado = await _repo.CreateAsync(admin);
-            return ToDTO(creado);
+            await _repository.CreateAsync(model);
         }
 
         public async Task UpdateAsync(int id, UpdateAdministradorDTO dto)
         {
-            var admin = await _repo.GetByIdAsync(id);
-            if (admin == null) throw new KeyNotFoundException($"Administrador {id} no encontrado.");
+            ValidateUpdate(dto);
 
-            admin.Nombre = dto.Nombre;
-            admin.ApellidoPaterno = dto.ApellidoPaterno;
-            admin.ApellidoMaterno = dto.ApellidoMaterno;
-            admin.Telefono = dto.Telefono;
+            var model = new Administrador
+            {
+                Nombre = dto.Nombre.Trim(),
+                ApellidoPaterno = dto.ApellidoPaterno.Trim(),
+                ApellidoMaterno = dto.ApellidoMaterno.Trim(),
+                Telefono = dto.Telefono.Trim()
+            };
 
-            await _repo.UpdateAsync(admin);
+            await _repository.UpdateAsync(id, model);
         }
 
         public async Task DesactivarAsync(int id)
         {
-            var admin = await _repo.GetByIdAsync(id);
-            if (admin == null) throw new KeyNotFoundException($"Administrador {id} no encontrado.");
-
-            await _repo.DesactivarAsync(id);
+            await _repository.DesactivarAsync(id);
         }
 
-        // Mapeo de Model -> DTO
-        private static AdministradorDTO ToDTO(Administrador a) => new AdministradorDTO
+        private static AdministradorDTO MapToDto(Administrador model)
         {
-            AdministradorID = a.AdministradorID,
-            UsuarioID = a.UsuarioID,
-            Nombre = a.Nombre,
-            ApellidoPaterno = a.ApellidoPaterno,
-            ApellidoMaterno = a.ApellidoMaterno,
-            Telefono = a.Telefono
-        };
+            return new AdministradorDTO
+            {
+                AdministradorID = model.AdministradorID,
+                UsuarioID = model.UsuarioID,
+                Nombre = model.Nombre,
+                ApellidoPaterno = model.ApellidoPaterno,
+                ApellidoMaterno = model.ApellidoMaterno,
+                Telefono = model.Telefono
+            };
+        }
+
+        private static void ValidateCreate(CreateAdministradorDTO dto)
+        {
+            if (dto.UsuarioID <= 0)
+                throw new ArgumentException("UsuarioID es obligatorio.");
+
+            if (string.IsNullOrWhiteSpace(dto.Nombre) ||
+                string.IsNullOrWhiteSpace(dto.ApellidoPaterno) ||
+                string.IsNullOrWhiteSpace(dto.ApellidoMaterno) ||
+                string.IsNullOrWhiteSpace(dto.Telefono))
+                throw new ArgumentException("Todos los campos son obligatorios.");
+
+            if (dto.Telefono.Trim().Length != 10)
+                throw new ArgumentException("El teléfono debe tener 10 caracteres.");
+        }
+
+        private static void ValidateUpdate(UpdateAdministradorDTO dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Nombre) ||
+                string.IsNullOrWhiteSpace(dto.ApellidoPaterno) ||
+                string.IsNullOrWhiteSpace(dto.ApellidoMaterno) ||
+                string.IsNullOrWhiteSpace(dto.Telefono))
+                throw new ArgumentException("Todos los campos son obligatorios.");
+
+            if (dto.Telefono.Trim().Length != 10)
+                throw new ArgumentException("El teléfono debe tener 10 caracteres.");
+        }
     }
-
-
 }
