@@ -173,6 +173,6 @@ La plataforma buscará:
 
 # 📄 Licencia
 
-Este proyecto es desarrollado con fines académicos y educativos.
+Este proyecto es desarrollado con fines académicos y educativos./
 
 ---
