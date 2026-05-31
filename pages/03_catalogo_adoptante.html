@@ -135,10 +135,12 @@
   }
   function loadRefugios() {
     // TODO: GET /api/Refugio → llenar #refugioSelector con chips
+    //   <div class="refugio-chip" onclick="navigate('#11_perfil_refugio?id=REFUGIOID')">Nombre</div>
   }
   function loadAnimales() {
     // TODO: GET /api/Animales?Estado=Disponible → renderizar en #petsGrid
     //   <a class="pet-card fade-in" href="#05_detalle_mascota?id=ANIMALID">...</a>
+    //   Incluir nombre del refugio como enlace: <a href="#11_perfil_refugio?id=REFUGIOID" style="color:var(--brown);font-weight:800;">Refugio.Nombre</a>
   }
   function aplicarFiltros() {
     // TODO: GET /api/Animales?especieID=...&tamano=...&edadMax=...
