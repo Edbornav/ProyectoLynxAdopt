@@ -1,0 +1,170 @@
+<style>
+  body { min-height: 100vh; }
+  .page-wrap { padding: 28px 40px; max-width: 960px; margin: 0 auto; }
+  .page-title { font-family: 'Fredoka One', cursive; font-size: 2.2rem; color: white; margin-bottom: 6px; }
+  .page-subtitle { color: var(--beige-light); font-weight: 600; margin-bottom: 28px; }
+  .pet-filter-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+  .pet-filter-chip {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border-radius: var(--radius-pill);
+    padding: 7px 18px;
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .pet-filter-chip.active { background: var(--white); color: var(--text-dark); }
+  .table-header {
+    display: grid;
+    grid-template-columns: 60px 1fr 140px 100px 140px;
+    align-items: center;
+    padding: 0 20px 10px;
+    font-weight: 800;
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.75);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    gap: 12px;
+  }
+  .sol-row {
+    background: var(--beige-card);
+    border-radius: var(--radius-pill);
+    display: grid;
+    grid-template-columns: 60px 1fr 140px 100px 140px;
+    align-items: center;
+    padding: 12px 20px;
+    margin-bottom: 12px;
+    gap: 12px;
+    box-shadow: var(--shadow);
+    animation: fadeInUp 0.4s ease both;
+    transition: transform 0.2s;
+  }
+  .sol-row:hover { transform: translateX(4px); }
+  .sol-avatar {
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    background: var(--orange-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+  .sol-name { font-family: 'Fredoka One', cursive; font-size: 1.05rem; color: var(--text-dark); }
+  .sol-date { font-size: 0.78rem; font-weight: 600; color: var(--text-mid); }
+  .sol-pet { font-weight: 800; font-size: 0.95rem; color: var(--text-dark); display: flex; align-items: center; gap: 6px; }
+  .action-row { display: flex; gap: 6px; align-items: center; justify-content: flex-end; }
+  .action-btn {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.15s;
+  }
+  .action-btn:hover { transform: scale(1.15); }
+  .btn-accept { background: var(--green); }
+  .btn-reject { background: var(--red); }
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: var(--beige-card);
+    border-radius: 24px;
+    padding: 36px 40px;
+    width: 540px;
+    max-width: 95vw;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    animation: fadeInUp 0.3s ease both;
+  }
+  .modal-close { position: absolute; top: 16px; right: 20px; background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text-mid); }
+  .modal-footer { display: flex; gap: 12px; }
+</style>
+
+<nav class="navbar">
+  <a href="#06_inicio_refugio" class="navbar-logo">🐾 LynxAdopt</a>
+  <div class="navbar-links">
+    <a href="#06_inicio_refugio">🏠 Inicio</a>
+    <a href="#07_solicitudes_refugio" class="active">📋 Solicitudes</a>
+    <a href="#10_agregar_mascota">➕ Agregar mascota</a>
+  </div>
+  <div class="navbar-bell">🔔<span class="badge" id="notifBadge">0</span></div>
+</nav>
+
+<div class="page-wrap">
+  <h1 class="page-title">Solicitudes Recibidas</h1>
+  <p class="page-subtitle">Revisa los perfiles de los adoptantes y asigna un estatus</p>
+  <div class="pet-filter-row" id="petFilterRow"></div>
+  <div class="table-header">
+    <div></div>
+    <div>Adoptante</div>
+    <div>Mascota</div>
+    <div>Ver perfil</div>
+    <div style="text-align:right;">Estatus</div>
+  </div>
+  <div id="solicitudesList"></div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <button class="modal-close" onclick="cerrarModalPerfil()">✕</button>
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+      <div class="sol-avatar" style="width:70px;height:70px;font-size:1.8rem;">👤</div>
+      <div>
+        <div class="modal-name" id="modalName" style="font-family:'Fredoka One',cursive;font-size:1.4rem;">--</div>
+        <span class="status-badge status-pending" id="modalStatus">Pendiente</span>
+      </div>
+    </div>
+    <div class="info-grid" id="modalInfoGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;margin-bottom:20px;"></div>
+    <div style="background:var(--beige);border-radius:var(--radius);padding:14px 18px;margin-bottom:20px;">
+      <h4 style="font-family:'Fredoka One',cursive;font-size:1rem;margin-bottom:8px;">💬 Motivo de adopción</h4>
+      <p id="modalMensaje" style="font-weight:600;color:var(--text-dark);">--</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-green" style="flex:1" onclick="aprobarSolicitud()">✅ Aprobar</button>
+      <button class="btn btn-red" style="flex:1" onclick="rechazarSolicitud()">❌ Rechazar</button>
+      <button class="btn btn-light" onclick="cerrarModalPerfil()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let solicitudActualId = null;
+
+  function loadSolicitudes() {
+    // TODO: GET /api/SolicitudAdopcion?refugioId=X
+    //   (JOIN Adoptante, Animales)
+    //   Renderizar en #solicitudesList
+  }
+
+  function openModal(solicitudId) {
+    solicitudActualId = solicitudId;
+    // TODO: GET /api/SolicitudAdopcion/{solicitudId}
+    //   Poblar: #modalName, #modalStatus, #modalInfoGrid, #modalMensaje (con PerfilAdoptante.MotivoAdopcion)
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  function cerrarModalPerfil() { document.getElementById('modalOverlay').classList.remove('open'); solicitudActualId = null; }
+
+  function aprobarSolicitud(id) {
+    const sid = id || solicitudActualId;
+    // TODO: PATCH /api/SolicitudAdopcion/{sid} { Estado: 'Aprobada' }
+    cerrarModalPerfil();
+  }
+
+  function rechazarSolicitud(id) {
+    const sid = id || solicitudActualId;
+    // TODO: PATCH /api/SolicitudAdopcion/{sid} { Estado: 'Rechazada' }
+    cerrarModalPerfil();
+  }
+
+  loadSolicitudes();
+</script>

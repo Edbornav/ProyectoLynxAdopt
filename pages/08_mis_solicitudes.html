@@ -1,0 +1,73 @@
+<style>
+  body { min-height: 100vh; }
+  .page-wrap { padding: 28px 40px; max-width: 900px; margin: 0 auto; }
+  .page-title { font-family: 'Fredoka One', cursive; font-size: 2.2rem; color: var(--white); margin-bottom: 24px; }
+  .solicitud-row {
+    background: var(--beige-card);
+    border-radius: var(--radius-pill);
+    padding: 14px 22px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+    animation: fadeInUp 0.4s ease both;
+    transition: transform 0.2s;
+  }
+  .solicitud-row:hover { transform: translateX(4px); }
+  .sol-avatar {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: var(--orange-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem;
+    flex-shrink: 0;
+  }
+  .sol-name { font-family: 'Fredoka One', cursive; font-size: 1.2rem; color: var(--text-dark); flex: 1; }
+  .sol-refugio { font-size: 0.82rem; font-weight: 600; color: var(--text-mid); }
+  .sol-actions { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+  .table-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 22px 10px;
+    font-weight: 800;
+    font-size: 0.88rem;
+    color: var(--white);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .th-name { flex: 1; }
+  .th-right { margin-left: auto; display: flex; gap: 80px; }
+  .empty-state { text-align: center; padding: 60px 0; color: var(--beige-light); }
+  .empty-state .emoji { font-size: 4rem; display: block; margin-bottom: 12px; }
+  .empty-state p { font-weight: 600; font-size: 1.1rem; }
+</style>
+
+<nav class="navbar">
+  <a href="#03_catalogo_adoptante" class="navbar-logo">🐾 LynxAdopt</a>
+  <div class="navbar-links">
+    <a href="#03_catalogo_adoptante">🐾 Catálogo</a>
+    <a href="#08_mis_solicitudes" class="active">📋 Solicitudes</a>
+    <a href="#09_perfil_adoptante">👤 Mi perfil</a>
+  </div>
+  <div class="navbar-bell">🔔<span class="badge" id="notifBadge">0</span></div>
+</nav>
+
+<div class="page-wrap">
+  <h1 class="page-title">Mis solicitudes</h1>
+  <div class="table-header">
+    <div style="width:52px;"></div>
+    <div class="th-name">Mascota</div>
+    <div class="th-right"><span>Detalles</span><span>Estatus</span></div>
+  </div>
+  <div id="solicitudesList"></div>
+</div>
+
+<script>
+  function loadSolicitudes() {
+    // TODO: GET /api/SolicitudAdopcion?adoptanteID=X
+    //   (JOIN Animales, Refugio) → renderizar en #solicitudesList
+  }
+  loadSolicitudes();
+</script>

@@ -1,0 +1,161 @@
+<style>
+  .question-card {
+    background: var(--beige-card);
+    border-radius: 24px;
+    padding: 28px 32px;
+    margin-bottom: 20px;
+  }
+  .question-num {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--orange-dark);
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+  .question-text {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.5rem;
+    color: var(--text-dark);
+  }
+  .question-desc {
+    font-size: 0.9rem;
+    color: var(--text-mid);
+    font-weight: 600;
+    margin: 6px 0 18px;
+  }
+  .option-textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 16px;
+    border-radius: 16px;
+    border: none;
+    background: var(--beige);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    resize: vertical;
+  }
+  .option-textarea:focus { outline: 2px solid var(--orange); }
+  .nav-buttons { display: flex; justify-content: flex-end; }
+  .btn-nav {
+    padding: 14px 40px;
+    border: none;
+    border-radius: var(--radius-pill);
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-next { background: var(--brown); color: white; }
+  .btn-next:hover { background: var(--brown-dark); transform: translateY(-2px); box-shadow: var(--shadow); }
+  .btn-prev { background: var(--beige); color: var(--text-mid); margin-right: 12px; }
+  .btn-prev:hover { background: var(--beige-light); }
+</style>
+
+<nav class="navbar">
+  <a href="#03_catalogo_adoptante" class="navbar-logo">🐾 LynxAdopt</a>
+</nav>
+
+<div class="profile-wrapper" style="max-width:680px;margin:40px auto;padding:0 16px;">
+  <div class="page-header" style="margin-bottom:24px;">
+    <h1 style="font-family:'Fredoka One',cursive;font-size:2rem;color:var(--text-dark);margin:0;">
+      Cuéntanos sobre ti
+    </h1>
+    <p style="margin:4px 0 0;color:var(--text-mid);font-weight:600;">
+      Esto ayuda a los refugios a conocerte mejor
+    </p>
+  </div>
+
+  <div class="progress-bar-wrap fade-in-delay-1">
+    <div class="progress-bar-fill" id="progressBar" style="width:33%"></div>
+  </div>
+
+  <div class="question-card fade-in-delay-1" id="questionCard"></div>
+
+  <div class="nav-buttons fade-in-delay-2">
+    <button class="btn-nav btn-prev" id="btnPrev" onclick="pasoAnterior()" style="display:none">← Anterior</button>
+    <button class="btn-nav btn-next" id="btnNext" onclick="siguientePaso()">Siguiente →</button>
+  </div>
+</div>
+
+<script>
+  let paso = 0;
+  const perfil = {
+    direccion: '',
+    ocupacion: '',
+    ingresos: '',
+    tipoVivienda: '',
+    tienePatio: false,
+    otrosAnimales: false,
+    experienciaPrevia: '',
+    motivoAdopcion: ''
+  };
+
+  const pasos = [
+    { titulo: '¿Dónde vives?', desc: 'Dirección general (colonia, ciudad, estado)', tipo: 'texto', key: 'direccion', placeholder: 'Ej. Colonia Centro, Ciudad de México, CDMX' },
+    { titulo: '¿A qué te dedicas?', desc: 'Tu ocupación actual', tipo: 'texto', key: 'ocupacion', placeholder: 'Ej. Ingeniero, estudiante, diseñador...' },
+    { titulo: 'Ingresos mensuales', desc: 'Aproximadamente (opcional)', tipo: 'texto', key: 'ingresos', placeholder: 'Ej. 15000' },
+    { titulo: 'Tipo de vivienda', desc: '¿En qué tipo de casa vives?', tipo: 'opciones', key: 'tipoVivienda', opciones: ['Casa con jardín', 'Casa sin jardín', 'Departamento', 'Otro'] },
+    { titulo: '¿Tienes patio?', desc: '¿Cuentas con patio o espacio al aire libre?', tipo: 'bool', key: 'tienePatio' },
+    { titulo: '¿Tienes otras mascotas?', desc: '¿Actualmente viven otros animales en tu hogar?', tipo: 'bool', key: 'otrosAnimales' },
+    { titulo: 'Experiencia previa', desc: '¿Has tenido mascotas antes? Cuéntanos', tipo: 'texto', key: 'experienciaPrevia', placeholder: 'Ej. He tenido perros toda mi vida...' },
+    { titulo: 'Motivo de adopción', desc: '¿Por qué quieres adoptar?', tipo: 'texto', key: 'motivoAdopcion', placeholder: 'Ej. Quiero darle un hogar a un animal que lo necesita...' }
+  ];
+
+  function renderPaso() {
+    const s = pasos[paso];
+    const pct = Math.round(((paso + 1) / pasos.length) * 100);
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('btnPrev').style.display = paso > 0 ? 'inline-block' : 'none';
+
+    const card = document.getElementById('questionCard');
+    let inputHtml = '';
+    if (s.tipo === 'bool') {
+      inputHtml = `<div style="display:flex;gap:16px;margin-top:12px;">
+        <button class="btn-nav ${perfil[s.key] === true ? 'btn-next' : 'btn-prev'}" onclick="setBool('${s.key}', true)">Sí</button>
+        <button class="btn-nav ${perfil[s.key] === false ? 'btn-next' : 'btn-prev'}" onclick="setBool('${s.key}', false)">No</button>
+      </div>`;
+    } else if (s.tipo === 'opciones') {
+      inputHtml = `<div style="display:flex;flex-direction:column;gap:10px;margin-top:12px;">`;
+      s.opciones.forEach(op => {
+        inputHtml += `<button class="btn-nav ${perfil[s.key] === op ? 'btn-next' : 'btn-prev'}" onclick="setOpcion('${s.key}', '${op}')">${op}</button>`;
+      });
+      inputHtml += `</div>`;
+    } else {
+      inputHtml = `<textarea class="option-textarea" placeholder="${s.placeholder}" id="inputPerfil">${perfil[s.key] || ''}</textarea>`;
+    }
+
+    card.innerHTML = `
+      <div class="question-num">Paso ${paso + 1} de ${pasos.length}</div>
+      <div class="question-text">${s.titulo}</div>
+      <div class="question-desc">${s.desc}</div>
+      ${inputHtml}
+    `;
+
+    if (s.tipo === 'texto') {
+      const ta = document.getElementById('inputPerfil');
+      if (ta) ta.addEventListener('input', () => { perfil[s.key] = ta.value; });
+    }
+
+    document.getElementById('btnNext').textContent = paso < pasos.length - 1 ? 'Siguiente →' : 'Guardar perfil ✓';
+  }
+
+  function setBool(key, val) { perfil[key] = val; renderPaso(); }
+  function setOpcion(key, val) { perfil[key] = val; siguientePaso(); }
+  function pasoAnterior() { if (paso > 0) { paso--; renderPaso(); } }
+
+  function siguientePaso() {
+    const s = pasos[paso];
+    if (s.tipo === 'texto') {
+      const ta = document.getElementById('inputPerfil');
+      if (ta) perfil[s.key] = ta.value;
+    }
+    if (paso < pasos.length - 1) { paso++; renderPaso(); }
+    else {
+      // TODO: POST /api/PerfilAdoptante { Direccion, Ocupacion, Ingresos, TipoVivienda, TienePatio, OtrosAnimales, ExperienciaPrevia, MotivoAdopcion }
+      //   redirect('03_catalogo_adoptante')
+    }
+  }
+
+  renderPaso();
+</script>
