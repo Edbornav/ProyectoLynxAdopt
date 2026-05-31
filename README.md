@@ -175,4 +175,4 @@ La plataforma buscará:
 
 Este proyecto es desarrollado con fines académicos y educativos.
 
----
+---/
