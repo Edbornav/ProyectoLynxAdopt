@@ -42,17 +42,16 @@ namespace ProyectoAdoptBack.Repositories
         {
             using var connection = CreateConnection();
             await connection.ExecuteAsync(
-                "SELECT sp_insert_administrador(@p_usuarioid, @p_nombre, @p_apellidopaterno, @p_apellidomaterno, @p_telefono);",
+                "SELECT sp_insert_refugio(@p_nombre, @p_descripcion, @p_direccion, @p_telefono, @p_correo, @p_estatus);",
                 new
                 {
-                   p_RefugioID = refugio.RefugioID,
+                 
                    p_Nombre = refugio.Nombre,
                    p_Descripcion = refugio.Descripcion,
                    p_Direccion = refugio.Direccion,
                    p_Telefono = refugio.Telefono,
                    p_Correo = refugio.Correo,
-                   p_Estatus = refugio.Estatus,
-                   p_FechaDeRegistro = refugio.FechaDeRegistro
+                   p_Estatus = refugio.Estatus
                 });
         }
 
@@ -60,19 +59,19 @@ namespace ProyectoAdoptBack.Repositories
         {
             using var connection = CreateConnection();
             await connection.ExecuteAsync(
-                "SELECT sp_update_refugio(@p_id, @p_refugioid, @p_nombre, @p_descripcion, @p_direccion, @p_telefono, @p_correo, @p_estatus, @p_fechaderegistro);",
+                "SELECT sp_update_refugio(@p_id, @p_nombre, @p_descripcion, @p_direccion, @p_telefono, @p_correo, @p_estatus);",
                 new
                 {
                     //Verrificar los valores que puede cambiar un refugio antes de probarlos y subirlos a main
-                   p_id = id,
-                   p_RefugioID = refugio.RefugioID,
+                  
+                    p_id = id,
                    p_Nombre = refugio.Nombre,
                    p_Descripcion = refugio.Descripcion,
                    p_Direccion = refugio.Direccion,
                    p_Telefono = refugio.Telefono,
                    p_Correo = refugio.Correo,
                    p_Estatus = refugio.Estatus,
-                   p_FechaDeRegistro = refugio.FechaDeRegistro
+                   
                 });
         }
 

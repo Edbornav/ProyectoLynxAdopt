@@ -44,10 +44,10 @@ namespace ProyectoAdoptBack.Repositories
         {
             using var connection = CreateConnection();
             await connection.ExecuteAsync(
-                "SELECT sp_insert_administrador(@p_usuarioid, @p_nombre, @p_apellidopaterno, @p_apellidomaterno, @p_telefono);",
+                "SELECT sp_insert_administrador(@p_nombre, @p_apellidopaterno, @p_apellidomaterno, @p_telefono);",
                 new
                 {
-                    p_usuarioid = administrador.UsuarioID,
+                    
                     p_nombre = administrador.Nombre,
                     p_apellidopaterno = administrador.ApellidoPaterno,
                     p_apellidomaterno = administrador.ApellidoMaterno,

@@ -41,10 +41,10 @@ namespace ProyectoAdoptBack.Repositories
         {
             using var connection = CreateConnection();
             await connection.ExecuteAsync(
-                "SELECT sp_insert_refugio_administrador(@p_RefugioAdministradorID, @p_RefugioID, @p_AdministradorID);",
+                "SELECT sp_insert_refugio_administrador( @p_RefugioID, @p_AdministradorID);",
                 new
                 {
-                    p_RefugioAdministradorID = refugioAdministradores.RefugioAdministradorID,
+                   
                     p_RefugioID = refugioAdministradores.RefugioID,
                     p_AdministradorID = refugioAdministradores.AdministradorID
                 });

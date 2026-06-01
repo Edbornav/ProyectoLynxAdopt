@@ -43,15 +43,15 @@ namespace ProyectoAdoptBack.Repositories
         {
             using var connection = CreateConnection();
             await connection.ExecuteAsync(
-                "SELECT sp_insert_solicitud(@p_SolicitudID, @p_RefugioID, @p_AdoptanteID, @p_MensajeAdoptante, @p_Estatus, @p_FechaDeRegistro);",
+                "SELECT sp_insert_solicitud( @p_RefugioID, @p_AdoptanteID, @p_MensajeAdoptante, @p_Estatus);",
                 new
                 {
-                    p_SolicitudID = solicitud.SolicitudID,
+                    
                     p_RefugioID =  solicitud.RefugioID,
                     p_AdoptanteID = solicitud.AdoptanteID,
                     p_MensajeAdoptante = solicitud.MensajeAdoptante,
                     p_Estatus = solicitud.Estatus,
-                    p_FechaDeRegistro = solicitud.FechaRegistro
+                    
                 });
 
             return solicitud;
@@ -61,16 +61,14 @@ namespace ProyectoAdoptBack.Repositories
         {
             using var connection = CreateConnection();
             await connection.ExecuteAsync(
-                "SELECT sp_update_solicitud(@p_id, @p_SolicitudID, @p_RefugioID, @p_AdoptanteID, @p_MensajeAdoptante, @p_Estatus, @p_FechaDeRegistro);",
+                "SELECT sp_update_solicitud(@p_id, @p_RefugioID, @p_AdoptanteID, @p_MensajeAdoptante, @p_Estatus);",
                 new
                 {
                     p_id = id,
-                    p_SolicitudID = solicitud.SolicitudID,
                     p_RefugioID =  solicitud.RefugioID,
                     p_AdoptanteID = solicitud.AdoptanteID,
                     p_MensajeAdoptante = solicitud.MensajeAdoptante,
-                    p_Estatus = solicitud.Estatus,
-                    p_FechaDeRegistro = solicitud.FechaRegistro
+                    p_Estatus = solicitud.Estatus
                 });
         }
 

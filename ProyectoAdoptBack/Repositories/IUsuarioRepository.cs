@@ -12,8 +12,8 @@ namespace ProyectoAdoptBack.Repositories
         Task DesactivarAsync(int id);
     }
 
-    public class UsuarioRepository : IUsuarioRepository  //Contrato con la interfaz
-    {
+        public class UsuarioRepository : IUsuarioRepository  //Contrato con la interfaz
+            {
         private readonly IConfiguration _configuration;
 
         public UsuarioRepository(IConfiguration configuration)
@@ -42,14 +42,14 @@ namespace ProyectoAdoptBack.Repositories
         {
             using var connection = CreateConnection();
             await connection.ExecuteAsync(
-                "SELECT sp_insert_usuario(@p_usuarioID, @p_Correo, @p_TipoUsuario, @p_Estatus, @p_fechaRegistro);",
+                "SELECT sp_insert_usuario( @p_Correo, @p_TipoUsuario, @p_Estatus);",
                 new
                 {
-                p_usuarioID = usuario.UsuarioID,
+               
                 p_Correo = usuario.Correo,
                 p_TipoUsuario = usuario.TipoUsuario,
-                p_Estatus = usuario.Estatus,
-                p_fechaRegistro = usuario.FechaRegistro
+                p_Estatus = usuario.Estatus
+               
                 });
         }
 
@@ -57,15 +57,14 @@ namespace ProyectoAdoptBack.Repositories
         {
             using var connection = CreateConnection();
             await connection.ExecuteAsync(
-                "SELECT sp_update_usuario(@p_id, @p_usuarioID, @p_Correo, @p_TipoUsuario, @p_Estatus, @p_fechaRegistro);",
+                "SELECT sp_update_usuario(@p_id, @p_Correo, @p_TipoUsuario, @p_Estatus);",
                 new
                 {
                     p_id = id,
-                    p_usuarioID = usuario.UsuarioID,
                     p_Correo = usuario.Correo,
                     p_TipoUsuario = usuario.TipoUsuario,
-                    p_Estatus = usuario.Estatus,
-                    p_fechaRegistro = usuario.FechaRegistro
+                    p_Estatus = usuario.Estatus
+                    
                 });
         }
 
