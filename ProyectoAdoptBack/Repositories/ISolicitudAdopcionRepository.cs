@@ -1,5 +1,5 @@
 using Dapper;
-using Microsoft.Data.SqlClient;
+using Npgsql;   
 using ProyectoAdoptBack.Models;
 
 namespace ProyectoAdoptBack.Repositories
@@ -9,79 +9,78 @@ namespace ProyectoAdoptBack.Repositories
         Task<IEnumerable<SolicitudAdopcion>> GetAllAsync();
         Task<SolicitudAdopcion?> GetByIdAsync(int id);
         Task<SolicitudAdopcion> CreateAsync(SolicitudAdopcion solicitud);
-        Task UpdateAsync(SolicitudAdopcion solicitud);
+        Task UpdateAsync(int id, SolicitudAdopcion solicitud);
         Task DesactivarAsync(int id);
     }
 
-    public class SolicitudAdopcionRepository: ISolicitudAdopcionRepository
+    public class SolicitudAdopcionRepository : ISolicitudAdopcionRepository  //Contrato con la interfaz
     {
-        private readonly string _connectionString;
+        private readonly IConfiguration _configuration;
 
         public SolicitudAdopcionRepository(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection")!;
+            _configuration = configuration;
         }
 
-        private SqlConnection CreateConnection() => new SqlConnection(_connectionString);
+        private NpgsqlConnection CreateConnection()
+            => new(_configuration.GetConnectionString("DefaultConnection"));
 
         public async Task<IEnumerable<SolicitudAdopcion>> GetAllAsync()
         {
-            const string sql = "EXEX sp_get_solicitudes_adopcion()";
-            using var conn = CreateConnection();
-            return await conn.QueryAsync<SolicitudAdopcion>(sql);
+            using var connection = CreateConnection();
+            return await connection.QueryAsync<SolicitudAdopcion>("SELECT * FROM sp_get_solicitudes_adopcion();");
         }
 
         public async Task<SolicitudAdopcion?> GetByIdAsync(int id)
         {
-            const string sql = "EXEC sp_get_solicitud_adopcion_by_id @p_id";
-            using var conn = CreateConnection();
-            return await conn.QueryFirstOrDefaultAsync<SolicitudAdopcion>(sql, new { p_id = id });
+            using var connection = CreateConnection();
+            return await connection.QueryFirstOrDefaultAsync<SolicitudAdopcion>(
+                "SELECT * FROM sp_get_solicitud_by_id(@p_id);",
+                new { p_id = id });
         }
-
 
         public async Task<SolicitudAdopcion> CreateAsync(SolicitudAdopcion solicitud)
         {
-            const string sql = @"EXEC sp_insert_solicitud_adopcion
-                                    @p_refugioId, @p_adoptanteId,
-                                    @p_mensajeadoptante, @p_estatus, @p_fecharegistro";
-
-            using var conn = CreateConnection();
-            await conn.ExecuteAsync(sql, new
-            {
-                p_refugioId = solicitud.RefugioID,
-                p_adoptanteId = solicitud.AdoptanteID,
-                p_mensajeadoptante = solicitud.MensajeAdoptante,
-                p_estatus = solicitud.Estatus,
-                p_fecharegistro = solicitud.FechaRegistro
-            });
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(
+                "SELECT sp_insert_solicitud(@p_SolicitudID, @p_RefugioID, @p_AdoptanteID, @p_MensajeAdoptante, @p_Estatus, @p_FechaDeRegistro);",
+                new
+                {
+                    p_SolicitudID = solicitud.SolicitudID,
+                    p_RefugioID =  solicitud.RefugioID,
+                    p_AdoptanteID = solicitud.AdoptanteID,
+                    p_MensajeAdoptante = solicitud.MensajeAdoptante,
+                    p_Estatus = solicitud.Estatus,
+                    p_FechaDeRegistro = solicitud.FechaRegistro
+                });
 
             return solicitud;
         }
 
-        public async Task UpdateAsync(SolicitudAdopcion solicitud)
+        public async Task UpdateAsync(int id, SolicitudAdopcion solicitud)
         {
-            const string sql = @"EXEC sp_update_solicitud_adopcion
-                                    @p_id, @p_refugioId, @p_adoptanteId,
-                                    @p_mensajeadoptante, @p_estatus";
-
-            using var conn = CreateConnection();
-            await conn.ExecuteAsync(sql, new
-            {
-                p_id = solicitud.SolicitudID,
-                p_refugioId = solicitud.RefugioID,
-                p_adoptanteId = solicitud.AdoptanteID,
-                p_mensajeadoptante = solicitud.MensajeAdoptante,
-                p_estatus = solicitud.Estatus
-            });
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(
+                "SELECT sp_update_solicitud(@p_id, @p_SolicitudID, @p_RefugioID, @p_AdoptanteID, @p_MensajeAdoptante, @p_Estatus, @p_FechaDeRegistro);",
+                new
+                {
+                    p_id = id,
+                    p_SolicitudID = solicitud.SolicitudID,
+                    p_RefugioID =  solicitud.RefugioID,
+                    p_AdoptanteID = solicitud.AdoptanteID,
+                    p_MensajeAdoptante = solicitud.MensajeAdoptante,
+                    p_Estatus = solicitud.Estatus,
+                    p_FechaDeRegistro = solicitud.FechaRegistro
+                });
         }
 
         public async Task DesactivarAsync(int id)
         {
-            const string sql = "EXEC sp_desactivar_solicitud_adopcion @p_id";
-
-            using var conn = CreateConnection();
-            await conn.ExecuteAsync(sql, new { p_id = id });
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(
+                "SELECT sp_desactivar_solicitud(@p_id);",
+                new { p_id = id });
         }
-
     }
+    //Nota: Aun hacen falta algunos procedimientos que tenemos realizados
 }

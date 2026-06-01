@@ -6,7 +6,7 @@ namespace ProyectoAdoptBack.Repositories
 {
     public interface IAdministradorRepository
     {
-        //Procesos que debe implementar el repositorio si o si
+        //Procesos que se debe implementar  si o si
         Task<IEnumerable<Administrador>> GetAllAsync();
         Task<Administrador?> GetByIdAsync(int id);
         Task CreateAsync(Administrador administrador);

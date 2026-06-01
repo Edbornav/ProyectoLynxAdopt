@@ -15,14 +15,15 @@ namespace ProyectoAdoptBack.Repositories
 
     public class AdoptanteRepository : IAdoptanteRepository
     {
-        private readonly string _connectionString;
+        private readonly IConfiguration _configuration;
 
         public AdoptanteRepository(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection")!;
+            _configuration = configuration;
         }
 
-        private NpgsqlConnection CreateConnection() => new(_configuration.GetConnectionString("DefaultConnection"));
+        private NpgsqlConnection CreateConnection()
+            => new(_configuration.GetConnectionString("DefaultConnection"));
 
         public async Task<IEnumerable<Adoptante>> GetAllAsync()
         {
