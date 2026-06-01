@@ -777,6 +777,104 @@ END; $$;
 
 
 -- -------------------------------------------
+-- TABLA: IMAGENES (polimórfica)
+-- -------------------------------------------
+
+CREATE TABLE Imagenes (
+    ImagenID      INT          GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
+    EntidadTipo   VARCHAR(50)  NOT NULL,
+    EntidadID     INT          NOT NULL,
+    Url           VARCHAR(500) NOT NULL,
+    Orden         INT          NOT NULL DEFAULT 0,
+    NombreArchivo VARCHAR(255) NOT NULL,
+    FechaSubida   DATE         NOT NULL DEFAULT CURRENT_DATE
+);
+
+CREATE INDEX idx_imagenes_entidad ON Imagenes (EntidadTipo, EntidadID);
+
+
+-- -------------------------------------------
+-- SP: IMAGENES
+-- -------------------------------------------
+
+CREATE OR REPLACE FUNCTION sp_get_imagenes()
+RETURNS TABLE (
+    ImagenID INT, EntidadTipo VARCHAR, EntidadID INT,
+    Url VARCHAR, Orden INT, NombreArchivo VARCHAR, FechaSubida DATE
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT i.ImagenID, i.EntidadTipo, i.EntidadID,
+           i.Url, i.Orden, i.NombreArchivo, i.FechaSubida
+    FROM Imagenes i;
+END; $$;
+
+CREATE OR REPLACE FUNCTION sp_get_imagen_by_id(p_id INT)
+RETURNS TABLE (
+    ImagenID INT, EntidadTipo VARCHAR, EntidadID INT,
+    Url VARCHAR, Orden INT, NombreArchivo VARCHAR, FechaSubida DATE
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT i.ImagenID, i.EntidadTipo, i.EntidadID,
+           i.Url, i.Orden, i.NombreArchivo, i.FechaSubida
+    FROM Imagenes i WHERE i.ImagenID = p_id;
+END; $$;
+
+CREATE OR REPLACE FUNCTION sp_get_imagenes_by_entidad(p_entidadtipo VARCHAR, p_entidadid INT)
+RETURNS TABLE (
+    ImagenID INT, EntidadTipo VARCHAR, EntidadID INT,
+    Url VARCHAR, Orden INT, NombreArchivo VARCHAR, FechaSubida DATE
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT i.ImagenID, i.EntidadTipo, i.EntidadID,
+           i.Url, i.Orden, i.NombreArchivo, i.FechaSubida
+    FROM Imagenes i
+    WHERE i.EntidadTipo = p_entidadtipo AND i.EntidadID = p_entidadid
+    ORDER BY i.Orden;
+END; $$;
+
+CREATE OR REPLACE FUNCTION sp_insert_imagen(
+    p_entidadtipo  VARCHAR,
+    p_entidadid    INT,
+    p_url          VARCHAR,
+    p_orden        INT,
+    p_nombrearchivo VARCHAR
+)
+RETURNS VOID
+LANGUAGE plpgsql AS $$
+BEGIN
+    INSERT INTO Imagenes (EntidadTipo, EntidadID, Url, Orden, NombreArchivo)
+    VALUES (p_entidadtipo, p_entidadid, p_url, p_orden, p_nombrearchivo);
+END; $$;
+
+CREATE OR REPLACE FUNCTION sp_update_imagen(
+    p_id           INT,
+    p_url          VARCHAR,
+    p_orden        INT,
+    p_nombrearchivo VARCHAR
+)
+RETURNS VOID
+LANGUAGE plpgsql AS $$
+BEGIN
+    UPDATE Imagenes
+    SET Url = p_url, Orden = p_orden, NombreArchivo = p_nombrearchivo
+    WHERE ImagenID = p_id;
+END; $$;
+
+CREATE OR REPLACE FUNCTION sp_delete_imagen(p_id INT)
+RETURNS VOID
+LANGUAGE plpgsql AS $$
+BEGIN
+    DELETE FROM Imagenes WHERE ImagenID = p_id;
+END; $$;
+
+
+-- -------------------------------------------
 -- SP: CITAS
 -- -------------------------------------------
 
