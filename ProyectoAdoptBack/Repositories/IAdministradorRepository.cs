@@ -1,90 +1,81 @@
 using Dapper;
-using Microsoft.Data.SqlClient;
+using Npgsql;
 using ProyectoAdoptBack.Models;
-
+//El uso del select y no call, es porque estamos haciendo uso de funciones  y no procedimientos almacenados, por lo que se hace uso de select para llamar a las funciones
 namespace ProyectoAdoptBack.Repositories
 {
     public interface IAdministradorRepository
     {
+        //Procesos que se debe implementar  si o si
         Task<IEnumerable<Administrador>> GetAllAsync();
         Task<Administrador?> GetByIdAsync(int id);
-        Task<Administrador> CreateAsync(Administrador administrador);
-        Task UpdateAsync(Administrador administrador);
+        Task CreateAsync(Administrador administrador);
+        Task UpdateAsync(int id, Administrador administrador);
         Task DesactivarAsync(int id);
     }
 
-    public class AdministradorRepository : IAdministradorRepository
+    public class AdministradorRepository : IAdministradorRepository  //Contrato con la interfaz
     {
-        private readonly string _connectionString;
+        private readonly IConfiguration _configuration;
 
         public AdministradorRepository(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection")!;
+            _configuration = configuration;
         }
 
-        private SqlConnection CreateConnection() => new SqlConnection(_connectionString);
+        private NpgsqlConnection CreateConnection()
+            => new(_configuration.GetConnectionString("DefaultConnection"));
 
         public async Task<IEnumerable<Administrador>> GetAllAsync()
         {
-            const string sql = "EXEC sp_get_administradores";
-
-            using var conn = CreateConnection();
-            return await conn.QueryAsync<Administrador>(sql);
+            using var connection = CreateConnection();
+            return await connection.QueryAsync<Administrador>("SELECT * FROM sp_get_administradores();");
         }
 
         public async Task<Administrador?> GetByIdAsync(int id)
         {
-            const string sql = "EXEC sp_get_administrador_by_id @p_id";
-
-            using var conn = CreateConnection();
-            return await conn.QueryFirstOrDefaultAsync<Administrador>(sql, new { p_id = id });
+            using var connection = CreateConnection();
+            return await connection.QueryFirstOrDefaultAsync<Administrador>(
+                "SELECT * FROM sp_get_administrador_by_id(@p_id);",
+                new { p_id = id });
         }
 
-        public async Task<Administrador> CreateAsync(Administrador administrador)
+        public async Task CreateAsync(Administrador administrador)
         {
-            const string sql = @"EXEC sp_insert_administrador
-                                    @p_usuarioid, @p_nombre,
-                                    @p_apellidopaterno, @p_apellidomaterno,
-                                    @p_telefono";
-
-            using var conn = CreateConnection();
-            await conn.ExecuteAsync(sql, new
-            {
-                p_usuarioid = administrador.UsuarioID,
-                p_nombre = administrador.Nombre,
-                p_apellidopaterno = administrador.ApellidoPaterno,
-                p_apellidomaterno = administrador.ApellidoMaterno,
-                p_telefono = administrador.Telefono
-            });
-
-            return administrador;
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(
+                "SELECT sp_insert_administrador(@p_nombre, @p_apellidopaterno, @p_apellidomaterno, @p_telefono);",
+                new
+                {
+                    
+                    p_nombre = administrador.Nombre,
+                    p_apellidopaterno = administrador.ApellidoPaterno,
+                    p_apellidomaterno = administrador.ApellidoMaterno,
+                    p_telefono = administrador.Telefono
+                });
         }
 
-        public async Task UpdateAsync(Administrador administrador)
+        public async Task UpdateAsync(int id, Administrador administrador)
         {
-            const string sql = @"EXEC sp_update_administrador
-                                    @p_id, @p_usuarioid, @p_nombre,
-                                    @p_apellidopaterno, @p_apellidomaterno,
-                                    @p_telefono";
-
-            using var conn = CreateConnection();
-            await conn.ExecuteAsync(sql, new
-            {
-                p_id = administrador.AdministradorID,
-                p_usuarioid = administrador.UsuarioID,
-                p_nombre = administrador.Nombre,
-                p_apellidopaterno = administrador.ApellidoPaterno,
-                p_apellidomaterno = administrador.ApellidoMaterno,
-                p_telefono = administrador.Telefono
-            });
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(
+                "SELECT sp_update_administrador(@p_id, @p_nombre, @p_apellidopaterno, @p_apellidomaterno, @p_telefono);",
+                new
+                {
+                    p_id = id,
+                    p_nombre = administrador.Nombre,
+                    p_apellidopaterno = administrador.ApellidoPaterno,
+                    p_apellidomaterno = administrador.ApellidoMaterno,
+                    p_telefono = administrador.Telefono
+                });
         }
 
         public async Task DesactivarAsync(int id)
         {
-            const string sql = "EXEC sp_desactivar_administrador @p_id";
-
-            using var conn = CreateConnection();
-            await conn.ExecuteAsync(sql, new { p_id = id });
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(
+                "SELECT sp_desactivar_administrador(@p_id);",
+                new { p_id = id });
         }
     }
 }

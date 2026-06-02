@@ -1,82 +1,79 @@
 using ProyectoAdoptBack.Models;
 using Dapper;
-using Microsoft.Data.SqlClient;
+using Npgsql;
 namespace ProyectoAdoptBack.Repositories
 {
-    public interface IUsuarioRepository
+   public interface IUsuarioRepository
     {
         Task<IEnumerable<Usuario>> GetAllAsync();
         Task<Usuario?> GetByIdAsync(int id);
-        Task<Usuario> CreateAsync(Usuario usuario);
-        Task UpdateAsync(Usuario usuario);
+        Task CreateAsync(Usuario usuario);
+        Task UpdateAsync(int id, Usuario usuario);
         Task DesactivarAsync(int id);
     }
 
-    public class UsuarioRepository : IUsuarioRepository
-    {
-        private readonly string _connectionString;
+        public class UsuarioRepository : IUsuarioRepository  //Contrato con la interfaz
+            {
+        private readonly IConfiguration _configuration;
 
         public UsuarioRepository(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection")!;
+            _configuration = configuration;
         }
 
-        private SqlConnection CreateConnection() => new SqlConnection(_connectionString);
+        private NpgsqlConnection CreateConnection()
+            => new(_configuration.GetConnectionString("DefaultConnection"));
 
         public async Task<IEnumerable<Usuario>> GetAllAsync()
         {
-            const string sql = "EXEC sp_get_usuarios";
-            using var conn = CreateConnection();
-            return await conn.QueryAsync<Usuario>(sql);
+            using var connection = CreateConnection();
+            return await connection.QueryAsync<Usuario>("SELECT * FROM sp_get_usuarios();");
         }
 
         public async Task<Usuario?> GetByIdAsync(int id)
         {
-            const string sql = "EXEC sp_get_usuario_by_id @p_id";
-            using var conn = CreateConnection();
-            return await conn.QueryFirstOrDefaultAsync<Usuario>(sql, new { p_id = id });
+            using var connection = CreateConnection();
+            return await connection.QueryFirstOrDefaultAsync<Usuario>(
+                "SELECT * FROM sp_get_usuario_by_id(@p_id);",
+                new { p_id = id });
         }
 
-        public async Task<Usuario> CreateAsync(Usuario usuario)
+        public async Task CreateAsync(Usuario usuario)
         {
-            const string sql = @"EXEC sp_insert_usuario
-                                    @p_correo, @p_tipousuario,
-                                    @p_estatus, @p_fecharegistro";
-
-            using var conn = CreateConnection();
-            await conn.ExecuteAsync(sql, new
-            {
-                p_correo = usuario.Correo,
-                p_tipousuario = usuario.TipoUsuario,
-                p_estatus = usuario.Estatus,
-                p_fecharegistro = usuario.FechaRegistro
-            });
-
-            return usuario;
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(
+                "SELECT sp_insert_usuario( @p_Correo, @p_TipoUsuario, @p_Estatus);",
+                new
+                {
+               
+                p_Correo = usuario.Correo,
+                p_TipoUsuario = usuario.TipoUsuario,
+                p_Estatus = usuario.Estatus
+               
+                });
         }
 
-        public async Task UpdateAsync(Usuario usuario)
+        public async Task UpdateAsync(int id, Usuario usuario)
         {
-            const string sql = @"EXEC sp_update_usuario
-                                    @p_id, @p_correo,
-                                    @p_tipousuario, @p_estatus";
-
-            using var conn = CreateConnection();
-            await conn.ExecuteAsync(sql, new
-            {
-                p_id = usuario.UsuarioID,
-                p_correo = usuario.Correo,
-                p_tipousuario = usuario.TipoUsuario,
-                p_estatus = usuario.Estatus
-            });
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(
+                "SELECT sp_update_usuario(@p_id, @p_Correo, @p_TipoUsuario, @p_Estatus);",
+                new
+                {
+                    p_id = id,
+                    p_Correo = usuario.Correo,
+                    p_TipoUsuario = usuario.TipoUsuario,
+                    p_Estatus = usuario.Estatus
+                    
+                });
         }
 
         public async Task DesactivarAsync(int id)
         {
-            const string sql = "EXEC sp_desactivar_usuario @p_id";
-
-            using var conn = CreateConnection();
-            await conn.ExecuteAsync(sql, new { p_id = id });
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(
+                "SELECT sp_desactivar_usuario(@p_id);",
+                new { p_id = id });
         }
     }
 }

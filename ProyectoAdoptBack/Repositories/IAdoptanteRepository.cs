@@ -1,5 +1,5 @@
 using Dapper;
-using Microsoft.Data.SqlClient;
+using Npgsql;
 using ProyectoAdoptBack.Models;
 
 namespace ProyectoAdoptBack.Repositories
@@ -15,14 +15,15 @@ namespace ProyectoAdoptBack.Repositories
 
     public class AdoptanteRepository : IAdoptanteRepository
     {
-        private readonly string _connectionString;
+        private readonly IConfiguration _configuration;
 
         public AdoptanteRepository(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection")!;
+            _configuration = configuration;
         }
 
-        private SqlConnection CreateConnection() => new SqlConnection(_connectionString);
+        private NpgsqlConnection CreateConnection()
+            => new(_configuration.GetConnectionString("DefaultConnection"));
 
         public async Task<IEnumerable<Adoptante>> GetAllAsync()
         {
