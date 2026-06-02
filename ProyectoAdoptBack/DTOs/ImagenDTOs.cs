@@ -19,4 +19,11 @@ namespace ProyectoAdoptBack.DTOs
         public int Orden { get; set; }
         public string NombreArchivo { get; set; } = string.Empty;
     }
+
+    public class UpdateImagenDTO
+{
+    public string Url { get; set; } = string.Empty;
+    public int Orden { get; set; }
+    public string NombreArchivo { get; set; } = string.Empty;
+}
 }
