@@ -1,58 +1,45 @@
 using Dapper;
 using Npgsql;
 using ProyectoAdoptBack.Models;
+
 namespace ProyectoAdoptBack.Repositories
 {
     public interface ISolicitudAnimalesRepository
     {
-        Task<IEnumerable<SolicitudAnimales>> GetAllAsync();
-        Task<SolicitudAnimales?> GetByIdAsync(int solicitudId, int animalId);
-        Task<SolicitudAnimales> CreateAsync(SolicitudAnimales solicitudAnimal);
+        Task<IEnumerable<SolicitudAnimales>> GetBySolicitudAsync(int solicitudId);
+        Task CreateAsync(SolicitudAnimales solicitudAnimal);
     }
 
-    public class SolicitudAnimalesRepository:ISolicitudAnimalesRepository
+    public class SolicitudAnimalesRepository : ISolicitudAnimalesRepository
     {
-        private readonly string _connectionString;
+        private readonly IConfiguration _configuration;
 
         public SolicitudAnimalesRepository(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection")!;
+            _configuration = configuration;
         }
 
-        private NpgsqlConnection CreateConnection() => new NpgsqlConnection(_connectionString);
+        private NpgsqlConnection CreateConnection()
+            => new(_configuration.GetConnectionString("DefaultConnection"));
 
-        public async Task<IEnumerable<SolicitudAnimales>> GetAllAsync()
+        public async Task<IEnumerable<SolicitudAnimales>> GetBySolicitudAsync(int solicitudId)
         {
-            const string sql = "EXEC sp_get_solicitud_animales";
-            using var conn = CreateConnection();
-            return await conn.QueryAsync<SolicitudAnimales>(sql);
+            using var connection = CreateConnection();
+            return await connection.QueryAsync<SolicitudAnimales>(
+                "SELECT * FROM sp_get_animales_by_solicitud(@p_solicitudid);",
+                new { p_solicitudid = solicitudId });
         }
 
-        public async Task<SolicitudAnimales?> GetByIdAsync(int solicitudId, int animalId)
+        public async Task CreateAsync(SolicitudAnimales solicitudAnimal)
         {
-            const string sql = "EXEC sp_get_solicitud_animal_by_id @p_solicitudId, @p_animalId";
-
-            using var conn = CreateConnection();
-            return await conn.QueryFirstOrDefaultAsync<SolicitudAnimales>(sql, new
-            {
-                p_solicitudId = solicitudId,
-                p_animalId = animalId
-            });
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(
+                "SELECT sp_insert_solicitud_animal(@p_solicitudid, @p_animalid);",
+                new
+                {
+                    p_solicitudid = solicitudAnimal.SolicitudID,
+                    p_animalid = solicitudAnimal.AnimalID
+                });
         }
-
-        public async Task<SolicitudAnimales> CreateAsync(SolicitudAnimales solicitudAnimal)
-        {
-            const string sql = "EXEC sp_insert_solicitud_animal @p_solicitudId, @p_animalId";
-
-            using var conn = CreateConnection();
-            await conn.ExecuteAsync(sql, new
-            {
-                p_solicitudId = solicitudAnimal.SolicitudID,
-                p_animalId = solicitudAnimal.AnimalID
-            });
-
-            return solicitudAnimal;
-        }
-
     }
 }

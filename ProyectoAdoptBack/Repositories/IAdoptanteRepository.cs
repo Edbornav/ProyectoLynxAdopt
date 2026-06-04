@@ -27,7 +27,7 @@ namespace ProyectoAdoptBack.Repositories
 
         public async Task<IEnumerable<Adoptante>> GetAllAsync()
         {
-            const string sql = "Select * from sp_get_adoptantes()";
+            const string sql = "SELECT AdoptanteID, UsuarioID, Nombre, ApellidoPaterno, ApellidoMaterno, Telefono, FechaNacimiento FROM sp_get_adoptantes();"; 
 
             using var conn = CreateConnection();
             return await conn.QueryAsync<Adoptante>(sql);
@@ -35,7 +35,7 @@ namespace ProyectoAdoptBack.Repositories
   
         public async Task<Adoptante?> GetByIdAsync(int id)
         {
-            const string sql = "Select * from sp_get_adoptante_by_id(@p_id)";
+            const string sql = "SELECT AdoptanteID, UsuarioID, Nombre, ApellidoPaterno, ApellidoMaterno, Telefono, FechaNacimiento FROM sp_get_adoptante_by_id(@p_id);"; 
 
             using var conn = CreateConnection();
             return await conn.QueryFirstOrDefaultAsync<Adoptante>(sql, new { p_id = id });
@@ -43,10 +43,7 @@ namespace ProyectoAdoptBack.Repositories
 
         public async Task<Adoptante> CreateAsync(Adoptante adoptante)
         {
-            const string sql = @"Select * from sp_insert_adoptante
-                                    @p_usuarioid, @p_nombre,
-                                    @p_apellidopaterno, @p_apellidomaterno,
-                                    @p_telefono, @p_fechanacimiento";
+            const string sql = @"SELECT sp_insert_adoptante(@p_usuarioid, @p_nombre, @p_apellidopaterno, @p_apellidomaterno, @p_telefono, @p_fechanacimiento);"; // cambio SQL mal formado corregido
 
             using var conn = CreateConnection();
             await conn.ExecuteAsync(sql, new
@@ -64,16 +61,12 @@ namespace ProyectoAdoptBack.Repositories
 
         public async Task UpdateAsync(Adoptante adoptante)
         {
-            const string sql = @"Select * from sp_update_adoptante
-                                    @p_adoptanteid, @p_usuarioid, @p_nombre,
-                                    @p_apellidopaterno, @p_apellidomaterno,
-                                    @p_telefono, @p_fechanacimiento";
+            const string sql = @"SELECT sp_update_adoptante(@p_id, @p_nombre, @p_apellidopaterno, @p_apellidomaterno, @p_telefono, @p_fechanacimiento);"; // cambio sqlQL
 
             using var conn = CreateConnection();
             await conn.ExecuteAsync(sql, new
             {
-                p_adoptanteid = adoptante.AdoptanteID,
-                p_usuarioid = adoptante.UsuarioID,
+                p_id = adoptante.AdoptanteID, // cambio parametro igual al script SQL
                 p_nombre = adoptante.Nombre,
                 p_apellidopaterno = adoptante.ApellidoPaterno,
                 p_apellidomaterno = adoptante.ApellidoMaterno,
@@ -84,7 +77,7 @@ namespace ProyectoAdoptBack.Repositories
 
         public async Task DesactivarAsync(int id)
         {
-            const string sql = "Select * from sp_desactivar_adoptante(@p_id)";
+            const string sql = "SELECT sp_desactivar_adoptante(@p_id);"; // cambio 
 
             using var conn = CreateConnection();
             await conn.ExecuteAsync(sql, new { p_id = id });

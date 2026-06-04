@@ -8,8 +8,10 @@ namespace ProyectoAdoptBack.Repositories
     {
         Task<IEnumerable<Animales>> GetAllAsync();
         Task<Animales?> GetByIdAsync(int id);
-        Task<Animales> CreateAsync(Animales animales);
-        Task UpdateAsync(Animales animales);
+        Task<IEnumerable<Animales>> GetByRefugioAsync(int refugioId);
+        Task<IEnumerable<Animales>> GetDisponiblesAsync();
+        Task CreateAsync(Animales animales);
+        Task UpdateAsync(int id, Animales animales);
         Task DesactivarAsync(int id);
     }
 
@@ -22,70 +24,79 @@ namespace ProyectoAdoptBack.Repositories
             _configuration = configuration;
         }
 
-         private NpgsqlConnection CreateConnection()=> new(_configuration.GetConnectionString("DefaultConnection"));
-
+        private NpgsqlConnection CreateConnection()
+            => new(_configuration.GetConnectionString("DefaultConnection"));
 
         public async Task<IEnumerable<Animales>> GetAllAsync()
         {
-            const string sql = "Select sp_get_animales";
-
-            using var conn = CreateConnection();
-            return await conn.QueryAsync<Animales>(sql);
+            using var connection = CreateConnection();
+            return await connection.QueryAsync<Animales>(
+                "SELECT AnimalID, RefugioID, RazaID, Nombre, Sexo, FechaNacimiento, Descripcion, Estatus, FechaRegistro FROM sp_get_animales();"); 
         }
 
         public async Task<Animales?> GetByIdAsync(int id)
         {
-            const string sql = "Select * from sp_get_animal_by_id(@p_id)";
-
-            using var conn = CreateConnection();
-            return await conn.QueryFirstOrDefaultAsync<Animales>(sql, new { p_id = id });
+            using var connection = CreateConnection();
+            return await connection.QueryFirstOrDefaultAsync<Animales>( 
+                "SELECT AnimalID, RefugioID, RazaID, Nombre, Sexo, FechaNacimiento, Descripcion, Estatus, FechaRegistro FROM sp_get_animal_by_id(@p_id);", 
+                new { p_id = id });
         }
 
-        public async Task<Animales> CreateAsync(Animales animales)
+        public async Task<IEnumerable<Animales>> GetByRefugioAsync(int refugioId)
         {
-            const string sql = @"Select sp_insert_animal
-                                    @p_nombre, @p_especie, @p_raza,
-                                    @p_edad, @p_sexo, @p_descripcion, @p_fotourl";
-
-            using var conn = CreateConnection();
-            await conn.ExecuteAsync(sql, new
-            {
-                p_nombre = animales.Nombre,
-                P_RazaID = animales.RazaID,
-                p_Sexi = animales.Sexo,
-                p_FechaNacimiento = animales.FechaNacimiento,
-                p_descripcion = animales.Descripcion,
-                p_Estatus = animales.Estatus,
-            });
-
-            return animales;
+            using var connection = CreateConnection();
+            return await connection.QueryAsync<Animales>(
+                "SELECT AnimalID, RefugioID, RazaID, Nombre, Sexo, FechaNacimiento, Descripcion, Estatus, FechaRegistro FROM sp_get_animales_by_refugio(@p_refugioid);", 
+                new { p_refugioid = refugioId });
         }
 
-        public async Task UpdateAsync(Animales animales)
+        public async Task<IEnumerable<Animales>> GetDisponiblesAsync()
         {
-            const string sql = @"Select * from sp_update_animal
-                                    @p_id, @p_nombre, @p_especie, @p_raza,
-                                    @p_edad, @p_sexo, @p_descripcion, @p_fotourl";
+            using var connection = CreateConnection();
+            return await connection.QueryAsync<Animales>(
+                "SELECT AnimalID, RefugioID, RazaID, Nombre, Sexo, FechaNacimiento, Descripcion, Estatus, FechaRegistro FROM sp_get_animales_disponibles();"); 
+        }
 
-            using var conn = CreateConnection();
-            await conn.ExecuteAsync(sql, new
-            {
-              p_nombre = animales.Nombre,
-                P_RazaID = animales.RazaID,
-                p_Sexi = animales.Sexo,
-                p_FechaNacimiento = animales.FechaNacimiento,
-                p_descripcion = animales.Descripcion,
-                p_Estatus = animales.Estatus,
+        public async Task CreateAsync(Animales animales)
+        {
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(
+                "SELECT sp_insert_animal(@p_refugioid, @p_razaid, @p_nombre, @p_sexo, @p_fechanacimiento, @p_descripcion, @p_estatus);",
+                new
+                {
+                    p_refugioid = animales.RefugioID,
+                    p_razaid = animales.RazaID,
+                    p_nombre = animales.Nombre,
+                    p_sexo = animales.Sexo,
+                    p_fechanacimiento = animales.FechaNacimiento,
+                    p_descripcion = animales.Descripcion,
+                    p_estatus = animales.Estatus
+                });
+        }
 
-            });
+        public async Task UpdateAsync(int id, Animales animales)
+        {
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(
+                "SELECT sp_update_animal(@p_id, @p_razaid, @p_nombre, @p_sexo, @p_fechanacimiento, @p_descripcion, @p_estatus);",
+                new
+                {
+                    p_id = id,
+                    p_razaid = animales.RazaID,
+                    p_nombre = animales.Nombre,
+                    p_sexo = animales.Sexo,
+                    p_fechanacimiento = animales.FechaNacimiento,
+                    p_descripcion = animales.Descripcion,
+                    p_estatus = animales.Estatus
+                });
         }
 
         public async Task DesactivarAsync(int id)
         {
-            const string sql = "Select * from sp_desactivar_animal(@p_id)";
-
-            using var conn = CreateConnection();
-            await conn.ExecuteAsync(sql, new { p_id = id });
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(
+                "SELECT sp_desactivar_animal(@p_id);",
+                new { p_id = id });
         }
     }
 }

@@ -27,14 +27,14 @@ namespace ProyectoAdoptBack.Repositories
         public async Task<IEnumerable<Refugio>> GetAllAsync()
         {
             using var connection = CreateConnection();
-            return await connection.QueryAsync<Refugio>("SELECT * FROM sp_get_refugios();");
+            return await connection.QueryAsync<Refugio>("SELECT RefugioID, Nombre, Descripcion, Direccion, Telefono, Correo, Estatus, FechaDeRegistro FROM sp_get_refugios();"); 
         }
 
         public async Task<Refugio?> GetByIdAsync(int id)
         {
             using var connection = CreateConnection();
             return await connection.QueryFirstOrDefaultAsync<Refugio>(
-                "SELECT * FROM sp_get_refugio_by_id(@p_id);",
+                "SELECT RefugioID, Nombre, Descripcion, Direccion, Telefono, Correo, Estatus, FechaDeRegistro FROM sp_get_refugio_by_id(@p_id);", 
                 new { p_id = id });
         }
 
@@ -46,12 +46,12 @@ namespace ProyectoAdoptBack.Repositories
                 new
                 {
                  
-                   p_Nombre = refugio.Nombre,
-                   p_Descripcion = refugio.Descripcion,
-                   p_Direccion = refugio.Direccion,
-                   p_Telefono = refugio.Telefono,
-                   p_Correo = refugio.Correo,
-                   p_Estatus = refugio.Estatus
+                   p_nombre = refugio.Nombre, 
+                   p_descripcion = refugio.Descripcion, 
+                   p_direccion = refugio.Direccion, 
+                   p_telefono = refugio.Telefono, 
+                   p_correo = refugio.Correo, 
+                   p_estatus = refugio.Estatus 
                 });
         }
 
@@ -65,12 +65,12 @@ namespace ProyectoAdoptBack.Repositories
                     //Verrificar los valores que puede cambiar un refugio antes de probarlos y subirlos a main
                   
                     p_id = id,
-                   p_Nombre = refugio.Nombre,
-                   p_Descripcion = refugio.Descripcion,
-                   p_Direccion = refugio.Direccion,
-                   p_Telefono = refugio.Telefono,
-                   p_Correo = refugio.Correo,
-                   p_Estatus = refugio.Estatus,
+                   p_nombre = refugio.Nombre, 
+                   p_descripcion = refugio.Descripcion, 
+                   p_direccion = refugio.Direccion, 
+                   p_telefono = refugio.Telefono, 
+                   p_correo = refugio.Correo, 
+                   p_estatus = refugio.Estatus, 
                    
                 });
         }
@@ -86,3 +86,4 @@ namespace ProyectoAdoptBack.Repositories
 
 }
 
+    

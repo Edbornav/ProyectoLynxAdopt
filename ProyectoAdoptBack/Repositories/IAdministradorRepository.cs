@@ -29,14 +29,14 @@ namespace ProyectoAdoptBack.Repositories
         public async Task<IEnumerable<Administrador>> GetAllAsync()
         {
             using var connection = CreateConnection();
-            return await connection.QueryAsync<Administrador>("SELECT * FROM sp_get_administradores();");
+            return await connection.QueryAsync<Administrador>("SELECT AdministradorID, UsuarioID, Nombre, ApellidoPaterno, ApellidoMaterno, Telefono FROM sp_get_administradores();"); 
         }
 
         public async Task<Administrador?> GetByIdAsync(int id)
         {
             using var connection = CreateConnection();
             return await connection.QueryFirstOrDefaultAsync<Administrador>(
-                "SELECT * FROM sp_get_administrador_by_id(@p_id);",
+                "SELECT AdministradorID, UsuarioID, Nombre, ApellidoPaterno, ApellidoMaterno, Telefono FROM sp_get_administrador_by_id(@p_id);", 
                 new { p_id = id });
         }
 
@@ -44,10 +44,10 @@ namespace ProyectoAdoptBack.Repositories
         {
             using var connection = CreateConnection();
             await connection.ExecuteAsync(
-                "SELECT sp_insert_administrador(@p_nombre, @p_apellidopaterno, @p_apellidomaterno, @p_telefono);",
+                "SELECT sp_insert_administrador(@p_usuarioid, @p_nombre, @p_apellidopaterno, @p_apellidomaterno, @p_telefono);", 
                 new
                 {
-                    
+                    p_usuarioid = administrador.UsuarioID, // cambio parametroww requerido por sp_insert_administrador
                     p_nombre = administrador.Nombre,
                     p_apellidopaterno = administrador.ApellidoPaterno,
                     p_apellidomaterno = administrador.ApellidoMaterno,

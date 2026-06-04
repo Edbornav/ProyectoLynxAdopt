@@ -5,10 +5,10 @@ namespace ProyectoAdoptBack.Services
 {
     public interface IAdoptanteService
     {
-        Task<IEnumerable<Adoptante>> GetAllAsync();
-        Task<Adoptante?> GetByIdAsync(int id);
-        Task CreateAsync(Adoptante adoptante);
-        Task UpdateAsync(int id, Adoptante adoptante);
+        Task<IEnumerable<AdoptanteDTO>> GetAllAsync();
+        Task<AdoptanteDTO?> GetByIdAsync(int id);
+        Task<AdoptanteDTO> CreateAsync(CreateAdoptanteDTO dto);
+        Task UpdateAsync(int id, UpdateAdoptanteDTO dto);
         Task DesactivarAsync(int id);
     }
 
@@ -46,7 +46,7 @@ namespace ProyectoAdoptBack.Services
                 FechaNacimiento = dto.FechaNacimiento
             };
             var created = await _repository.CreateAsync(adoptante);
-            return ToDTO(creado);
+            return ToDTO(created); // cambio (se corrigio variable inexistente)
 
 
         }

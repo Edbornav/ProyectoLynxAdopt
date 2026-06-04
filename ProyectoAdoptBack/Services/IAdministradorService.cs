@@ -92,19 +92,19 @@ namespace ProyectoAdoptBack.Services
                 string.IsNullOrWhiteSpace(dto.ApellidoPaterno) ||
                 string.IsNullOrWhiteSpace(dto.ApellidoMaterno) ||
                 string.IsNullOrWhiteSpace(dto.Telefono))
-                throw new ArgumentException("Todos los campos son obligatorios.");
+                throw new ArgumentException("Agrega todos los campos, son obligatorios.");
 
             if (dto.Telefono.Trim().Length != 10)
                 throw new ArgumentException("El teléfono debe tener 10 caracteres.");
         }
-
+        
         private static void ValidateUpdate(UpdateAdministradorDTO dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Nombre) ||
                 string.IsNullOrWhiteSpace(dto.ApellidoPaterno) ||
                 string.IsNullOrWhiteSpace(dto.ApellidoMaterno) ||
                 string.IsNullOrWhiteSpace(dto.Telefono))
-                throw new ArgumentException("Todos los campos son obligatorios.");
+                throw new ArgumentException("Agrega todos los campos, son obligatorios.");
 
             if (dto.Telefono.Trim().Length != 10)
                 throw new ArgumentException("El teléfono debe tener 10 caracteres.");

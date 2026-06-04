@@ -1,5 +1,5 @@
 using Dapper;
-using Npgsql;   
+using Npgsql;
 using ProyectoAdoptBack.Models;
 
 namespace ProyectoAdoptBack.Repositories
@@ -8,12 +8,14 @@ namespace ProyectoAdoptBack.Repositories
     {
         Task<IEnumerable<SolicitudAdopcion>> GetAllAsync();
         Task<SolicitudAdopcion?> GetByIdAsync(int id);
-        Task<SolicitudAdopcion> CreateAsync(SolicitudAdopcion solicitud);
-        Task UpdateAsync(int id, SolicitudAdopcion solicitud);
+        Task<IEnumerable<SolicitudAdopcion>> GetByAdoptanteAsync(int adoptanteId);
+        Task<IEnumerable<SolicitudAdopcion>> GetByRefugioAsync(int refugioId);
+        Task CreateAsync(SolicitudAdopcion solicitud);
+        Task UpdateEstatusAsync(int id, string estatus);
         Task DesactivarAsync(int id);
     }
 
-    public class SolicitudAdopcionRepository : ISolicitudAdopcionRepository  //Contrato con la interfaz
+    public class SolicitudAdopcionRepository : ISolicitudAdopcionRepository
     {
         private readonly IConfiguration _configuration;
 
@@ -28,47 +30,56 @@ namespace ProyectoAdoptBack.Repositories
         public async Task<IEnumerable<SolicitudAdopcion>> GetAllAsync()
         {
             using var connection = CreateConnection();
-            return await connection.QueryAsync<SolicitudAdopcion>("SELECT * FROM sp_get_solicitudes_adopcion();");
+            return await connection.QueryAsync<SolicitudAdopcion>(
+                "SELECT SolicitudID, RefugioID, AdoptanteID, MensajeAdoptante, Estatus, FechaRegistro FROM sp_get_solicitudes();"); 
         }
 
         public async Task<SolicitudAdopcion?> GetByIdAsync(int id)
         {
             using var connection = CreateConnection();
             return await connection.QueryFirstOrDefaultAsync<SolicitudAdopcion>(
-                "SELECT * FROM sp_get_solicitud_by_id(@p_id);",
+                "SELECT SolicitudID, RefugioID, AdoptanteID, MensajeAdoptante, Estatus, FechaRegistro FROM sp_get_solicitud_by_id(@p_id);", 
                 new { p_id = id });
         }
 
-        public async Task<SolicitudAdopcion> CreateAsync(SolicitudAdopcion solicitud)
+        public async Task<IEnumerable<SolicitudAdopcion>> GetByAdoptanteAsync(int adoptanteId)
         {
             using var connection = CreateConnection();
-            await connection.ExecuteAsync(
-                "SELECT sp_insert_solicitud( @p_RefugioID, @p_AdoptanteID, @p_MensajeAdoptante, @p_Estatus);",
-                new
-                {
-                    
-                    p_RefugioID =  solicitud.RefugioID,
-                    p_AdoptanteID = solicitud.AdoptanteID,
-                    p_MensajeAdoptante = solicitud.MensajeAdoptante,
-                    p_Estatus = solicitud.Estatus,
-                    
-                });
-
-            return solicitud;
+            return await connection.QueryAsync<SolicitudAdopcion>(
+                "SELECT SolicitudID, RefugioID, AdoptanteID, MensajeAdoptante, Estatus, FechaRegistro FROM sp_get_solicitudes_by_adoptante(@p_adoptanteid);", 
+                new { p_adoptanteid = adoptanteId });
         }
 
-        public async Task UpdateAsync(int id, SolicitudAdopcion solicitud)
+        public async Task<IEnumerable<SolicitudAdopcion>> GetByRefugioAsync(int refugioId)
+        {
+            using var connection = CreateConnection();
+            return await connection.QueryAsync<SolicitudAdopcion>(
+                "SELECT SolicitudID, RefugioID, AdoptanteID, MensajeAdoptante, Estatus, FechaRegistro FROM sp_get_solicitudes_by_refugio(@p_refugioid);", 
+                new { p_refugioid = refugioId });
+        }
+
+        public async Task CreateAsync(SolicitudAdopcion solicitud)
         {
             using var connection = CreateConnection();
             await connection.ExecuteAsync(
-                "SELECT sp_update_solicitud(@p_id, @p_RefugioID, @p_AdoptanteID, @p_MensajeAdoptante, @p_Estatus);",
+                "SELECT sp_insert_solicitud(@p_refugioid, @p_adoptanteid, @p_mensajeadoptante);",
+                new
+                {
+                    p_refugioid = solicitud.RefugioID,
+                    p_adoptanteid = solicitud.AdoptanteID,
+                    p_mensajeadoptante = solicitud.MensajeAdoptante
+                });
+        }
+
+        public async Task UpdateEstatusAsync(int id, string estatus)
+        {
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(
+                "SELECT sp_update_estatus_solicitud(@p_id, @p_estatus);",
                 new
                 {
                     p_id = id,
-                    p_RefugioID =  solicitud.RefugioID,
-                    p_AdoptanteID = solicitud.AdoptanteID,
-                    p_MensajeAdoptante = solicitud.MensajeAdoptante,
-                    p_Estatus = solicitud.Estatus
+                    p_estatus = estatus
                 });
         }
 
@@ -80,5 +91,4 @@ namespace ProyectoAdoptBack.Repositories
                 new { p_id = id });
         }
     }
-    //Nota: Aun hacen falta algunos procedimientos que tenemos realizados
 }

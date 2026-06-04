@@ -29,7 +29,7 @@ namespace ProyectoAdoptBack.Repositories
         {
             using var connection = CreateConnection();
             return await connection.QueryAsync<Imagen>(
-                "SELECT * FROM sp_get_imagenes_by_entidad(@p_entidadtipo, @p_entidadid);",
+                "SELECT ImagenID, EntidadTipo, EntidadID, Url, Orden, NombreArchivo, FechaSubida FROM sp_get_imagenes_by_entidad(@p_entidadtipo, @p_entidadid);", 
                 new
                 {
                     p_entidadtipo = entidadTipo,
@@ -40,8 +40,8 @@ namespace ProyectoAdoptBack.Repositories
         public async Task<int> CreateAsync(Imagen imagen)
         {
             using var connection = CreateConnection();
-            return await connection.ExecuteScalarAsync<int>(
-                "SELECT sp_insert_imagen(@p_entidadtipo, @p_entidadid, @p_url, @p_orden, @p_nombrearchivo);",
+            await connection.ExecuteAsync( // cambio sp_insert_imagen retorna VOID, no debe usarse ExecuteScalar
+                "SELECT sp_insert_imagen(@p_entidadtipo, @p_entidadid, @p_url, @p_orden, @p_nombrearchivo);", 
                 new
                 {
                     p_entidadtipo = imagen.EntidadTipo,
@@ -50,21 +50,23 @@ namespace ProyectoAdoptBack.Repositories
                     p_orden = imagen.Orden,
                     p_nombrearchivo = imagen.NombreArchivo
                 });
+            return imagen.ImagenID; // cambio se mantiene la firma sin esperar retorno de la funcion VOID
         }
 
         public async Task<Imagen?> DeleteAsync(int imagenId)
         {
             using var connection = CreateConnection();
-            return await connection.QueryFirstOrDefaultAsync<Imagen>(
-                "SELECT * FROM sp_delete_imagen(@p_imagenid);",
-                new { p_imagenid = imagenId });
+            await connection.ExecuteAsync(
+                "SELECT sp_delete_imagen(@p_id);", // cambio (sp_delete_imagen retorna VOID, no debe consultarse con SELECT *)
+                new { p_id = imagenId }); // cambio (parametro igual al script SQL)
+            return null; // cambio (la funcion SQL no devuelve imagen eliminada)
         }
 
         public async Task<IEnumerable<Imagen>> DeleteByEntidadAsync(string entidadTipo, int entidadId)
         {
             using var connection = CreateConnection();
             return await connection.QueryAsync<Imagen>(
-                "SELECT * FROM sp_delete_imagenes_by_entidad(@p_entidadtipo, @p_entidadid);",
+                "DELETE FROM Imagenes WHERE EntidadTipo = @p_entidadtipo AND EntidadID = @p_entidadid RETURNING ImagenID, EntidadTipo, EntidadID, Url, Orden, NombreArchivo, FechaSubida;", // cambio (se reemplazo funcion inexistente por SQL PostgreSQL valido)
                 new
                 {
                     p_entidadtipo = entidadTipo,
@@ -76,7 +78,7 @@ namespace ProyectoAdoptBack.Repositories
         {
             using var connection = CreateConnection();
             await connection.ExecuteAsync(
-                "SELECT sp_reordenar_imagenes(@p_imagenid, @p_orden);",
+                "UPDATE Imagenes SET Orden = @p_orden WHERE ImagenID = @p_imagenid;", // cambio (se reemplazo funcion inexistente por SQL PostgreSQL valido)
                 new
                 {
                     p_imagenid = imagenId,

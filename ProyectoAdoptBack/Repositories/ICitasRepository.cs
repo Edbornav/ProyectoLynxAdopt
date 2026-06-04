@@ -6,10 +6,12 @@ namespace ProyectoAdoptBack.Repositories
 {
     public interface ICitasRepository
     {
-        Task<IEnumerable<Citas>> GetCitas();
+        Task<IEnumerable<Citas>> GetAllAsync();
         Task<Citas?> GetByIdAsync(int id);
-        Task<Citas> CreateAsync(Citas citas);
-        Task UpdateAsync(Citas citas);
+        Task<IEnumerable<Citas>> GetBySolicitudAsync(int solicitudId);
+        Task CreateAsync(Citas cita);
+        Task UpdateAsync(int id, Citas cita);
+        Task UpdateEstadoAsync(int id, string estadoCita);
         Task DesactivarAsync(int id);
     }
 
@@ -22,62 +24,76 @@ namespace ProyectoAdoptBack.Repositories
             _configuration = configuration;
         }
 
-       private NpgsqlConnection CreateConnection()
+        private NpgsqlConnection CreateConnection()
             => new(_configuration.GetConnectionString("DefaultConnection"));
 
-        public async Task<IEnumerable<Citas>> GetCitas()
+        public async Task<IEnumerable<Citas>> GetAllAsync()
         {
-            const string sql = "Select sp_get_citas";
-
-            using var conn = CreateConnection();
-            return await conn.QueryAsync<Citas>(sql);
+            using var connection = CreateConnection();
+            return await connection.QueryAsync<Citas>(
+                "SELECT CitaID, SolicitudID, FechaHoraCita, EstadoCita FROM sp_get_citas();");
         }
 
         public async Task<Citas?> GetByIdAsync(int id)
         {
-            const string sql = "Select * from sp_get_cita_by_id(@p_id)";
-
-            using var conn = CreateConnection();
-            return await conn.QueryFirstOrDefaultAsync<Citas>(sql, new { p_id = id });
+            using var connection = CreateConnection();
+            return await connection.QueryFirstOrDefaultAsync<Citas>(
+                "SELECT CitaID, SolicitudID, FechaHoraCita, EstadoCita FROM sp_get_cita_by_id(@p_id);", 
+                new { p_id = id });
         }
 
-       public async Task<Citas> CreateAsync(Citas citas)
+        public async Task<IEnumerable<Citas>> GetBySolicitudAsync(int solicitudId)
         {
-            const string sql = @"Select sp_insert_cita
-                                    @p_solicitudid, @p_fechahoracita, @p_estadocita";
-
-            using var conn = CreateConnection();
-            await conn.ExecuteAsync(sql, new
-            {
-                p_solicitudid   = citas.SolicitudID,
-                p_fechahoracita = citas.FechaHoraCita,
-                p_estadocita    = citas.EstadoCita
-            });
-
-            return citas;
+            using var connection = CreateConnection();
+            return await connection.QueryAsync<Citas>(
+                "SELECT CitaID, SolicitudID, FechaHoraCita, EstadoCita FROM sp_get_citas_by_solicitud(@p_solicitudid);", 
+                new { p_solicitudid = solicitudId });
         }
-        
-        public async Task UpdateAsync(Citas citas)
+
+        public async Task CreateAsync(Citas cita)
         {
-            const string sql = @"Select sp_update_cita
-                                    @p_id, @p_fechahoracita, @p_estadocita";
-
-            using var conn = CreateConnection();
-            await conn.ExecuteAsync(sql, new
-            {
-                p_id            = citas.CitaID,
-                p_fechahoracita = citas.FechaHoraCita,
-                p_estadocita    = citas.EstadoCita
-            });
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(
+                "SELECT sp_insert_cita(@p_solicitudid, @p_fechahoracita, @p_estadocita);",
+                new
+                {
+                    p_solicitudid = cita.SolicitudID,
+                    p_fechahoracita = cita.FechaHoraCita,
+                    p_estadocita = cita.EstadoCita
+                });
         }
 
+        public async Task UpdateAsync(int id, Citas cita)
+        {
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(
+                "SELECT sp_update_cita(@p_id, @p_fechahoracita, @p_estadocita);",
+                new
+                {
+                    p_id = id,
+                    p_fechahoracita = cita.FechaHoraCita,
+                    p_estadocita = cita.EstadoCita
+                });
+        }
+
+        public async Task UpdateEstadoAsync(int id, string estadoCita)
+        {
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(
+                "SELECT sp_update_estado_cita(@p_id, @p_estadocita);",
+                new
+                {
+                    p_id = id,
+                    p_estadocita = estadoCita
+                });
+        }
 
         public async Task DesactivarAsync(int id)
         {
-            const string sql = "Select * from sp_desactivar_cita(@p_id)";
-
-            using var conn = CreateConnection();
-            await conn.ExecuteAsync(sql, new { p_id = id });
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(
+                "SELECT sp_desactivar_cita(@p_id);",
+                new { p_id = id });
         }
     }
 }

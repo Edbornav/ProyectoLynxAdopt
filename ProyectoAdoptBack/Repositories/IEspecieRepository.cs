@@ -1,56 +1,62 @@
 using ProyectoAdoptBack.Models;
 using Dapper;
 using Npgsql;
+
 namespace ProyectoAdoptBack.Repositories
 {
     public interface IEspecieRepository
     {
-        Task<IEnumerable<Especie>> GetEspecies();
-        Task<Especie?> GetByIdAsync(int id); 
-        Task<Especie> CreateAsync(Especie especie);
-        Task UpdateAsync(Especie especie);
-
-    } 
+        Task<IEnumerable<Especie>> GetAllAsync();
+        Task<Especie?> GetByIdAsync(int id);
+        Task CreateAsync(Especie especie);
+        Task UpdateAsync(int id, Especie especie);
+    }
 
     public class EspecieRepository : IEspecieRepository
     {
-        private readonly String _connectionString;
+        private readonly IConfiguration _configuration;
+
         public EspecieRepository(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection")!;
+            _configuration = configuration;
         }
-        private NpgsqlConnection CreateConnection() => new NpgsqlConnection(_connectionString);
-        public async Task<IEnumerable<Especie>> GetEspecies()
+
+        private NpgsqlConnection CreateConnection()
+            => new(_configuration.GetConnectionString("DefaultConnection"));
+
+        public async Task<IEnumerable<Especie>> GetAllAsync()
         {
-            const string sql = "SELECT * FROM sp_get_especies()";
-            using var conn = CreateConnection();
-            return await conn.QueryAsync<Especie>(sql);
+            using var connection = CreateConnection();
+            return await connection.QueryAsync<Especie>(
+                "SELECT * FROM sp_get_especies();");
         }
+
         public async Task<Especie?> GetByIdAsync(int id)
         {
-            const string sql = "SELECT * FROM sp_get_especie_by_id(@Id) ";
-            using var conn = CreateConnection();
-            return await conn.QueryFirstOrDefaultAsync<Especie>(sql, new { Id = id });
+            using var connection = CreateConnection();
+            return await connection.QueryFirstOrDefaultAsync<Especie>(
+                "SELECT * FROM sp_get_especie_by_id(@p_id);",
+                new { p_id = id });
         }
-        public async Task<Especie> CreateAsync(Especie especie)
+
+        public async Task CreateAsync(Especie especie)
         {
-            const string sql = @"SELECT SP_insert_especie(@p_nombre) ";
-            using var conn = CreateConnection();
-            await conn.ExecuteAsync(sql, new
-            {
-                p_nombre = especie.Nombre
-            });
-            return especie;
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(
+                "SELECT sp_insert_especie(@p_nombre);",
+                new { p_nombre = especie.Nombre });
         }
-        public async Task UpdateAsync(Especie especie)
+
+        public async Task UpdateAsync(int id, Especie especie)
         {
-            const string sql = @"SELECT SP_update_especie(@p_id, @p_nombre) ";
-            using var conn = CreateConnection();
-            await conn.ExecuteAsync(sql, new
-            {
-                p_id = especie.EspecieID,
-                p_nombre = especie.Nombre
-            });
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(
+                "SELECT sp_update_especie(@p_id, @p_nombre);",
+                new
+                {
+                    p_id = id,
+                    p_nombre = especie.Nombre
+                });
         }
     }
 }

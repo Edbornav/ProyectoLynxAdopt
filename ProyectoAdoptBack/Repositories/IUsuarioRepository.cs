@@ -27,14 +27,14 @@ namespace ProyectoAdoptBack.Repositories
         public async Task<IEnumerable<Usuario>> GetAllAsync()
         {
             using var connection = CreateConnection();
-            return await connection.QueryAsync<Usuario>("SELECT * FROM sp_get_usuarios();");
+            return await connection.QueryAsync<Usuario>("SELECT UsuarioID, Correo, TipoUsuario, Estatus, FechaRegistro FROM sp_get_usuarios();"); 
         }
 
         public async Task<Usuario?> GetByIdAsync(int id)
         {
             using var connection = CreateConnection();
             return await connection.QueryFirstOrDefaultAsync<Usuario>(
-                "SELECT * FROM sp_get_usuario_by_id(@p_id);",
+                "SELECT UsuarioID, Correo, TipoUsuario, Estatus, FechaRegistro FROM sp_get_usuario_by_id(@p_id);", 
                 new { p_id = id });
         }
 
@@ -42,13 +42,13 @@ namespace ProyectoAdoptBack.Repositories
         {
             using var connection = CreateConnection();
             await connection.ExecuteAsync(
-                "SELECT sp_insert_usuario( @p_Correo, @p_TipoUsuario, @p_Estatus);",
+                "SELECT sp_insert_usuario(@p_correo, @p_tipousuario, @p_estatus);", 
                 new
                 {
-               
-                p_Correo = usuario.Correo,
-                p_TipoUsuario = usuario.TipoUsuario,
-                p_Estatus = usuario.Estatus
+               // cambios (parametro igual al script SQL)
+                p_correo = usuario.Correo, 
+                p_tipousuario = usuario.TipoUsuario, 
+                p_estatus = usuario.Estatus 
                
                 });
         }
@@ -57,14 +57,14 @@ namespace ProyectoAdoptBack.Repositories
         {
             using var connection = CreateConnection();
             await connection.ExecuteAsync(
-                "SELECT sp_update_usuario(@p_id, @p_Correo, @p_TipoUsuario, @p_Estatus);",
+                "SELECT sp_update_usuario(@p_id, @p_correo, @p_tipousuario, @p_estatus);", 
                 new
                 {
                     p_id = id,
-                    p_Correo = usuario.Correo,
-                    p_TipoUsuario = usuario.TipoUsuario,
-                    p_Estatus = usuario.Estatus
-                    
+                    p_correo = usuario.Correo, 
+                    p_tipousuario = usuario.TipoUsuario, 
+                    p_estatus = usuario.Estatus 
+                    // cambios (parametro igual al script SQL)
                 });
         }
 

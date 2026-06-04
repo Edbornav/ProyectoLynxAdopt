@@ -13,7 +13,7 @@ namespace ProyectoAdoptBack.Services
 
     public class PerfilAdoptanteService:IPerfilAdoptanteService
     {
-        private readonly IPerfilAdoptanteRepository repository;
+        private readonly IPerfilAdoptanteRepository _repository; // cambio (se corrigio nombre del campo usado en el service)
 
         public PerfilAdoptanteService(IPerfilAdoptanteRepository repository)
         {
@@ -22,41 +22,43 @@ namespace ProyectoAdoptBack.Services
 
         public async Task<IEnumerable<PerfilAdoptanteDTO>> GetAllAsync()
         {
-            var perfiles = await _repo.GetAllAsync();
+            var perfiles = await _repository.GetAllAsync(); // cambio (se corrigio nombre del repository)
             return perfiles.Select(p => ToDTO(p));
         }
 
         public async Task<PerfilAdoptanteDTO?> GetByIdAsync(int id)
         {
-            var perfil = await _repo.GetByIdAsync(id);
+            var perfil = await _repository.GetByIdAsync(id); // cambio (se corrigio nombre del repository)
             if (perfil == null) return null;
             return ToDTO(perfil);
         }
 
         public async Task<PerfilAdoptanteDTO> CreateAsync(CreatePerfilAdoptanteDTO dto)
         {
+            ValidateCreate(dto); // error: faltaba validar campos obligatorios
             var perfil = new PerfilAdoptante
             {
                 AdoptanteUsuarioID = dto.AdoptanteUsuarioID,
-                DescripcionCasa = dto.DescripcionCasa,
-                DescripcionMascotas = dto.DescripcionMascotas,
-                DescripcionExperienciaConMascotas = dto.DescripcionExperienciaConMascotas
+                DescripcionCasa = dto.DescripcionCasa.Trim(), // error: faltaba limpiar espacios
+                DescripcionMascotas = dto.DescripcionMascotas.Trim(), // error: faltaba limpiar espacios
+                DescripcionExperienciaConMascotas = dto.DescripcionExperienciaConMascotas.Trim() // error: faltaba limpiar espacios
             };
 
-            var creado = await _repo.CreateAsync(perfil);
+            var creado = await _repository.CreateAsync(perfil); // cambio (se corrigio nombre del repository)
             return ToDTO(creado);
         }
 
         public async Task UpdateAsync(int id, UpdatePerfilAdoptanteDTO dto)
         {
-            var perfil = await _repo.GetByIdAsync(id);
+            ValidateUpdate(dto); // error: faltaba validar campos obligatorios
+            var perfil = await _repository.GetByIdAsync(id); // cambio (se corrigio nombre del repository)
             if (perfil == null) throw new KeyNotFoundException($"PerfilAdoptante {id} no encontrado.");
 
-            perfil.DescripcionCasa = dto.DescripcionCasa;
-            perfil.DescripcionMascotas = dto.DescripcionMascotas;
-            perfil.DescripcionExperienciaConMascotas = dto.DescripcionExperienciaConMascotas;
+            perfil.DescripcionCasa = dto.DescripcionCasa.Trim(); // error: faltaba limpiar espacios
+            perfil.DescripcionMascotas = dto.DescripcionMascotas.Trim(); // error: faltaba limpiar espacios
+            perfil.DescripcionExperienciaConMascotas = dto.DescripcionExperienciaConMascotas.Trim(); // error: faltaba limpiar espacios
 
-            await _repo.UpdateAsync(perfil);
+            await _repository.UpdateAsync(perfil); // cambio (se corrigio nombre del repository)
         }
 
         private static PerfilAdoptanteDTO ToDTO(PerfilAdoptante p) => new PerfilAdoptanteDTO
@@ -67,7 +69,25 @@ namespace ProyectoAdoptBack.Services
             DescripcionMascotas = p.DescripcionMascotas,
             DescripcionExperienciaConMascotas = p.DescripcionExperienciaConMascotas
         };
-         
+
+        private static void ValidateCreate(CreatePerfilAdoptanteDTO dto)
+        {
+            if (dto.AdoptanteUsuarioID <= 0)
+                throw new ArgumentException("AdoptanteUsuarioID es obligatorio."); // error: id obligatorio
+            if (string.IsNullOrWhiteSpace(dto.DescripcionCasa) ||
+                string.IsNullOrWhiteSpace(dto.DescripcionMascotas) ||
+                string.IsNullOrWhiteSpace(dto.DescripcionExperienciaConMascotas))
+                throw new ArgumentException("Todos los campos son obligatorios."); // error: campos obligatorios
+        }
+
+        private static void ValidateUpdate(UpdatePerfilAdoptanteDTO dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.DescripcionCasa) ||
+                string.IsNullOrWhiteSpace(dto.DescripcionMascotas) ||
+                string.IsNullOrWhiteSpace(dto.DescripcionExperienciaConMascotas))
+                throw new ArgumentException("Todos los campos son obligatorios."); // error: campos obligatorios
+        }
+          
 
 
     }

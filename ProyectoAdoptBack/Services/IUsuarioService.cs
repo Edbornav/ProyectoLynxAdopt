@@ -85,7 +85,7 @@ namespace ProyectoAdoptBack.Services
             if (string.IsNullOrWhiteSpace(dto.Correo) ||
                 string.IsNullOrWhiteSpace(dto.TipoUsuario) ||
                 string.IsNullOrWhiteSpace(dto.Estatus))
-                throw new ArgumentException("Todos los campos son obligatorios.");
+                throw new ArgumentException("Agrega todos los campos, son obligatorios.");
 
             if (!dto.Correo.Contains('@') || !dto.Correo.Contains('.'))
                 throw new ArgumentException("El correo no tiene un formato válido.");
@@ -104,7 +104,7 @@ namespace ProyectoAdoptBack.Services
             if (string.IsNullOrWhiteSpace(dto.Correo) ||
                 string.IsNullOrWhiteSpace(dto.TipoUsuario) ||
                 string.IsNullOrWhiteSpace(dto.Estatus))
-                throw new ArgumentException("Todos los campos son obligatorios.");
+                throw new ArgumentException("Agrega todos los campos, son obligatorios.");
 
             if (!dto.Correo.Contains('@') || !dto.Correo.Contains('.'))
                 throw new ArgumentException("El correo no tiene un formato válido.");

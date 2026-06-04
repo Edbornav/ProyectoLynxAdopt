@@ -8,76 +8,63 @@ namespace ProyectoAdoptBack.Repositories
     {
         Task<IEnumerable<PerfilAdoptante>> GetAllAsync();
         Task<PerfilAdoptante?> GetByIdAsync(int id);
-        Task<PerfilAdoptante> CreateAsync(PerfilAdoptante perfil);
-        Task UpdateAsync(PerfilAdoptante perfil);
+        Task CreateAsync(PerfilAdoptante perfil);
+        Task UpdateAsync(int id, PerfilAdoptante perfil);
     }
 
-
-    public class PerfilAdoptanteRepository: IPerfilAdoptanteRepository
+    public class PerfilAdoptanteRepository : IPerfilAdoptanteRepository
     {
-        private readonly string _connectionString;
+        private readonly IConfiguration _configuration;
 
         public PerfilAdoptanteRepository(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection")!;
+            _configuration = configuration;
         }
 
-        private NpgsqlConnection CreateConnection() => new NpgsqlConnection(_connectionString);
+        private NpgsqlConnection CreateConnection()
+            => new(_configuration.GetConnectionString("DefaultConnection"));
 
         public async Task<IEnumerable<PerfilAdoptante>> GetAllAsync()
         {
-            const string sql = "SELECT * FROM sp_get_perfiles_adoptante()";
-
-            using var conn = CreateConnection();
-            return await conn.QueryAsync<PerfilAdoptante>(sql);
+            using var connection = CreateConnection();
+            return await connection.QueryAsync<PerfilAdoptante>(
+                "SELECT * FROM sp_get_perfiles_adoptante();");
         }
 
         public async Task<PerfilAdoptante?> GetByIdAsync(int id)
         {
-            const string sql = "SELECT * FROM sp_get_perfil_adoptante_by_id(@p_id)";
-
-            using var conn = CreateConnection();
-            return await conn.QueryFirstOrDefaultAsync<PerfilAdoptante>(sql, new { p_id = id });
+            using var connection = CreateConnection();
+            return await connection.QueryFirstOrDefaultAsync<PerfilAdoptante>(
+                "SELECT * FROM sp_get_perfil_adoptante_by_id(@p_id);",
+                new { p_id = id });
         }
 
-        public async Task<PerfilAdoptante> CreateAsync(PerfilAdoptante perfil)
+        public async Task CreateAsync(PerfilAdoptante perfil)
         {
-            const string sql = @"SELECT sp_insert_perfil_adoptante(
-                                    @p_adoptanteusuarioid,
-                                    @p_descripcioncasa,
-                                    @p_descripcionmascotas,
-                                    @p_descripcionexperienciaconmascotas)";
-
-            using var conn = CreateConnection();
-            await conn.ExecuteAsync(sql, new
-            {
-                p_adoptanteusuarioid = perfil.AdoptanteUsuarioID,
-                p_descripcioncasa = perfil.DescripcionCasa,
-                p_descripcionmascotas = perfil.DescripcionMascotas,
-                p_descripcionexperienciaconmascotas = perfil.DescripcionExperienciaConMascotas
-            });
-
-            return perfil;
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(
+                "SELECT sp_insert_perfil_adoptante(@p_adoptanteid, @p_descripcioncasa, @p_descripcionmascotas, @p_descripcionexperienciaconmascotas);",
+                new
+                {
+                    p_adoptanteid = perfil.AdoptanteUsuarioID,
+                    p_descripcioncasa = perfil.DescripcionCasa,
+                    p_descripcionmascotas = perfil.DescripcionMascotas,
+                    p_descripcionexperienciaconmascotas = perfil.DescripcionExperienciaConMascotas
+                });
         }
 
-        public async Task UpdateAsync(PerfilAdoptante perfil)
+        public async Task UpdateAsync(int id, PerfilAdoptante perfil)
         {
-            const string sql = @"SELECT sp_update_perfil_adoptante(
-                                    @p_id,
-                                    @p_descripcioncasa,
-                                    @p_descripcionmascotas,
-                                    @p_descripcionexperienciaconmascotas)";
-
-            using var conn = CreateConnection();
-            await conn.ExecuteAsync(sql, new
-            {
-                p_id = perfil.PerfilAdoptanteID,
-                p_descripcioncasa = perfil.DescripcionCasa,
-                p_descripcionmascotas = perfil.DescripcionMascotas,
-                p_descripcionexperienciaconmascotas = perfil.DescripcionExperienciaConMascotas
-            });
-
-        
+            using var connection = CreateConnection();
+            await connection.ExecuteAsync(
+                "SELECT sp_update_perfil_adoptante(@p_id, @p_descripcioncasa, @p_descripcionmascotas, @p_descripcionexperienciaconmascotas);",
+                new
+                {
+                    p_id = id,
+                    p_descripcioncasa = perfil.DescripcionCasa,
+                    p_descripcionmascotas = perfil.DescripcionMascotas,
+                    p_descripcionexperienciaconmascotas = perfil.DescripcionExperienciaConMascotas
+                });
         }
     }
 }

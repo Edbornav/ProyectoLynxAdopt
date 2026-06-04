@@ -1,66 +1,91 @@
 using ProyectoAdoptBack.DTOs;
 using ProyectoAdoptBack.Models;
 using ProyectoAdoptBack.Repositories;
+
 namespace ProyectoAdoptBack.Services
 {
     public interface IRazaService
     {
-        Task<IEnumerable<RazaDTO>> GetAllAsync();
+        Task<List<RazaDTO>> GetAllAsync();
         Task<RazaDTO?> GetByIdAsync(int id);
-        Task<RazaDTO> CreateAsync(CreateRazaDTO dto);
+        Task<List<RazaDTO>> GetByEspecieAsync(int especieId);
+        Task CreateAsync(CreateRazaDTO dto);
         Task UpdateAsync(int id, UpdateRazaDTO dto);
     }
 
     public class RazaService : IRazaService
     {
-        private readonly IRazaRepository _repo; 
+        private readonly IRazaRepository _repository;
 
-        public RazaService(IRazaRepository repo)
+        public RazaService(IRazaRepository repository)
         {
-            _repo = repo;
+            _repository = repository;
         }
 
-        public async Task<IEnumerable<RazaDTO>> GetAllAsync()
+        public async Task<List<RazaDTO>> GetAllAsync()
         {
-            var razas = await _repo.GetAllAsync();
-            return razas.Select(r => ToDTO(r));
+            var razas = await _repository.GetAllAsync();
+            return razas.Select(MapToDto).ToList();
         }
 
         public async Task<RazaDTO?> GetByIdAsync(int id)
         {
-            var raza = await _repo.GetByIdAsync(id);
-            if (raza == null) return null;
-            return ToDTO(raza);
+            var raza = await _repository.GetbyIdAsync(id); 
+            return raza is null ? null : MapToDto(raza);
         }
 
-        public async Task<RazaDTO> CreateAsync(CreateRazaDTO dto)
+        public async Task<List<RazaDTO>> GetByEspecieAsync(int especieId)
         {
-            var raza = new Raza
+            if (especieId <= 0)
+                throw new ArgumentException("EspecieID no válido.");
+            var razas = await _repository.GetByEspecieAsync(especieId);
+            return razas.Select(MapToDto).ToList();
+        }
+
+        public async Task CreateAsync(CreateRazaDTO dto)
+        {
+            ValidateCreate(dto);
+            var model = new Raza
             {
                 EspecieID = dto.EspecieID,
-                Nombre = dto.Nombre
+                Nombre = dto.Nombre.Trim()
             };
-
-            var creada = await _repo.CreateAsync(raza);
-            return ToDTO(creada);
+            await _repository.CreateAsync(model);
         }
 
         public async Task UpdateAsync(int id, UpdateRazaDTO dto)
         {
-            var raza = await _repo.GetByIdAsync(id);
-            if (raza == null) throw new KeyNotFoundException($"Raza {id} no encontrada.");
-
-            raza.EspecieID = dto.EspecieID;
-            raza.Nombre = dto.Nombre;
-
-            await _repo.UpdateAsync(raza);
+            ValidateUpdate(dto);
+            var model = new Raza
+            {
+                RazaID = id, 
+                EspecieID = dto.EspecieID,
+                Nombre = dto.Nombre.Trim()
+            };
+            await _repository.UpdateAsync(model); 
         }
 
-        private static RazaDTO ToDTO(Raza r) => new RazaDTO
+        private static RazaDTO MapToDto(Raza model) => new()
         {
-            RazaID = r.RazaID,
-            EspecieID = r.EspecieID,
-            Nombre = r.Nombre
+            RazaID = model.RazaID,
+            EspecieID = model.EspecieID,
+            Nombre = model.Nombre
         };
+
+        private static void ValidateCreate(CreateRazaDTO dto)
+        {
+            if (dto.EspecieID <= 0)
+                throw new ArgumentException("EspecieID es obligatorio.");
+            if (string.IsNullOrWhiteSpace(dto.Nombre))
+                throw new ArgumentException("El nombre de la raza es obligatorio.");
+        }
+
+        private static void ValidateUpdate(UpdateRazaDTO dto)
+        {
+            if (dto.EspecieID <= 0)
+                throw new ArgumentException("EspecieID es obligatorio.");
+            if (string.IsNullOrWhiteSpace(dto.Nombre))
+                throw new ArgumentException("El nombre de la raza es obligatorio.");
+        }
     }
 }

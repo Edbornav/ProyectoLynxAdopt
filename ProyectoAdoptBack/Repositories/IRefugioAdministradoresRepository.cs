@@ -1,17 +1,17 @@
 using Dapper;
 using Npgsql;
 using ProyectoAdoptBack.Models;
+
 namespace ProyectoAdoptBack.Repositories
 {
     public interface IRefugioAdministradoresRepository
     {
-        //Procesos que se debe implementar  si o si
         Task<IEnumerable<RefugioAdministradores>> GetAllAsync();
-        Task<RefugioAdministradores?> GetByIdAsync(int refugioId, int adminId);
+        Task<IEnumerable<RefugioAdministradores>> GetByRefugioAsync(int refugioId);
         Task CreateAsync(RefugioAdministradores refugioAdministradores);
-        
     }
-    public class RefugioAdministradoresRepository : IRefugioAdministradoresRepository  //Contrato con la interfaz
+
+    public class RefugioAdministradoresRepository : IRefugioAdministradoresRepository
     {
         private readonly IConfiguration _configuration;
 
@@ -26,31 +26,28 @@ namespace ProyectoAdoptBack.Repositories
         public async Task<IEnumerable<RefugioAdministradores>> GetAllAsync()
         {
             using var connection = CreateConnection();
-            return await connection.QueryAsync<RefugioAdministradores>("SELECT * FROM sp_get_refugio_administradores();");
+            return await connection.QueryAsync<RefugioAdministradores>(
+                "SELECT * FROM sp_get_refugio_administradores();");
         }
 
-        public async Task<RefugioAdministradores?> GetByIdAsync(int refugioId, int adminId)
+        public async Task<IEnumerable<RefugioAdministradores>> GetByRefugioAsync(int refugioId)
         {
             using var connection = CreateConnection();
-            return await connection.QueryFirstOrDefaultAsync<RefugioAdministradores>(
-                "SELECT * FROM sp_get_refugio_administrador_by_ids(@p_RefugioID, @p_AdministradorID);",
-                new { p_RefugioID = refugioId, p_AdministradorID = adminId });
+            return await connection.QueryAsync<RefugioAdministradores>(
+                "SELECT * FROM sp_get_admins_by_refugio(@p_refugioid);",
+                new { p_refugioid = refugioId });
         }
 
         public async Task CreateAsync(RefugioAdministradores refugioAdministradores)
         {
             using var connection = CreateConnection();
             await connection.ExecuteAsync(
-                "SELECT sp_insert_refugio_administrador( @p_RefugioID, @p_AdministradorID);",
+                "SELECT sp_insert_refugio_administrador(@p_refugioid, @p_usuarioadminid);",
                 new
                 {
-                   
-                    p_RefugioID = refugioAdministradores.RefugioID,
-                    p_AdministradorID = refugioAdministradores.AdministradorID
+                    p_refugioid = refugioAdministradores.RefugioID,
+                    p_usuarioadminid = refugioAdministradores.AdministradorID
                 });
         }
-
-       
-
     }
 }
