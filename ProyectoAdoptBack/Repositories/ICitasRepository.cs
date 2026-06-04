@@ -1,5 +1,5 @@
 using Dapper;
-using Microsoft.Data.SqlClient;
+using Npgsql;
 using ProyectoAdoptBack.Models;
 
 namespace ProyectoAdoptBack.Repositories
@@ -15,18 +15,19 @@ namespace ProyectoAdoptBack.Repositories
 
     public class CitasRepository : ICitasRepository
     {
-        private readonly string _connectionString;
+        private readonly IConfiguration _configuration;
 
         public CitasRepository(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection")!;
+            _configuration = configuration;
         }
 
-        private SqlConnection CreateConnection() => new SqlConnection(_connectionString);
+       private NpgsqlConnection CreateConnection()
+            => new(_configuration.GetConnectionString("DefaultConnection"));
 
         public async Task<IEnumerable<Citas>> GetCitas()
         {
-            const string sql = "EXEC sp_get_citas";
+            const string sql = "Select sp_get_citas";
 
             using var conn = CreateConnection();
             return await conn.QueryAsync<Citas>(sql);
@@ -34,48 +35,46 @@ namespace ProyectoAdoptBack.Repositories
 
         public async Task<Citas?> GetByIdAsync(int id)
         {
-            const string sql = "EXEC sp_get_cita_by_id @Id";
+            const string sql = "Select * from sp_get_cita_by_id(@p_id)";
 
             using var conn = CreateConnection();
-            return await conn.QueryFirstOrDefaultAsync<Citas>(sql, new { Id = id });
+            return await conn.QueryFirstOrDefaultAsync<Citas>(sql, new { p_id = id });
         }
 
-        public async Task<Citas> CreateAsync(Citas citas)
+       public async Task<Citas> CreateAsync(Citas citas)
         {
-            const string sql = "EXEC sp_insert_cita @p_adoptanteId, @p_animalId, @p_fechaHora, @p_estado";
+            const string sql = @"Select sp_insert_cita
+                                    @p_solicitudid, @p_fechahoracita, @p_estadocita";
 
             using var conn = CreateConnection();
             await conn.ExecuteAsync(sql, new
             {
-                p_adoptanteId = citas.AdoptanteID,
-                p_animalId = citas.AnimalID,
-                p_fechaHora = citas.FechaHora,
-                p_estado = citas.Estado
+                p_solicitudid   = citas.SolicitudID,
+                p_fechahoracita = citas.FechaHoraCita,
+                p_estadocita    = citas.EstadoCita
             });
 
             return citas;
         }
-
         
         public async Task UpdateAsync(Citas citas)
         {
-            const string sql = "EXEC sp_update_cita @p_id, @p_adoptanteId, @p_animalId, @p_fechaHora, @p_estado";
+            const string sql = @"Select sp_update_cita
+                                    @p_id, @p_fechahoracita, @p_estadocita";
 
             using var conn = CreateConnection();
             await conn.ExecuteAsync(sql, new
             {
-                p_id = citas.CitaID,
-                p_adoptanteId = citas.AdoptanteID,
-                p_animalId = citas.AnimalID,
-                p_fechaHora = citas.FechaHora,
-                p_estado = citas.Estado
+                p_id            = citas.CitaID,
+                p_fechahoracita = citas.FechaHoraCita,
+                p_estadocita    = citas.EstadoCita
             });
         }
 
 
         public async Task DesactivarAsync(int id)
         {
-            const string sql = "EXEC sp_desactivar_cita @p_id";
+            const string sql = "Select * from sp_desactivar_cita(@p_id)";
 
             using var conn = CreateConnection();
             await conn.ExecuteAsync(sql, new { p_id = id });

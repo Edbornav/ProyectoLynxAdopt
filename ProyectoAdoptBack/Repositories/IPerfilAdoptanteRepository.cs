@@ -1,5 +1,5 @@
 using Dapper;
-using Microsoft.Data.SqlClient;
+using Npgsql;
 using ProyectoAdoptBack.Models;
 
 namespace ProyectoAdoptBack.Repositories
@@ -22,7 +22,7 @@ namespace ProyectoAdoptBack.Repositories
             _connectionString = configuration.GetConnectionString("DefaultConnection")!;
         }
 
-        private SqlConnection CreateConnection() => new SqlConnection(_connectionString);
+        private NpgsqlConnection CreateConnection() => new NpgsqlConnection(_connectionString);
 
         public async Task<IEnumerable<PerfilAdoptante>> GetAllAsync()
         {
@@ -76,7 +76,8 @@ namespace ProyectoAdoptBack.Repositories
                 p_descripcionmascotas = perfil.DescripcionMascotas,
                 p_descripcionexperienciaconmascotas = perfil.DescripcionExperienciaConMascotas
             });
+
+        
         }
     }
 }
-
