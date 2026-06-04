@@ -21,10 +21,11 @@ CREATE TABLE Raza (
 );
 
 CREATE TABLE Usuarios (
-    UsuarioID     INT          GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
-    Correo        VARCHAR(50)  NOT NULL,
-    TipoUsuario   VARCHAR(50)  NOT NULL CHECK (TipoUsuario IN ('Adoptante', 'Administrador')),
-    Estatus       VARCHAR(50)  NOT NULL CHECK (Estatus IN ('Activo', 'Inactivo')),
+    UsuarioID     INT           GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
+    Correo        VARCHAR(50)   NOT NULL,
+    PasswordHash  VARCHAR(255)  NOT NULL,
+    TipoUsuario   VARCHAR(50)   NOT NULL CHECK (TipoUsuario IN ('Adoptante', 'Administrador')),
+    Estatus       VARCHAR(50)   NOT NULL CHECK (Estatus IN ('Activo', 'Inactivo')),
     FechaRegistro DATE
 );
 
@@ -212,15 +213,16 @@ BEGIN
 END; $$;
 
 CREATE OR REPLACE FUNCTION sp_insert_usuario(
-    p_correo      VARCHAR,
-    p_tipousuario VARCHAR,
-    p_estatus     VARCHAR
+    p_correo       VARCHAR,
+    p_passwordhash VARCHAR,
+    p_tipousuario  VARCHAR,
+    p_estatus      VARCHAR
 )
 RETURNS VOID
 LANGUAGE plpgsql AS $$
 BEGIN
-    INSERT INTO Usuarios (Correo, TipoUsuario, Estatus, FechaRegistro)
-    VALUES (p_correo, p_tipousuario, p_estatus, CURRENT_DATE);
+    INSERT INTO Usuarios (Correo, PasswordHash, TipoUsuario, Estatus, FechaRegistro)
+    VALUES (p_correo, p_passwordhash, p_tipousuario, p_estatus, CURRENT_DATE);
 END; $$;
 
 CREATE OR REPLACE FUNCTION sp_update_usuario(
@@ -242,6 +244,15 @@ RETURNS VOID
 LANGUAGE plpgsql AS $$
 BEGIN
     UPDATE Usuarios SET Estatus = 'Inactivo' WHERE UsuarioID = p_id;
+END; $$;
+
+CREATE OR REPLACE FUNCTION sp_login(p_correo VARCHAR)
+RETURNS TABLE (UsuarioID INT, Correo VARCHAR, PasswordHash VARCHAR, TipoUsuario VARCHAR, Estatus VARCHAR)
+LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT u.UsuarioID, u.Correo, u.PasswordHash, u.TipoUsuario, u.Estatus
+    FROM Usuarios u WHERE u.Correo = p_correo AND u.Estatus = 'Activo';
 END; $$;
 
 
