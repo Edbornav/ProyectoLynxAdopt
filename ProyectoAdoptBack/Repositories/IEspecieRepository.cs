@@ -1,16 +1,16 @@
 using ProyectoAdoptBack.Models;
 using Dapper;
-using Microsoft.Data.SqlClient;
+using Npgsql;
 namespace ProyectoAdoptBack.Repositories
 {
     public interface IEspecieRepository
     {
         Task<IEnumerable<Especie>> GetEspecies();
-        Task<Especie?> GetByIdAsync(int id);
+        Task<Especie?> GetByIdAsync(int id); 
         Task<Especie> CreateAsync(Especie especie);
         Task UpdateAsync(Especie especie);
 
-    }
+    } 
 
     public class EspecieRepository : IEspecieRepository
     {
@@ -19,7 +19,7 @@ namespace ProyectoAdoptBack.Repositories
         {
             _connectionString = configuration.GetConnectionString("DefaultConnection")!;
         }
-        private SqlConnection CreateConnection() => new SqlConnection(_connectionString);
+        private NpgsqlConnection CreateConnection() => new NpgsqlConnection(_connectionString);
         public async Task<IEnumerable<Especie>> GetEspecies()
         {
             const string sql = "SELECT * FROM sp_get_especies()";

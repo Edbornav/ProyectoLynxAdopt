@@ -1,4 +1,4 @@
-using Microsoft.Data.SqlClient;
+using Npgsql;
 using Dapper;
 using ProyectoAdoptBack.Models;
 
@@ -14,7 +14,7 @@ namespace ProyectoAdoptBack.Repositories
     }
 
     public class RazaRepository : IRazaRepository
-    {
+    {    
         private readonly String _connectionString;
 
         public RazaRepository(IConfiguration configuration)
@@ -23,7 +23,7 @@ namespace ProyectoAdoptBack.Repositories
 
         }
 
-        private SqlConnection CreateConnection() => new SqlConnection(_connectionString);
+        private NpgsqlConnection CreateConnection() => new NpgsqlConnection(_connectionString);
 
         public async Task<IEnumerable<Raza>> GetAllAsync()
         {

@@ -27,15 +27,15 @@ namespace ProyectoAdoptBack.Repositories
 
         public async Task<IEnumerable<Adoptante>> GetAllAsync()
         {
-            const string sql = "EXEC sp_get_adoptantes";
+            const string sql = "Select * from sp_get_adoptantes()";
 
             using var conn = CreateConnection();
             return await conn.QueryAsync<Adoptante>(sql);
         }
-
+  
         public async Task<Adoptante?> GetByIdAsync(int id)
         {
-            const string sql = "EXEC sp_get_adoptante_by_id @p_id";
+            const string sql = "Select * from sp_get_adoptante_by_id(@p_id)";
 
             using var conn = CreateConnection();
             return await conn.QueryFirstOrDefaultAsync<Adoptante>(sql, new { p_id = id });
@@ -43,7 +43,7 @@ namespace ProyectoAdoptBack.Repositories
 
         public async Task<Adoptante> CreateAsync(Adoptante adoptante)
         {
-            const string sql = @"EXEC sp_insert_adoptante
+            const string sql = @"Select * from sp_insert_adoptante
                                     @p_usuarioid, @p_nombre,
                                     @p_apellidopaterno, @p_apellidomaterno,
                                     @p_telefono, @p_fechanacimiento";
@@ -64,7 +64,7 @@ namespace ProyectoAdoptBack.Repositories
 
         public async Task UpdateAsync(Adoptante adoptante)
         {
-            const string sql = @"EXEC sp_update_adoptante
+            const string sql = @"Select * from sp_update_adoptante
                                     @p_adoptanteid, @p_usuarioid, @p_nombre,
                                     @p_apellidopaterno, @p_apellidomaterno,
                                     @p_telefono, @p_fechanacimiento";
@@ -84,7 +84,7 @@ namespace ProyectoAdoptBack.Repositories
 
         public async Task DesactivarAsync(int id)
         {
-            const string sql = "EXEC sp_desactivar_adoptante @p_id";
+            const string sql = "Select * from sp_desactivar_adoptante(@p_id)";
 
             using var conn = CreateConnection();
             await conn.ExecuteAsync(sql, new { p_id = id });
