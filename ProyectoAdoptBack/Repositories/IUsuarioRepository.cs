@@ -42,14 +42,15 @@ namespace ProyectoAdoptBack.Repositories
         {
             using var connection = CreateConnection();
             await connection.ExecuteAsync(
-                "SELECT sp_insert_usuario(@p_correo, @p_tipousuario, @p_estatus);", 
+                //Agregado @p_passwordhash para que coincida con la firma del SP sp_insert_usuario(p_correo, p_passwordhash, p_tipousuario, p_estatus)
+                "SELECT sp_insert_usuario(@p_correo, @p_passwordhash, @p_tipousuario, @p_estatus);", 
                 new
                 {
-               // cambios (parametro igual al script SQL)
                 p_correo = usuario.Correo, 
+                p_passwordhash = usuario.PasswordHash, //Agregado: envia el hash generado en el service
                 p_tipousuario = usuario.TipoUsuario, 
                 p_estatus = usuario.Estatus 
-               
+                
                 });
         }
 

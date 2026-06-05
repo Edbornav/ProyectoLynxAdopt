@@ -1,6 +1,7 @@
 using ProyectoAdoptBack.DTOs;
 using ProyectoAdoptBack.Models;
 using ProyectoAdoptBack.Repositories;
+using BCrypt.Net; //Agregado para usar BCrypt.HashPassword()
 
 namespace ProyectoAdoptBack.Services
 {
@@ -38,9 +39,13 @@ namespace ProyectoAdoptBack.Services
         {
             ValidateCreate(dto);
 
+            //Se hashea la contraseña con BCrypt antes de guardarla
+            var passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+
             var model = new Usuario
             {
                 Correo = dto.Correo.Trim(),
+                PasswordHash = passwordHash, //Se asigna el hash generado
                 TipoUsuario = dto.TipoUsuario.Trim(),
                 Estatus = dto.Estatus.Trim(),
                 FechaRegistro = DateTime.UtcNow
