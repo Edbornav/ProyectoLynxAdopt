@@ -1,0 +1,149 @@
+<style>
+  body { min-height: 100vh; }
+  .main-layout {
+    display: flex;
+    gap: 24px;
+    padding: 28px 32px;
+  }
+  .filters-panel {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 20px;
+    width: 210px;
+    flex-shrink: 0;
+    height: fit-content;
+    position: sticky;
+    top: 80px;
+    box-shadow: var(--shadow);
+  }
+  .filter-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.1rem;
+    color: var(--text-dark);
+    margin-bottom: 14px;
+  }
+  .filter-group { margin-bottom: 18px; }
+  .filter-group > label {
+    display: block;
+    font-weight: 800;
+    font-size: 0.82rem;
+    color: var(--text-mid);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .filter-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+    cursor: pointer;
+  }
+  .filter-option input[type=checkbox] { accent-color: var(--orange); width: 16px; height: 16px; }
+  .filter-range { width: 100%; accent-color: var(--orange); }
+  .btn-filter-apply {
+    width: 100%;
+    padding: 10px;
+    background: var(--orange);
+    color: white;
+    border: none;
+    border-radius: var(--radius-pill);
+    font-family: 'Fredoka One', cursive;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background var(--transition);
+  }
+  .btn-filter-apply:hover { background: var(--orange-dark); }
+  .catalog-content { flex: 1; min-width: 0; }
+  .refugio-selector {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    margin-bottom: 20px;
+    scrollbar-width: none;
+  }
+  .refugio-selector::-webkit-scrollbar { display: none; }
+  .refugio-chip {
+    background: var(--beige-card);
+    border-radius: var(--radius-pill);
+    padding: 8px 18px;
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: var(--text-dark);
+    cursor: pointer;
+    white-space: nowrap;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .refugio-chip.active {
+    background: var(--brown);
+    color: white;
+    border-color: var(--brown-dark);
+  }
+  .refugio-chip:hover { transform: translateY(-2px); }
+</style>
+
+<nav class="navbar">
+  <a href="#03_catalogo_adoptante" class="navbar-logo">🐾 LynxAdopt</a>
+  <div class="navbar-links">
+    <a href="#03_catalogo_adoptante" class="active">🐾 Catálogo</a>
+    <a href="#08_mis_solicitudes">📋 Solicitudes</a>
+    <a href="#09_perfil_adoptante">👤 Mi perfil</a>
+  </div>
+  <div class="navbar-search">
+    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" placeholder="Buscar..."/>
+  </div>
+  <div class="navbar-bell">🔔<span class="badge" id="notifBadge">0</span></div>
+</nav>
+
+<div class="main-layout">
+  <div class="filters-panel">
+    <div class="filter-title">🔍 Filtros</div>
+    <div class="filter-group">
+      <label>Especie</label>
+      <div id="especiesFiltros"></div>
+    </div>
+    <div class="filter-group">
+      <label>Edad máx. (años)</label>
+      <input type="range" class="filter-range" min="0" max="15" value="8" id="ageRange"
+             oninput="document.getElementById('ageVal').textContent=this.value"/>
+      <div style="font-size:0.82rem;font-weight:700;color:var(--text-mid);text-align:right;">
+        Hasta <span id="ageVal">8</span> años
+      </div>
+    </div>
+    <button class="btn-filter-apply" onclick="aplicarFiltros()">Aplicar filtros</button>
+  </div>
+
+  <div class="catalog-content">
+    <div class="title-bar">Animales en adopción</div>
+    <div class="refugio-selector" id="refugioSelector"></div>
+    <div class="pets-grid" id="petsGrid"></div>
+  </div>
+</div>
+
+<script>
+  function loadEspecies() {
+    // TODO: GET /api/Especie → llenar #especiesFiltros con checkboxes
+    //   <div class="filter-option"><input type="checkbox" value="EspecieID"/> Nombre</div>
+  }
+  function loadRefugios() {
+    // TODO: GET /api/Refugio → llenar #refugioSelector con chips
+    //   <div class="refugio-chip" onclick="navigate('#11_perfil_refugio?id=REFUGIOID')">Nombre</div>
+  }
+  function loadAnimales() {
+    // TODO: GET /api/Animales?Estado=Disponible → renderizar en #petsGrid
+    //   <a class="pet-card fade-in" href="#05_detalle_mascota?id=ANIMALID">...</a>
+    //   Incluir nombre del refugio como enlace: <a href="#11_perfil_refugio?id=REFUGIOID" style="color:var(--brown);font-weight:800;">Refugio.Nombre</a>
+  }
+  function aplicarFiltros() {
+    // TODO: GET /api/Animales?especieID=...&tamano=...&edadMax=...
+  }
+  loadEspecies(); loadRefugios(); loadAnimales();
+</script>
