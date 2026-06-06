@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ProyectoAdoptBack.DTOs;
+using ProyectoAdoptBack.Services;
 
 namespace ProyectoAdoptBack.Controllers
 {
@@ -7,33 +8,46 @@ namespace ProyectoAdoptBack.Controllers
     [ApiController]
     public class AdoptantesController : ControllerBase
     {
-        [HttpGet]
-        public ActionResult<List<AdoptanteDTO>> GetAll()
+        private readonly IAdoptanteService _service;
+
+        public AdoptantesController(IAdoptanteService service)
         {
-            return Ok(new List<AdoptanteDTO>());
+            _service = service;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var items = await _service.GetAllAsync();
+            return Ok(items);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<AdoptanteDTO> GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            return NotFound();
+            var item = await _service.GetByIdAsync(id);
+            if (item == null) return NotFound();
+            return Ok(item);
         }
 
         [HttpPost]
-        public ActionResult<AdoptanteDTO> Create([FromBody] CreateAdoptanteDTO dto)
+        public async Task<IActionResult> Create([FromBody] CreateAdoptanteDTO dto)
         {
-            return Ok(new AdoptanteDTO());
+            var item = await _service.CreateAsync(dto);
+            return Ok(item);
         }
 
         [HttpPut("{id}")]
-        public ActionResult Update(int id, [FromBody] UpdateAdoptanteDTO dto)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateAdoptanteDTO dto)
         {
+            await _service.UpdateAsync(id, dto);
             return NoContent();
         }
 
         [HttpPatch("{id}/desactivar")]
-        public ActionResult Desactivar(int id)
+        public async Task<IActionResult> Desactivar(int id)
         {
+            await _service.DesactivarAsync(id);
             return NoContent();
         }
     }

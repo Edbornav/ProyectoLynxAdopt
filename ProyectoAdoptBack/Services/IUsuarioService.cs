@@ -9,6 +9,7 @@ namespace ProyectoAdoptBack.Services
     {
         Task<List<UsuarioDTO>> GetAllAsync();
         Task<UsuarioDTO?> GetByIdAsync(int id);
+        Task<UsuarioDTO?> LoginAsync(LoginDTO dto);
         Task CreateAsync(CreateUsuarioDTO dto);
         Task UpdateAsync(int id, UpdateUsuarioDTO dto);
         Task DesactivarAsync(int id);
@@ -33,6 +34,21 @@ namespace ProyectoAdoptBack.Services
         {
             var usuario = await _repository.GetByIdAsync(id);
             return usuario is null ? null : MapToDto(usuario);
+        }
+
+        public async Task<UsuarioDTO?> LoginAsync(LoginDTO dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Correo) || string.IsNullOrWhiteSpace(dto.Password))
+                throw new ArgumentException("Correo y contraseña son obligatorios.");
+
+            var usuario = await _repository.LoginAsync(dto.Correo.Trim());
+            if (usuario == null)
+                return null;
+
+            if (!BCrypt.Net.BCrypt.Verify(dto.Password, usuario.PasswordHash))
+                return null;
+
+            return MapToDto(usuario);
         }
 
         public async Task CreateAsync(CreateUsuarioDTO dto)

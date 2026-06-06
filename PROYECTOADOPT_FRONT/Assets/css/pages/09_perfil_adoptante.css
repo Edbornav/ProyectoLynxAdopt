@@ -1,0 +1,26 @@
+.profile-wrap { padding: 28px 40px; max-width: 900px; margin: 0 auto; }
+.profile-card {
+  background: var(--beige-card);
+  border-radius: 28px;
+  overflow: hidden;
+  display: flex;
+  box-shadow: var(--shadow-lg);
+  animation: fadeInUp 0.4s ease both;
+}
+.profile-left { background: var(--white); width: 260px; flex-shrink: 0; padding: 40px 28px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.avatar-wrap { position: relative; }
+.avatar-big { width: 130px; height: 130px; border-radius: 50%; background: var(--orange-light); display: flex; align-items: center; justify-content: center; font-size: 3.5rem; border: 4px solid var(--orange); }
+.avatar-edit { position: absolute; bottom: 4px; right: 4px; background: var(--orange); color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; cursor: pointer; border: 2px solid white; }
+.profile-name { font-family: 'Fredoka One', cursive; font-size: 1.3rem; color: var(--text-dark); text-align: center; }
+.profile-role-tag { background: var(--orange); color: white; border-radius: var(--radius-pill); padding: 5px 16px; font-size: 0.82rem; font-weight: 800; }
+.profile-stat { text-align: center; }
+.profile-stat .num { font-family: 'Fredoka One', cursive; font-size: 1.8rem; color: var(--orange); }
+.profile-stat .lbl { font-size: 0.82rem; font-weight: 700; color: var(--text-mid); }
+.stats-row { display: flex; gap: 20px; }
+.divider { width: 100%; height: 1px; background: var(--beige); margin: 4px 0; }
+.profile-right { flex: 1; padding: 36px 40px; }
+.section-head { font-family: 'Fredoka One', cursive; font-size: 1.3rem; color: var(--text-dark); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.perfil-card { background: var(--beige); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 16px; }
+.perfil-card .q { font-size: 0.8rem; font-weight: 800; color: var(--text-mid); margin-bottom: 3px; }
+.perfil-card .a { font-size: 0.93rem; font-weight: 700; color: var(--text-dark); }
+.edit-btn-row { display: flex; gap: 12px; }

@@ -24,8 +24,8 @@ namespace ProyectoAdoptBack.Services
             if (solicitudId <= 0)
                 throw new ArgumentException("SolicitudID no valido."); // error: id invalido
 
-            var animales = await _repository.GetAllAsync(); // error: repository no tiene GetBySolicitudAsync
-            return animales.Where(a => a.SolicitudID == solicitudId).Select(MapToDto).ToList();
+            var animales = await _repository.GetBySolicitudAsync(solicitudId);
+            return animales.Select(MapToDto).ToList();
         }
 
         public async Task CreateAsync(CreateSolicitudAnimalesDTO dto)

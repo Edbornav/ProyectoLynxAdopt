@@ -25,7 +25,7 @@ namespace ProyectoAdoptBack.Repositories
         }
 
         private NpgsqlConnection CreateConnection()
-            => new(_configuration.GetConnectionString("DefaultConnection"));
+            => new(_configuration.GetConnectionString("PostgreSQL"));
 
         public async Task<IEnumerable<Citas>> GetAllAsync()
         {

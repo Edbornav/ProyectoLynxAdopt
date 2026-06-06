@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ProyectoAdoptBack.DTOs;
+using ProyectoAdoptBack.Services;
 
 namespace ProyectoAdoptBack.Controllers
 {
@@ -7,27 +8,50 @@ namespace ProyectoAdoptBack.Controllers
     [ApiController]
     public class ImagenController : ControllerBase
     {
-        [HttpGet]
-        public ActionResult<List<ImagenDTO>> GetAll()
+        private readonly IImagenService _service;
+
+        public ImagenController(IImagenService service)
         {
-            return Ok(new List<ImagenDTO>());
+            _service = service;
         }
 
-        [HttpGet("{id}")]
-        public ActionResult<ImagenDTO> GetById(int id)
+        [HttpGet]
+        public async Task<IActionResult> GetByEntidad([FromQuery] string entidadTipo, [FromQuery] int entidadId)
         {
-            return NotFound();
+            if (string.IsNullOrWhiteSpace(entidadTipo) || entidadId <= 0)
+                return BadRequest("entidadTipo y entidadId son requeridos.");
+            var items = await _service.GetByEntidadAsync(entidadTipo, entidadId);
+            return Ok(items);
         }
 
         [HttpPost]
-        public ActionResult<ImagenDTO> Create([FromBody] CreateImagenDTO dto)
+        public async Task<IActionResult> Create([FromBody] CreateImagenDTO dto)
         {
-            return Ok(new ImagenDTO());
+            var id = await _service.CreateAsync(dto);
+            return Ok(new { id });
         }
 
-        [HttpPut("{id}")]
-        public ActionResult Update(int id, [FromBody] UpdateImagenDTO dto)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
+            var item = await _service.DeleteAsync(id);
+            if (item == null) return NotFound();
+            return Ok(item);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteByEntidad([FromQuery] string entidadTipo, [FromQuery] int entidadId)
+        {
+            if (string.IsNullOrWhiteSpace(entidadTipo) || entidadId <= 0)
+                return BadRequest("entidadTipo y entidadId son requeridos.");
+            var items = await _service.DeleteByEntidadAsync(entidadTipo, entidadId);
+            return Ok(items);
+        }
+
+        [HttpPatch("{id}/reordenar")]
+        public async Task<IActionResult> Reordenar(int id, [FromBody] int orden)
+        {
+            await _service.ReordenarAsync(id, orden);
             return NoContent();
         }
     }

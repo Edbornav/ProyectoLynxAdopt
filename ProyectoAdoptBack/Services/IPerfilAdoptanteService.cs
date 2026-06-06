@@ -7,7 +7,7 @@ namespace ProyectoAdoptBack.Services
     {
         Task<IEnumerable<PerfilAdoptanteDTO>> GetAllAsync();
         Task<PerfilAdoptanteDTO?> GetByIdAsync(int id);
-        Task<PerfilAdoptanteDTO> CreateAsync(CreatePerfilAdoptanteDTO dto);
+        Task CreateAsync(CreatePerfilAdoptanteDTO dto);
         Task UpdateAsync(int id, UpdatePerfilAdoptanteDTO dto);
     }
 
@@ -33,19 +33,18 @@ namespace ProyectoAdoptBack.Services
             return ToDTO(perfil);
         }
 
-        public async Task<PerfilAdoptanteDTO> CreateAsync(CreatePerfilAdoptanteDTO dto)
+        public async Task CreateAsync(CreatePerfilAdoptanteDTO dto)
         {
-            ValidateCreate(dto); // error: faltaba validar campos obligatorios
+            ValidateCreate(dto);
             var perfil = new PerfilAdoptante
             {
                 AdoptanteUsuarioID = dto.AdoptanteUsuarioID,
-                DescripcionCasa = dto.DescripcionCasa.Trim(), // error: faltaba limpiar espacios
-                DescripcionMascotas = dto.DescripcionMascotas.Trim(), // error: faltaba limpiar espacios
-                DescripcionExperienciaConMascotas = dto.DescripcionExperienciaConMascotas.Trim() // error: faltaba limpiar espacios
+                DescripcionCasa = dto.DescripcionCasa.Trim(),
+                DescripcionMascotas = dto.DescripcionMascotas.Trim(),
+                DescripcionExperienciaConMascotas = dto.DescripcionExperienciaConMascotas.Trim()
             };
 
-            var creado = await _repository.CreateAsync(perfil); // cambio (se corrigio nombre del repository)
-            return ToDTO(creado);
+            await _repository.CreateAsync(perfil);
         }
 
         public async Task UpdateAsync(int id, UpdatePerfilAdoptanteDTO dto)
@@ -58,7 +57,7 @@ namespace ProyectoAdoptBack.Services
             perfil.DescripcionMascotas = dto.DescripcionMascotas.Trim(); // error: faltaba limpiar espacios
             perfil.DescripcionExperienciaConMascotas = dto.DescripcionExperienciaConMascotas.Trim(); // error: faltaba limpiar espacios
 
-            await _repository.UpdateAsync(perfil); // cambio (se corrigio nombre del repository)
+            await _repository.UpdateAsync(id, perfil);
         }
 
         private static PerfilAdoptanteDTO ToDTO(PerfilAdoptante p) => new PerfilAdoptanteDTO

@@ -20,7 +20,7 @@ namespace ProyectoAdoptBack.Repositories
 
         public RazaRepository(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection")!;
+            _connectionString = configuration.GetConnectionString("PostgreSQL")!;
 
         }
 

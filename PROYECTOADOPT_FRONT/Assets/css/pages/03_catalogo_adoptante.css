@@ -1,0 +1,102 @@
+.main-layout {
+  display: flex;
+  gap: 24px;
+  padding: 28px 32px;
+}
+.filters-panel {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 20px;
+  width: 210px;
+  flex-shrink: 0;
+  height: fit-content;
+  position: sticky;
+  top: 80px;
+  box-shadow: var(--shadow);
+}
+.filter-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.1rem;
+  color: var(--text-dark);
+  margin-bottom: 14px;
+}
+.filter-group { margin-bottom: 18px; }
+.filter-group > label {
+  display: block;
+  font-weight: 800;
+  font-size: 0.82rem;
+  color: var(--text-mid);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 6px;
+  cursor: pointer;
+}
+.filter-option input[type=checkbox] { accent-color: var(--orange); width: 16px; height: 16px; }
+.filter-range { width: 100%; accent-color: var(--orange); }
+.btn-filter-apply {
+  width: 100%;
+  padding: 10px;
+  background: var(--orange);
+  color: white;
+  border: none;
+  border-radius: var(--radius-pill);
+  font-family: 'Fredoka One', cursive;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background var(--transition);
+}
+.btn-filter-apply:hover { background: var(--orange-dark); }
+.catalog-content { flex: 1; min-width: 0; }
+.refugio-selector {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  margin-bottom: 20px;
+  scrollbar-width: none;
+}
+.refugio-selector::-webkit-scrollbar { display: none; }
+.refugio-chip {
+  background: var(--beige-card);
+  border-radius: var(--radius-pill);
+  padding: 8px 18px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--text-dark);
+  cursor: pointer;
+  white-space: nowrap;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.refugio-chip.active {
+  background: var(--brown);
+  color: white;
+  border-color: var(--brown-dark);
+}
+.refugio-chip:hover { transform: translateY(-2px); }
+.title-bar {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.4rem;
+  color: var(--text-dark);
+  margin-bottom: 16px;
+  background: var(--beige-card);
+  padding: 12px 20px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.pets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+}

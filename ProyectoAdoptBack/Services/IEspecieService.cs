@@ -7,7 +7,7 @@ namespace ProyectoAdoptBack.Services
     {
         Task<IEnumerable<EspecieDTO>> GetAllAsync();
         Task<EspecieDTO?> GetByIdAsync(int id);
-        Task<EspecieDTO> CreateAsync(CreateEspecieDTO dto);
+        Task CreateAsync(CreateEspecieDTO dto);
         Task UpdateAsync(int id, UpdateEspecieDTO dto);
 
     }
@@ -24,7 +24,7 @@ namespace ProyectoAdoptBack.Services
 
         public async Task<IEnumerable<EspecieDTO>> GetAllAsync()
         {
-            var especies = await _repository.GetEspecies(); // cambio (metodo correcto del repository)
+            var especies = await _repository.GetAllAsync();
             return especies.Select(e => ToDTO(e));
         }
 
@@ -35,15 +35,14 @@ namespace ProyectoAdoptBack.Services
             return ToDTO(especie);
         }
 
-        public async Task<EspecieDTO> CreateAsync(CreateEspecieDTO dto)
+        public async Task CreateAsync(CreateEspecieDTO dto)
         {
-            ValidateCreate(dto); // error: faltaba validar nombre vacio
+            ValidateCreate(dto);
             var especie = new Especie
             {
-                Nombre = dto.Nombre.Trim() // error: faltaba limpiar espacios
+                Nombre = dto.Nombre.Trim()
             };
-            var creado = await _repository.CreateAsync(especie);
-            return ToDTO(creado);
+            await _repository.CreateAsync(especie);
         }
 
         public async Task UpdateAsync(int id, UpdateEspecieDTO dto)
@@ -54,7 +53,7 @@ namespace ProyectoAdoptBack.Services
 
             especie.Nombre = dto.Nombre.Trim(); // error: faltaba limpiar espacios
 
-            await _repository.UpdateAsync(especie); // cambio (se corrigio nombre del repository)
+            await _repository.UpdateAsync(id, especie);
         }
 
         private static EspecieDTO ToDTO(Especie e) => new EspecieDTO

@@ -24,6 +24,8 @@ function loadFragment(url) {
     });
 }
 
+const centeredPages = ['01_seleccion_rol', '02_inicio_sesion', '04_registro'];
+
 function navigate(hash) {
   const cleaned = hash.replace('#', '');
   const qIdx = cleaned.indexOf('?');
@@ -35,6 +37,11 @@ function navigate(hash) {
   } else {
     page = cleaned;
     routeParams = {};
+  }
+  if (centeredPages.includes(page)) {
+    app.classList.add('centered');
+  } else {
+    app.classList.remove('centered');
   }
   loadFragment('pages/' + page + '.html');
 }

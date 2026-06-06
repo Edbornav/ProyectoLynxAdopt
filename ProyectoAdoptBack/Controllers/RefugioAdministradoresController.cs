@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ProyectoAdoptBack.DTOs;
+using ProyectoAdoptBack.Services;
 
 namespace ProyectoAdoptBack.Controllers
 {
@@ -7,23 +8,32 @@ namespace ProyectoAdoptBack.Controllers
     [ApiController]
     public class RefugioAdministradoresController : ControllerBase
     {
-        [HttpGet]
-        public ActionResult<List<RefugioAdministradoresDTO>> GetAll()
+        private readonly IRefugioAdministradoresService _service;
+
+        public RefugioAdministradoresController(IRefugioAdministradoresService service)
         {
-            return Ok(new List<RefugioAdministradoresDTO>());
+            _service = service;
         }
 
-        [HttpGet("{refugioId}/{adminId}")]
-        public ActionResult<RefugioAdministradoresDTO> GetById(int refugioId, int adminId)
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
         {
-            return NotFound();
+            var items = await _service.GetAllAsync();
+            return Ok(items);
+        }
+
+        [HttpGet("{refugioId}")]
+        public async Task<IActionResult> GetByRefugio(int refugioId)
+        {
+            var items = await _service.GetByRefugioAsync(refugioId);
+            return Ok(items);
         }
 
         [HttpPost]
-        public ActionResult<RefugioAdministradoresDTO> Create([FromBody] CreateRefugioAdministradoresDTO dto)
+        public async Task<IActionResult> Create([FromBody] CreateRefugioAdministradoresDTO dto)
         {
-            return Ok(new RefugioAdministradoresDTO());
+            await _service.CreateAsync(dto);
+            return Ok();
         }
-
     }
 }

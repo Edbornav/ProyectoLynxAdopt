@@ -1,0 +1,111 @@
+.paw-bg-left {
+  position: absolute;
+  font-size: 350px;
+  opacity: 0.1;
+  color: var(--beige);
+  left: -80px; top: -60px;
+  pointer-events: none;
+}
+.login-wrapper {
+  display: flex;
+  width: 900px;
+  max-width: 95vw;
+  min-height: 520px;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  animation: fadeInUp 0.5s ease both;
+}
+.login-form-panel {
+  background: var(--beige-card);
+  flex: 1;
+  padding: 52px 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.login-logo {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.6rem;
+  color: var(--orange);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.login-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 2rem;
+  color: var(--text-dark);
+  margin-bottom: 32px;
+}
+.login-input-group { margin-bottom: 20px; }
+.login-input-group label {
+  display: block;
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--text-dark);
+  margin-bottom: 8px;
+}
+.login-input-group input {
+  width: 100%;
+  padding: 13px 20px;
+  border-radius: var(--radius-pill);
+  border: none;
+  background: var(--orange);
+  color: var(--white);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  outline: none;
+  transition: background 0.2s;
+}
+.login-input-group input::placeholder { color: rgba(255,255,255,0.65); }
+.login-input-group input:focus { background: var(--orange-dark); }
+.btn-acceder {
+  width: 100%;
+  margin-top: 28px;
+  padding: 14px;
+  background: var(--brown);
+  color: var(--white);
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-acceder:hover { background: var(--brown-dark); transform: translateY(-2px); box-shadow: var(--shadow); }
+.register-link {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.9rem;
+  color: var(--text-mid);
+  font-weight: 600;
+}
+.register-link a {
+  color: var(--orange-dark);
+  font-weight: 800;
+  text-decoration: none;
+}
+.login-image-panel {
+  width: 380px;
+  background: var(--orange-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+.login-image-panel .cat-emoji {
+  font-size: 180px;
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.3));
+  animation: float 3s ease-in-out infinite;
+}
+.login-image-panel::before {
+  content: '🐾';
+  position: absolute;
+  font-size: 200px;
+  opacity: 0.1;
+  top: -40px; right: -40px;
+}

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ProyectoAdoptBack.DTOs;
+using ProyectoAdoptBack.Services;
 
 namespace ProyectoAdoptBack.Controllers
 {
@@ -7,33 +8,46 @@ namespace ProyectoAdoptBack.Controllers
     [ApiController]
     public class CitasController : ControllerBase
     {
-        [HttpGet]
-        public ActionResult<List<CitasDTO>> GetAll()
+        private readonly ICitasService _service;
+
+        public CitasController(ICitasService service)
         {
-            return Ok(new List<CitasDTO>());
+            _service = service;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var items = await _service.GetAllAsync();
+            return Ok(items);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<CitasDTO> GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            return NotFound();
+            var item = await _service.GetByIdAsync(id);
+            if (item == null) return NotFound();
+            return Ok(item);
         }
 
         [HttpPost]
-        public ActionResult<CitasDTO> Create([FromBody] CreateCitasDTO dto)
+        public async Task<IActionResult> Create([FromBody] CreateCitasDTO dto)
         {
-            return Ok(new CitasDTO());
+            await _service.CreateAsync(dto);
+            return Ok();
         }
 
         [HttpPut("{id}")]
-        public ActionResult Update(int id, [FromBody] UpdateCitasDTO dto)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateCitasDTO dto)
         {
+            await _service.UpdateAsync(id, dto);
             return NoContent();
         }
 
         [HttpPatch("{id}/desactivar")]
-        public ActionResult Desactivar(int id)
+        public async Task<IActionResult> Desactivar(int id)
         {
+            await _service.DesactivarAsync(id);
             return NoContent();
         }
     }

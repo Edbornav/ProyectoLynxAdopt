@@ -7,6 +7,7 @@ namespace ProyectoAdoptBack.Repositories
     {
         Task<IEnumerable<Usuario>> GetAllAsync();
         Task<Usuario?> GetByIdAsync(int id);
+        Task<Usuario?> LoginAsync(string correo);
         Task CreateAsync(Usuario usuario);
         Task UpdateAsync(int id, Usuario usuario);
         Task DesactivarAsync(int id);
@@ -22,7 +23,7 @@ namespace ProyectoAdoptBack.Repositories
         }
 
         private NpgsqlConnection CreateConnection()
-            => new(_configuration.GetConnectionString("DefaultConnection"));
+            => new(_configuration.GetConnectionString("PostgreSQL"));
 
         public async Task<IEnumerable<Usuario>> GetAllAsync()
         {
@@ -36,6 +37,14 @@ namespace ProyectoAdoptBack.Repositories
             return await connection.QueryFirstOrDefaultAsync<Usuario>(
                 "SELECT UsuarioID, Correo, TipoUsuario, Estatus, FechaRegistro FROM sp_get_usuario_by_id(@p_id);", 
                 new { p_id = id });
+        }
+
+        public async Task<Usuario?> LoginAsync(string correo)
+        {
+            using var connection = CreateConnection();
+            return await connection.QueryFirstOrDefaultAsync<Usuario>(
+                "SELECT UsuarioID, Correo, PasswordHash, TipoUsuario, Estatus FROM sp_login(@p_correo);",
+                new { p_correo = correo });
         }
 
         public async Task CreateAsync(Usuario usuario)

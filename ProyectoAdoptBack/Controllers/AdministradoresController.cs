@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ProyectoAdoptBack.DTOs;
+using ProyectoAdoptBack.Services;
 
 namespace ProyectoAdoptBack.Controllers
 {
@@ -7,33 +8,46 @@ namespace ProyectoAdoptBack.Controllers
     [ApiController]
     public class AdministradoresController : ControllerBase
     {
-        [HttpGet]
-        public ActionResult<List<AdministradorDTO>> GetAll()
+        private readonly IAdministradorService _service;
+
+        public AdministradoresController(IAdministradorService service)
         {
-            return Ok(new List<AdministradorDTO>());
+            _service = service;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var items = await _service.GetAllAsync();
+            return Ok(items);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<AdministradorDTO> GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            return NotFound();
+            var item = await _service.GetByIdAsync(id);
+            if (item == null) return NotFound();
+            return Ok(item);
         }
 
         [HttpPost]
-        public ActionResult<AdministradorDTO> Create([FromBody] CreateAdministradorDTO dto)
+        public async Task<IActionResult> Create([FromBody] CreateAdministradorDTO dto)
         {
-            return Ok(new AdministradorDTO());
+            await _service.CreateAsync(dto);
+            return Ok();
         }
 
         [HttpPut("{id}")]
-        public ActionResult Update(int id, [FromBody] UpdateAdministradorDTO dto)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateAdministradorDTO dto)
         {
+            await _service.UpdateAsync(id, dto);
             return NoContent();
         }
 
         [HttpPatch("{id}/desactivar")]
-        public ActionResult Desactivar(int id)
+        public async Task<IActionResult> Desactivar(int id)
         {
+            await _service.DesactivarAsync(id);
             return NoContent();
         }
     }

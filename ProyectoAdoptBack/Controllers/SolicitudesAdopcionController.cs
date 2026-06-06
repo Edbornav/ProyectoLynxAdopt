@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ProyectoAdoptBack.DTOs;
+using ProyectoAdoptBack.Services;
 
 namespace ProyectoAdoptBack.Controllers
 {
@@ -7,33 +8,46 @@ namespace ProyectoAdoptBack.Controllers
     [ApiController]
     public class SolicitudesAdopcionController : ControllerBase
     {
-        [HttpGet]
-        public ActionResult<List<SolicitudAdopcionDTO>> GetAll()
+        private readonly ISolicitudAdopcionService _service;
+
+        public SolicitudesAdopcionController(ISolicitudAdopcionService service)
         {
-            return Ok(new List<SolicitudAdopcionDTO>());
+            _service = service;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var items = await _service.GetAllAsync();
+            return Ok(items);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<SolicitudAdopcionDTO> GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            return NotFound();
+            var item = await _service.GetByIdAsync(id);
+            if (item == null) return NotFound();
+            return Ok(item);
         }
 
         [HttpPost]
-        public ActionResult<SolicitudAdopcionDTO> Create([FromBody] CreateSolicitudAdopcionDTO dto)
+        public async Task<IActionResult> Create([FromBody] CreateSolicitudAdopcionDTO dto)
         {
-            return Ok(new SolicitudAdopcionDTO());
+            await _service.CreateAsync(dto);
+            return Ok();
         }
 
         [HttpPut("{id}")]
-        public ActionResult Update(int id, [FromBody] UpdateSolicitudAdopcionDTO dto)
+        public async Task<IActionResult> UpdateEstatus(int id, [FromBody] UpdateSolicitudAdopcionDTO dto)
         {
+            await _service.UpdateEstatusAsync(id, dto);
             return NoContent();
         }
 
         [HttpPatch("{id}/desactivar")]
-        public ActionResult Desactivar(int id)
+        public async Task<IActionResult> Desactivar(int id)
         {
+            await _service.DesactivarAsync(id);
             return NoContent();
         }
     }

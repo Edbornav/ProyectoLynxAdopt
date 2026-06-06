@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ProyectoAdoptBack.DTOs;
+using ProyectoAdoptBack.Services;
 
 namespace ProyectoAdoptBack.Controllers
 {
@@ -7,29 +8,40 @@ namespace ProyectoAdoptBack.Controllers
     [ApiController]
     public class PerfilesAdoptanteController : ControllerBase
     {
-        [HttpGet]
-        public ActionResult<List<PerfilAdoptanteDTO>> GetAll()
+        private readonly IPerfilAdoptanteService _service;
+
+        public PerfilesAdoptanteController(IPerfilAdoptanteService service)
         {
-            return Ok(new List<PerfilAdoptanteDTO>());
+            _service = service;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var items = await _service.GetAllAsync();
+            return Ok(items);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<PerfilAdoptanteDTO> GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            return NotFound();
+            var item = await _service.GetByIdAsync(id);
+            if (item == null) return NotFound();
+            return Ok(item);
         }
 
         [HttpPost]
-        public ActionResult<PerfilAdoptanteDTO> Create([FromBody] CreatePerfilAdoptanteDTO dto)
+        public async Task<IActionResult> Create([FromBody] CreatePerfilAdoptanteDTO dto)
         {
-            return Ok(new PerfilAdoptanteDTO());
+            await _service.CreateAsync(dto);
+            return Ok();
         }
 
         [HttpPut("{id}")]
-        public ActionResult Update(int id, [FromBody] UpdatePerfilAdoptanteDTO dto)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdatePerfilAdoptanteDTO dto)
         {
+            await _service.UpdateAsync(id, dto);
             return NoContent();
         }
-
     }
 }
