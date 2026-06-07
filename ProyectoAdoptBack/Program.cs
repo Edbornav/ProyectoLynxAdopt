@@ -1,5 +1,10 @@
 using ProyectoAdoptBack.Services;
 using ProyectoAdoptBack.Repositories;
+using Dapper;
+using System.Data;
+
+SqlMapper.AddTypeHandler(new DateOnlyToDateTimeHandler());
+SqlMapper.AddTypeHandler(new NullableDateOnlyToDateTimeHandler());
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -69,3 +74,27 @@ app.UseCors("AllowAll");
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
+
+public class DateOnlyToDateTimeHandler : SqlMapper.TypeHandler<DateTime>
+{
+    public override DateTime Parse(object value)
+    {
+        if (value is DateOnly d) return d.ToDateTime(TimeOnly.MinValue);
+        return (DateTime)value;
+    }
+
+    public override void SetValue(IDbDataParameter parameter, DateTime value)
+        => parameter.Value = value;
+}
+
+public class NullableDateOnlyToDateTimeHandler : SqlMapper.TypeHandler<DateTime?>
+{
+    public override DateTime? Parse(object value)
+    {
+        if (value is DateOnly d) return d.ToDateTime(TimeOnly.MinValue);
+        return (DateTime?)value;
+    }
+
+    public override void SetValue(IDbDataParameter parameter, DateTime? value)
+        => parameter.Value = value;
+}

@@ -43,7 +43,7 @@ namespace ProyectoAdoptBack.Repositories
 
         public async Task<Adoptante> CreateAsync(Adoptante adoptante)
         {
-            const string sql = @"SELECT sp_insert_adoptante(@p_usuarioid, @p_nombre, @p_apellidopaterno, @p_apellidomaterno, @p_telefono, @p_fechanacimiento);"; // cambio SQL mal formado corregido
+            const string sql = @"SELECT sp_insert_adoptante(@p_usuarioid, @p_nombre, @p_apellidopaterno, @p_apellidomaterno, @p_telefono, @p_fechanacimiento::date);"; // cambio SQL mal formado corregido
 
             using var conn = CreateConnection();
             await conn.ExecuteAsync(sql, new
@@ -61,7 +61,7 @@ namespace ProyectoAdoptBack.Repositories
 
         public async Task UpdateAsync(Adoptante adoptante)
         {
-            const string sql = @"SELECT sp_update_adoptante(@p_id, @p_nombre, @p_apellidopaterno, @p_apellidomaterno, @p_telefono, @p_fechanacimiento);"; // cambio sqlQL
+            const string sql = @"SELECT sp_update_adoptante(@p_id, @p_nombre, @p_apellidopaterno, @p_apellidomaterno, @p_telefono, @p_fechanacimiento::date);"; // cambio sqlQL
 
             using var conn = CreateConnection();
             await conn.ExecuteAsync(sql, new

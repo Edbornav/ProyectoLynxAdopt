@@ -61,7 +61,7 @@ namespace ProyectoAdoptBack.Repositories
         {
             using var connection = CreateConnection();
             await connection.ExecuteAsync(
-                "SELECT sp_insert_animal(@p_refugioid, @p_razaid, @p_nombre, @p_sexo, @p_fechanacimiento, @p_descripcion, @p_estatus);",
+                "SELECT sp_insert_animal(@p_refugioid, @p_razaid, @p_nombre, @p_sexo, @p_fechanacimiento::date, @p_descripcion, @p_estatus);",
                 new
                 {
                     p_refugioid = animales.RefugioID,
@@ -78,7 +78,7 @@ namespace ProyectoAdoptBack.Repositories
         {
             using var connection = CreateConnection();
             await connection.ExecuteAsync(
-                "SELECT sp_update_animal(@p_id, @p_razaid, @p_nombre, @p_sexo, @p_fechanacimiento, @p_descripcion, @p_estatus);",
+                "SELECT sp_update_animal(@p_id, @p_razaid, @p_nombre, @p_sexo, @p_fechanacimiento::date, @p_descripcion, @p_estatus);",
                 new
                 {
                     p_id = id,
