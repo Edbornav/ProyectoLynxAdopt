@@ -219,13 +219,14 @@ CREATE OR REPLACE FUNCTION sp_insert_usuario(
     p_estatus      VARCHAR
 )
 RETURNS integer
-LANGUAGE plpgsql 
-AS $$
 DECLARE
     p_id integer;
+LANGUAGE plpgsql 
+AS $$
+
 BEGIN
     INSERT INTO Usuarios (Correo, PasswordHash, TipoUsuario, Estatus, FechaRegistro)
-    VALUES (p_correo, p_passwordhash, p_tipousuario, p_estatus, CURRENT_DATE)
+    VALUES (p_correo, p_passwordhash, p_tipousuario, p_estatus, CURRENT_DATE);
     returning UsuarioID into p_id;
 
     RETURN p_id;
@@ -378,17 +379,26 @@ BEGIN
     FROM PerfilAdoptante p WHERE p.AdoptanteUsuarioID = p_id;
 END; $$;
 
-CREATE OR REPLACE FUNCTION sp_insert_perfil_adoptante(
-    p_adoptanteid                       INT,
-    p_descripcioncasa                   VARCHAR,
-    p_descripcionmascotas               VARCHAR,
-    p_descripcionexperienciaconmascotas VARCHAR
+CREATE OR REPLACE FUNCTION sp_insert_adoptante(
+    p_usuarioid       INT,
+    p_nombre          VARCHAR,
+    p_apellidopaterno VARCHAR,
+    p_apellidomaterno VARCHAR,
+    p_telefono        VARCHAR,
+    p_fechanacimiento DATE
 )
-RETURNS VOID
-LANGUAGE plpgsql AS $$
+RETURNS integer
+DECLARE
+    p_id integer;
+LANGUAGE plpgsql 
+AS $$
+
 BEGIN
-    INSERT INTO PerfilAdoptante (AdoptanteUsuarioID, DescripcionCasa, DescripcionMascotas, DescripcionExperienciaConMascotas)
-    VALUES (p_adoptanteid, p_descripcioncasa, p_descripcionmascotas, p_descripcionexperienciaconmascotas);
+    INSERT INTO Adoptante (UsuarioID, Nombre, ApellidoPaterno, ApellidoMaterno, Telefono, FechaNacimiento)
+    VALUES (p_usuarioid, p_nombre, p_apellidopaterno, p_apellidomaterno, p_telefono, p_fechanacimiento);
+    returning AdoptanteID into p_id;
+
+    RETURN p_id;
 END; $$;
 
 CREATE OR REPLACE FUNCTION sp_update_perfil_adoptante(
@@ -526,12 +536,12 @@ CREATE OR REPLACE FUNCTION sp_insert_refugio(
 )
 RETURNS INTEGER 
 Declare
-    p_id integer;
+    p_id integerl;
 LANGUAGE plpgsql 
 AS $$
 BEGIN
     INSERT INTO Refugio (Nombre, Descripcion, Direccion, Telefono, Correo, Estatus, FechaDeRegistro)
-    VALUES (p_nombre, p_descripcion, p_direccion, p_telefono, p_correo, p_estatus, CURRENT_DATE)
+    VALUES (p_nombre, p_descripcion, p_direccion, p_telefono, p_correo, p_estatus, CURRENT_DATE);
     returning RefugioID into p_id;
 
     return p_id;
@@ -758,16 +768,19 @@ BEGIN
     FROM SolicitudAdopcion s WHERE s.RefugioID = p_refugioid;
 END; $$;
 
+
 CREATE OR REPLACE FUNCTION sp_insert_solicitud(
     p_refugioid        INT,
     p_adoptanteid      INT,
     p_mensajeadoptante VARCHAR
 )
 RETURNS integer
-LANGUAGE plpgsql AS $$
+Declare p_id integer;
+LANGUAGE plpgsql 
+AS $$
 BEGIN
     INSERT INTO SolicitudAdopcion (RefugioID, AdoptanteID, MensajeAdoptante)
-    VALUES (p_refugioid, p_adoptanteid, p_mensajeadoptante)
+    VALUES (p_refugioid, p_adoptanteid, p_mensajeadoptante);
     returning SolicitudID into p_id;
     
     return p_id;
