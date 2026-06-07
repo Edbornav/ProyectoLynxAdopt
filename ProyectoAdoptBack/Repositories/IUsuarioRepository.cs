@@ -8,7 +8,7 @@ namespace ProyectoAdoptBack.Repositories
         Task<IEnumerable<Usuario>> GetAllAsync();
         Task<Usuario?> GetByIdAsync(int id);
         Task<Usuario?> LoginAsync(string correo);
-        Task CreateAsync(Usuario usuario);
+        Task <int>CreateAsync(Usuario usuario);
         Task UpdateAsync(int id, Usuario usuario);
         Task DesactivarAsync(int id);
     }
@@ -47,10 +47,11 @@ namespace ProyectoAdoptBack.Repositories
                 new { p_correo = correo });
         }
 
-        public async Task CreateAsync(Usuario usuario)
+        public async Task<int> CreateAsync(Usuario usuario)
         {
             using var connection = CreateConnection();
-            await connection.ExecuteAsync(
+        
+            return await connection.ExecuteScalarAsync<int>(
                 //Agregado @p_passwordhash para que coincida con la firma del SP sp_insert_usuario(p_correo, p_passwordhash, p_tipousuario, p_estatus)
                 "SELECT sp_insert_usuario(@p_correo, @p_passwordhash, @p_tipousuario, @p_estatus);", 
                 new

@@ -8,7 +8,7 @@ namespace ProyectoAdoptBack.Repositories
         //Procesos que se debe implementar  si o si
         Task<IEnumerable<Refugio>> GetAllAsync();
         Task<Refugio?> GetByIdAsync(int id);
-        Task CreateAsync(Refugio refugio);
+        Task<int> CreateAsync(Refugio refugio);
         Task UpdateAsync(int id, Refugio refugio);
         Task DesactivarAsync(int id);
     }
@@ -38,10 +38,10 @@ namespace ProyectoAdoptBack.Repositories
                 new { p_id = id });
         }
 
-        public async Task CreateAsync(Refugio refugio)
+        public async Task<int> CreateAsync(Refugio refugio)
         {
             using var connection = CreateConnection();
-            await connection.ExecuteAsync(
+            return await connection.ExecuteScalarAsync<int>(
                 "SELECT sp_insert_refugio(@p_nombre, @p_descripcion, @p_direccion, @p_telefono, @p_correo, @p_estatus);",
                 new
                 {

@@ -8,7 +8,7 @@ namespace ProyectoAdoptBack.Services
     {
         Task<List<RefugioDTO>> GetAllAsync();
         Task<RefugioDTO?> GetByIdAsync(int id);
-        Task CreateAsync(CreateRefugioDTO dto);
+        Task <int> CreateAsync(CreateRefugioDTO dto);
         Task UpdateAsync(int id, UpdateRefugioDTO dto);
         Task DesactivarAsync(int id);
     }
@@ -34,7 +34,7 @@ namespace ProyectoAdoptBack.Services
             return refugio is null ? null : MapToDto(refugio);
         }
 
-        public async Task CreateAsync(CreateRefugioDTO dto)
+        public async Task<int> CreateAsync(CreateRefugioDTO dto)
         {
             ValidateCreate(dto);
 
@@ -48,7 +48,7 @@ namespace ProyectoAdoptBack.Services
                 Estatus = dto.Estatus.Trim()
             };
 
-            await _repository.CreateAsync(model);
+            return await _repository.CreateAsync(model);
         }
 
         public async Task UpdateAsync(int id, UpdateRefugioDTO dto)

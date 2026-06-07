@@ -8,7 +8,7 @@ namespace ProyectoAdoptBack.Repositories
     {
         Task<IEnumerable<Adoptante>> GetAllAsync();
         Task<Adoptante?> GetByIdAsync(int id);
-        Task<Adoptante> CreateAsync(Adoptante adoptante);
+        Task<int> CreateAsync(Adoptante adoptante);
         Task UpdateAsync(Adoptante adoptante);
         Task DesactivarAsync(int id);
     }
@@ -41,12 +41,13 @@ namespace ProyectoAdoptBack.Repositories
             return await conn.QueryFirstOrDefaultAsync<Adoptante>(sql, new { p_id = id });
         }
 
-        public async Task<Adoptante> CreateAsync(Adoptante adoptante)
+        public async Task<int> CreateAsync(Adoptante adoptante)
         {
-            const string sql = @"SELECT sp_insert_adoptante(@p_usuarioid, @p_nombre, @p_apellidopaterno, @p_apellidomaterno, @p_telefono, @p_fechanacimiento);"; // cambio SQL mal formado corregido
-
-            using var conn = CreateConnection();
-            await conn.ExecuteAsync(sql, new
+            using var connection = CreateConnection();
+        
+            return await connection.ExecuteScalarAsync<int>(
+                "SELECT sp_insert_adoptante(@p_usuarioid, @p_nombre, @p_apellidopaterno, @p_apellidomaterno, @p_telefono, @p_fechanacimiento);",
+                new
             {
                 p_usuarioid = adoptante.UsuarioID,
                 p_nombre = adoptante.Nombre,
@@ -56,7 +57,7 @@ namespace ProyectoAdoptBack.Repositories
                 p_fechanacimiento = adoptante.FechaNacimiento
             });
 
-            return adoptante;
+    
         }
 
         public async Task UpdateAsync(Adoptante adoptante)

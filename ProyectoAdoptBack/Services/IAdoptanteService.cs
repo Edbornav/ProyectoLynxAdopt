@@ -7,7 +7,7 @@ namespace ProyectoAdoptBack.Services
     {
         Task<IEnumerable<AdoptanteDTO>> GetAllAsync();
         Task<AdoptanteDTO?> GetByIdAsync(int id);
-        Task<AdoptanteDTO> CreateAsync(CreateAdoptanteDTO dto);
+        Task<int> CreateAsync(CreateAdoptanteDTO dto);// Necesitamos retornar el id de adoptante para crear solicitud de adopcion :DD
         Task UpdateAsync(int id, UpdateAdoptanteDTO dto);
         Task DesactivarAsync(int id);
     }
@@ -34,19 +34,18 @@ namespace ProyectoAdoptBack.Services
             return ToDTO(adoptante);
         }
 
-        public async Task<AdoptanteDTO> CreateAsync(CreateAdoptanteDTO dto)
+        public async Task<int> CreateAsync(CreateAdoptanteDTO dto)
         {
-            var adoptante = new Adoptante
+            var model = new Adoptante
             {
                 UsuarioID = dto.UsuarioID,
-                Nombre = dto.Nombre,
-                ApellidoPaterno = dto.ApellidoPaterno,
-                ApellidoMaterno = dto.ApellidoMaterno,
-                Telefono = dto.Telefono,
+                Nombre = dto.Nombre.Trim(),
+                ApellidoPaterno = dto.ApellidoPaterno.Trim(),
+                ApellidoMaterno = dto.ApellidoMaterno.Trim(),
+                Telefono = dto.Telefono.Trim(), 
                 FechaNacimiento = dto.FechaNacimiento
             };
-            var created = await _repository.CreateAsync(adoptante);
-            return ToDTO(created); // cambio (se corrigio variable inexistente)
+            return await _repository.CreateAsync(model);
 
 
         }

@@ -10,7 +10,7 @@ namespace ProyectoAdoptBack.Services
         Task<List<UsuarioDTO>> GetAllAsync();
         Task<UsuarioDTO?> GetByIdAsync(int id);
         Task<UsuarioDTO?> LoginAsync(LoginDTO dto);
-        Task CreateAsync(CreateUsuarioDTO dto);
+        Task<int> CreateAsync(CreateUsuarioDTO dto); //uso de int para retornar el id del usuario
         Task UpdateAsync(int id, UpdateUsuarioDTO dto);
         Task DesactivarAsync(int id);
     }
@@ -51,7 +51,7 @@ namespace ProyectoAdoptBack.Services
             return MapToDto(usuario);
         }
 
-        public async Task CreateAsync(CreateUsuarioDTO dto)
+        public async Task<int> CreateAsync(CreateUsuarioDTO dto) //Este metodo debe de retornar el id del usuario para que pueda ser utilizado en la creacion de adoptante o administrador
         {
             ValidateCreate(dto);
 
@@ -67,7 +67,7 @@ namespace ProyectoAdoptBack.Services
                 FechaRegistro = DateTime.UtcNow
             };
 
-            await _repository.CreateAsync(model);
+            return await _repository.CreateAsync(model);
         }
 
         public async Task UpdateAsync(int id, UpdateUsuarioDTO dto)

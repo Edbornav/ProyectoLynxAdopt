@@ -10,7 +10,7 @@ namespace ProyectoAdoptBack.Services
         Task<SolicitudAdopcionDTO?> GetByIdAsync(int id);
         Task<List<SolicitudAdopcionDTO>> GetByAdoptanteAsync(int adoptanteId);
         Task<List<SolicitudAdopcionDTO>> GetByRefugioAsync(int refugioId);
-        Task CreateAsync(CreateSolicitudAdopcionDTO dto);
+        Task <int> CreateAsync(CreateSolicitudAdopcionDTO dto);
         Task UpdateEstatusAsync(int id, UpdateSolicitudAdopcionDTO dto); // error: el DTO real se llama UpdateSolicitudAdopcionDTO
         Task DesactivarAsync(int id);
     }
@@ -52,16 +52,16 @@ namespace ProyectoAdoptBack.Services
             return solicitudes.Select(MapToDto).ToList();
         }
 
-        public async Task CreateAsync(CreateSolicitudAdopcionDTO dto)
+        public async Task<int> CreateAsync(CreateSolicitudAdopcionDTO dto)
         {
             ValidateCreate(dto);
             var model = new SolicitudAdopcion
             {
                 RefugioID = dto.RefugioID,
                 AdoptanteID = dto.AdoptanteID,
-                MensajeAdoptante = dto.MensajeAdoptante.Trim() // error: faltaba limpiar espacios
+                MensajeAdoptante = dto.MensajeAdoptante.Trim() 
             };
-            await _repository.CreateAsync(model);
+            return await _repository.CreateAsync(model);
         }
 
         public async Task UpdateEstatusAsync(int id, UpdateSolicitudAdopcionDTO dto)

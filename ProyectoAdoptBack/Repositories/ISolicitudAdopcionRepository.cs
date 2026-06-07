@@ -10,7 +10,7 @@ namespace ProyectoAdoptBack.Repositories
         Task<SolicitudAdopcion?> GetByIdAsync(int id);
         Task<IEnumerable<SolicitudAdopcion>> GetByAdoptanteAsync(int adoptanteId);
         Task<IEnumerable<SolicitudAdopcion>> GetByRefugioAsync(int refugioId);
-        Task CreateAsync(SolicitudAdopcion solicitud);
+        Task<int> CreateAsync(SolicitudAdopcion solicitud);
         Task UpdateEstatusAsync(int id, string estatus);
         Task DesactivarAsync(int id);
     }
@@ -58,10 +58,10 @@ namespace ProyectoAdoptBack.Repositories
                 new { p_refugioid = refugioId });
         }
 
-        public async Task CreateAsync(SolicitudAdopcion solicitud)
+        public async Task<int> CreateAsync(SolicitudAdopcion solicitud)
         {
             using var connection = CreateConnection();
-            await connection.ExecuteAsync(
+            return await connection.ExecuteScalarAsync<int>(
                 "SELECT sp_insert_solicitud(@p_refugioid, @p_adoptanteid, @p_mensajeadoptante);",
                 new
                 {
