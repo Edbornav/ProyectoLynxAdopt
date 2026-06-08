@@ -15,14 +15,14 @@ namespace ProyectoAdoptBack.Controllers
         {
             _service = service;
         }
-        [Authorize]
+        [Authorize(Roles = "Administrador")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var items = await _service.GetAllAsync();
             return Ok(items);
         }
-        [Authorize]
+        [Authorize(Roles ="Administrador")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -44,7 +44,7 @@ namespace ProyectoAdoptBack.Controllers
             await _service.UpdateEstatusAsync(id, dto);
             return NoContent();
         }
-        [Authorize]
+        [Authorize(Roles ="Administrador")]
         [HttpPatch("{id}/desactivar")]
         public async Task<IActionResult> Desactivar(int id)
         {

@@ -31,7 +31,7 @@ namespace ProyectoAdoptBack.Controllers
             if (item == null) return NotFound();
             return Ok(item);
         }
-        [AllowAnonymous]
+        [Authorize(Roles ="Administrador")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateAdministradorDTO dto)
         {
