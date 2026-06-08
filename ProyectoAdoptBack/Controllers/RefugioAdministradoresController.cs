@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProyectoAdoptBack.DTOs;
 using ProyectoAdoptBack.Services;
@@ -6,6 +7,7 @@ namespace ProyectoAdoptBack.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles ="Administrador")]
     public class RefugioAdministradoresController : ControllerBase
     {
         private readonly IRefugioAdministradoresService _service;
@@ -14,14 +16,12 @@ namespace ProyectoAdoptBack.Controllers
         {
             _service = service;
         }
-
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var items = await _service.GetAllAsync();
             return Ok(items);
         }
-
         [HttpGet("{refugioId}")]
         public async Task<IActionResult> GetByRefugio(int refugioId)
         {

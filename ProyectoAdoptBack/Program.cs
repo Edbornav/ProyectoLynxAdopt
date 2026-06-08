@@ -2,6 +2,11 @@ using ProyectoAdoptBack.Services;
 using ProyectoAdoptBack.Repositories;
 using Dapper;
 using System.Data;
+using ProyectoAdoptBack.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 
 SqlMapper.AddTypeHandler(new DateOnlyToDateTimeHandler());
 SqlMapper.AddTypeHandler(new NullableDateOnlyToDateTimeHandler());
@@ -22,6 +27,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();  
 builder.Services.AddOpenApi();
 
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt")); //Vincular lo que agrege en appsetting y el Models JwtSetting
 //Administrador
 builder.Services.AddScoped<IAdministradorRepository, AdministradorRepository>();
 builder.Services.AddScoped<IAdministradorService, AdministradorService>();
@@ -61,6 +67,26 @@ builder.Services.AddScoped<ICitasService, CitasService>();
 //adoptante
 builder.Services.AddScoped<IAdoptanteRepository, AdoptanteRepository>();
 builder.Services.AddScoped<IAdoptanteService, AdoptanteService>();
+
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
+builder.Services.AddScoped<ITokenService, TokenService>();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings!.Issuer,
+            ValidAudience = jwtSettings!.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
+        };
+    });
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -71,6 +97,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();

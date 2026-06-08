@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProyectoAdoptBack.DTOs;
 using ProyectoAdoptBack.Services;
@@ -14,14 +15,14 @@ namespace ProyectoAdoptBack.Controllers
         {
             _service = service;
         }
-
+        [Authorize]
         [HttpGet("{solicitudId}")]
         public async Task<IActionResult> GetBySolicitud(int solicitudId)
         {
             var items = await _service.GetBySolicitudAsync(solicitudId);
             return Ok(items);
         }
-
+        [Authorize(Roles ="Adoptante")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateSolicitudAnimalesDTO dto)
         {
