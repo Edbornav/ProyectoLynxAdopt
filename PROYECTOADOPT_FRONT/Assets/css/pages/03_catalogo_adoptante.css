@@ -100,3 +100,59 @@
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 20px;
 }
+
+.pet-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: transform 0.2s;
+}
+.pet-card:hover { transform: translateY(-4px); }
+.pet-img {
+    height: 180px;
+    background: var(--beige-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    border-radius: var(--radius) var(--radius) 0 0;
+}
+.pet-info { padding: 14px; }
+.pet-name {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.1rem;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+}
+.pet-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 0.82rem;
+    color: var(--text-mid);
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+.pet-status {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: var(--radius-pill);
+    font-size: 0.78rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+.status-disponible { background: #d4f7d4; color: #2d7a2d; }
+.status-otro { background: #fde8d0; color: #b85c00; }
+.btn-solicitar {
+    width: 100%;
+    padding: 8px;
+    background: var(--orange);
+    color: white;
+    border: none;
+    border-radius: var(--radius-pill);
+    font-family: 'Fredoka One', cursive;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-solicitar:hover { background: var(--orange-dark); }

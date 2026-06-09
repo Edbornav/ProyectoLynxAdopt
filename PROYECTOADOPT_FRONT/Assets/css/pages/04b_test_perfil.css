@@ -49,3 +49,75 @@
 .btn-next:hover { background: var(--brown-dark); transform: translateY(-2px); box-shadow: var(--shadow); }
 .btn-prev { background: var(--beige); color: var(--text-mid); margin-right: 12px; }
 .btn-prev:hover { background: var(--beige-light); }
+
+.question-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 28px;
+    margin-bottom: 20px;
+}
+.question-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.4rem;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+}
+.question-desc {
+    color: var(--text-mid);
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 16px;
+}
+.question-textarea {
+    width: 100%;
+    border: 2px solid var(--beige-card);
+    border-radius: var(--radius);
+    padding: 12px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    resize: vertical;
+    transition: border 0.2s;
+    box-sizing: border-box;
+}
+.question-textarea:focus {
+    outline: none;
+    border-color: var(--orange);
+}
+.char-count {
+    text-align: right;
+    font-size: 0.78rem;
+    color: var(--text-mid);
+    margin-top: 4px;
+}
+.progress-bar-wrap {
+    background: var(--beige-card);
+    border-radius: var(--radius-pill);
+    height: 8px;
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+.progress-bar-fill {
+    height: 100%;
+    background: var(--orange);
+    border-radius: var(--radius-pill);
+    transition: width 0.4s ease;
+}
+.nav-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+.btn-nav {
+    padding: 10px 24px;
+    border: none;
+    border-radius: var(--radius-pill);
+    font-family: 'Fredoka One', cursive;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-prev { background: var(--beige-card); color: var(--text-dark); }
+.btn-prev:hover { background: #e0d5c8; }
+.btn-next { background: var(--orange); color: white; }
+.btn-next:hover { background: var(--orange-dark); }
+.btn-next:disabled { background: #ccc; cursor: not-allowed; }
