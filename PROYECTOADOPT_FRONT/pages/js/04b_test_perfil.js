@@ -1,4 +1,3 @@
-const API_BASE_URL = 'https://localhost:7143/api';
 
 //indica en que paso vas y guarda las respuestas del usuario en un objeto para luego enviarlas al servidor y crear el perfil del adoptante con esa información
 let pasoActual = 0;

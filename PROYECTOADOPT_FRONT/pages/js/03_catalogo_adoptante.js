@@ -1,4 +1,4 @@
-const API_BASE_URL ='https://localhost:7143/api';
+
 
 let todosLosAnimales =[]; //guarda a los animales que se obtiene de la api 
 let refugioActivo=null; // 
