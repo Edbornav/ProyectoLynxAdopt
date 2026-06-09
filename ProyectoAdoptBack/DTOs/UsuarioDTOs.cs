@@ -29,4 +29,13 @@ namespace ProyectoAdoptBack.DTOs
         public string Correo { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
     }
+    public class LoginResponseDTO
+    {
+        public string Token {get; set;}= string.Empty;
+        public int UsuarioID {get; set;}
+        public string Correo {get; set;}= string.Empty;
+        public string TipoUsuario {get; set;}= string.Empty;
+
+    }
+    
 }
