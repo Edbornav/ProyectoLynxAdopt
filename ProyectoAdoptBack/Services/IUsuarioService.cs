@@ -9,7 +9,7 @@ namespace ProyectoAdoptBack.Services
     {
         Task<List<UsuarioDTO>> GetAllAsync();
         Task<UsuarioDTO?> GetByIdAsync(int id);
-        Task<UsuarioDTO?> LoginAsync(LoginDTO dto);
+        Task<LoginResponseDTO?> LoginAsync(LoginDTO dto); //ahora con la implementraciojn del LoginReponse debemos de regresar el token ademas de los datos del usuario
         Task<int> CreateAsync(CreateUsuarioDTO dto); //uso de int para retornar el id del usuario
         Task UpdateAsync(int id, UpdateUsuarioDTO dto);
         Task DesactivarAsync(int id);
@@ -18,10 +18,12 @@ namespace ProyectoAdoptBack.Services
     public class UsuarioService : IUsuarioService
     {
         private readonly IUsuarioRepository _repository;
+        private readonly ITokenService _tokenservice;
 
-        public UsuarioService(IUsuarioRepository repository)
+        public UsuarioService(IUsuarioRepository repository, ITokenService tokenService)
         {
             _repository = repository;
+            _tokenservice = tokenService;
         }
 
         public async Task<List<UsuarioDTO>> GetAllAsync()
@@ -36,7 +38,7 @@ namespace ProyectoAdoptBack.Services
             return usuario is null ? null : MapToDto(usuario);
         }
 
-        public async Task<UsuarioDTO?> LoginAsync(LoginDTO dto)
+        public async Task<LoginResponseDTO?> LoginAsync(LoginDTO dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Correo) || string.IsNullOrWhiteSpace(dto.Password))
                 throw new ArgumentException("Correo y contraseña son obligatorios.");
@@ -48,7 +50,15 @@ namespace ProyectoAdoptBack.Services
             if (!BCrypt.Net.BCrypt.Verify(dto.Password, usuario.PasswordHash))
                 return null;
 
-            return MapToDto(usuario);
+            var token = _tokenservice.GenerarToken(usuario);
+            return new LoginResponseDTO
+            {
+                Token = token,
+                UsuarioID = usuario.UsuarioID,
+                Correo = usuario.Correo,
+                TipoUsuario = usuario.TipoUsuario
+            };
+            
         }
 
         public async Task<int> CreateAsync(CreateUsuarioDTO dto) //Este metodo debe de retornar el id del usuario para que pueda ser utilizado en la creacion de adoptante o administrador
