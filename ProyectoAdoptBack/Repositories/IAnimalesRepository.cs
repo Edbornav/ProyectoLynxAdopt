@@ -10,7 +10,7 @@ namespace ProyectoAdoptBack.Repositories
         Task<Animales?> GetByIdAsync(int id);
         Task<IEnumerable<Animales>> GetByRefugioAsync(int refugioId);
         Task<IEnumerable<Animales>> GetDisponiblesAsync();
-        Task CreateAsync(Animales animales);
+        Task<int> CreateAsync(Animales animales);
         Task UpdateAsync(int id, Animales animales);
         Task DesactivarAsync(int id);
     }
@@ -57,10 +57,10 @@ namespace ProyectoAdoptBack.Repositories
                 "SELECT AnimalID, RefugioID, RazaID, Nombre, Sexo, FechaNacimiento, Descripcion, Estatus, FechaRegistro FROM sp_get_animales_disponibles();"); 
         }
 
-        public async Task CreateAsync(Animales animales)
+        public async Task<int> CreateAsync(Animales animales)
         {
             using var connection = CreateConnection();
-            await connection.ExecuteAsync(
+            return await connection.ExecuteScalarAsync<int>(
                 "SELECT sp_insert_animal(@p_refugioid, @p_razaid, @p_nombre, @p_sexo, @p_fechanacimiento::date, @p_descripcion, @p_estatus);",
                 new
                 {

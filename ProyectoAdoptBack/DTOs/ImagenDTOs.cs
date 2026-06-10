@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Http;
+
 namespace ProyectoAdoptBack.DTOs
 {
     public class ImagenDTO
@@ -18,6 +20,14 @@ namespace ProyectoAdoptBack.DTOs
         public string Url { get; set; } = string.Empty;
         public int Orden { get; set; }
         public string NombreArchivo { get; set; } = string.Empty;
+    }
+
+    public class CreateImagenRequest
+    {
+        public IFormFile? Archivo { get; set; }
+        public string EntidadTipo { get; set; } = string.Empty;
+        public int EntidadID { get; set; }
+        public int Orden { get; set; }
     }
 
     public class UpdateImagenDTO

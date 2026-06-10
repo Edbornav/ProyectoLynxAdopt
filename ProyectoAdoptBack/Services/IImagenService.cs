@@ -8,6 +8,7 @@ namespace ProyectoAdoptBack.Services
     {
         Task<List<ImagenDTO>> GetByEntidadAsync(string entidadTipo, int entidadId);
         Task<int> CreateAsync(CreateImagenDTO dto);
+        Task<int> CreateConArchivoAsync(CreateImagenRequest request);
         Task<ImagenDTO?> DeleteAsync(int imagenId);
         Task<List<ImagenDTO>> DeleteByEntidadAsync(string entidadTipo, int entidadId);
         Task ReordenarAsync(int imagenId, int orden);
@@ -16,10 +17,39 @@ namespace ProyectoAdoptBack.Services
     public class ImagenService : IImagenService
     {
         private readonly IImagenRepository _repository;
+        private readonly ISupabaseStorageService _storage;
 
-        public ImagenService(IImagenRepository repository)
+        public ImagenService(IImagenRepository repository, ISupabaseStorageService storage)
         {
             _repository = repository;
+            _storage = storage;
+        }
+
+        public async Task<int> CreateConArchivoAsync(CreateImagenRequest request)
+        {
+            if (request.Archivo == null || request.Archivo.Length == 0)
+                throw new ArgumentException("El archivo es obligatorio.");
+
+            ValidateEntidad(request.EntidadTipo, request.EntidadID);
+
+            using var stream = request.Archivo.OpenReadStream();
+            var url = await _storage.UploadAsync(
+                stream,
+                request.Archivo.FileName,
+                request.Archivo.ContentType,
+                request.EntidadTipo
+            );
+
+            var model = new Imagen
+            {
+                EntidadTipo = request.EntidadTipo.Trim(),
+                EntidadID = request.EntidadID,
+                Url = url,
+                Orden = request.Orden,
+                NombreArchivo = request.Archivo.FileName.Trim()
+            };
+
+            return await _repository.CreateAsync(model);
         }
 
         public async Task<List<ImagenDTO>> GetByEntidadAsync(string entidadTipo, int entidadId)
@@ -51,13 +81,23 @@ namespace ProyectoAdoptBack.Services
                 throw new ArgumentException("ImagenID no válido.");
 
             var imagen = await _repository.DeleteAsync(imagenId);
-            return imagen is null ? null : MapToDto(imagen);
+            if (imagen is null) return null;
+
+            try { await _storage.DeleteAsync(imagen.Url); }
+            catch { }
+
+            return MapToDto(imagen);
         }
 
         public async Task<List<ImagenDTO>> DeleteByEntidadAsync(string entidadTipo, int entidadId)
         {
             ValidateEntidad(entidadTipo, entidadId);
             var imagenes = await _repository.DeleteByEntidadAsync(entidadTipo, entidadId);
+            foreach (var img in imagenes)
+            {
+                try { await _storage.DeleteAsync(img.Url); }
+                catch { }
+            }
             return imagenes.Select(MapToDto).ToList();
         }
 

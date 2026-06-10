@@ -32,11 +32,20 @@ namespace ProyectoAdoptBack.Controllers
             return Ok(item);
         }
         [AllowAnonymous]
+        [HttpGet("por-usuario/{usuarioId}")]
+        public async Task<IActionResult> GetByUsuario(int usuarioId)
+        {
+            var item = await _service.GetByUsuarioAsync(usuarioId);
+            if (item == null) return NotFound();
+            return Ok(item);
+        }
+
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateAdministradorDTO dto)
         {
-            await _service.CreateAsync(dto);
-            return Ok();
+            var id = await _service.CreateAsync(dto);
+            return Ok(new { id });
         }
         [Authorize]
         [HttpPut("{id}")]

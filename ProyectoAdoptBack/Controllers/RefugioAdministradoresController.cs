@@ -7,7 +7,6 @@ namespace ProyectoAdoptBack.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles ="Administrador")]
     public class RefugioAdministradoresController : ControllerBase
     {
         private readonly IRefugioAdministradoresService _service;
@@ -16,12 +15,14 @@ namespace ProyectoAdoptBack.Controllers
         {
             _service = service;
         }
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var items = await _service.GetAllAsync();
             return Ok(items);
         }
+        [AllowAnonymous]
         [HttpGet("{refugioId}")]
         public async Task<IActionResult> GetByRefugio(int refugioId)
         {
@@ -29,6 +30,15 @@ namespace ProyectoAdoptBack.Controllers
             return Ok(items);
         }
 
+        [AllowAnonymous]
+        [HttpGet("por-administrador/{administradorId}")]
+        public async Task<IActionResult> GetByAdministrador(int administradorId)
+        {
+            var items = await _service.GetByAdministradorAsync(administradorId);
+            return Ok(items);
+        }
+
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateRefugioAdministradoresDTO dto)
         {

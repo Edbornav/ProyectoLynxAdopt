@@ -8,7 +8,8 @@ namespace ProyectoAdoptBack.Services
     {
         Task<List<AdministradorDTO>> GetAllAsync();
         Task<AdministradorDTO?> GetByIdAsync(int id);
-        Task CreateAsync(CreateAdministradorDTO dto);
+        Task<AdministradorDTO?> GetByUsuarioAsync(int usuarioId);
+        Task<int> CreateAsync(CreateAdministradorDTO dto);
         Task UpdateAsync(int id, UpdateAdministradorDTO dto);
         Task DesactivarAsync(int id);
     }
@@ -34,7 +35,13 @@ namespace ProyectoAdoptBack.Services
             return administrador is null ? null : MapToDto(administrador);
         }
 
-        public async Task CreateAsync(CreateAdministradorDTO dto)
+        public async Task<AdministradorDTO?> GetByUsuarioAsync(int usuarioId)
+        {
+            var administrador = await _repository.GetByUsuarioAsync(usuarioId);
+            return administrador is null ? null : MapToDto(administrador);
+        }
+
+        public async Task<int> CreateAsync(CreateAdministradorDTO dto)
         {
             ValidateCreate(dto);
 
@@ -47,7 +54,7 @@ namespace ProyectoAdoptBack.Services
                 Telefono = dto.Telefono.Trim()
             };
 
-            await _repository.CreateAsync(model);
+            return await _repository.CreateAsync(model);
         }
 
         public async Task UpdateAsync(int id, UpdateAdministradorDTO dto)

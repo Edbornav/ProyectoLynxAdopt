@@ -35,8 +35,8 @@ namespace ProyectoAdoptBack.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreatePerfilAdoptanteDTO dto)
         {
-            await _service.CreateAsync(dto);
-            return Ok();
+            var id = await _service.CreateAsync(dto);
+            return Ok(new { id });
         }
         [Authorize(Roles ="Adoptante")]
         [HttpPut("{id}")]

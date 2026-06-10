@@ -8,6 +8,7 @@ namespace ProyectoAdoptBack.Repositories
     {
         Task<IEnumerable<RefugioAdministradores>> GetAllAsync();
         Task<IEnumerable<RefugioAdministradores>> GetByRefugioAsync(int refugioId);
+        Task<IEnumerable<RefugioAdministradores>> GetByAdministradorAsync(int administradorId);
         Task CreateAsync(RefugioAdministradores refugioAdministradores);
     }
 
@@ -38,6 +39,14 @@ namespace ProyectoAdoptBack.Repositories
                 new { p_refugioid = refugioId });
         }
 
+        public async Task<IEnumerable<RefugioAdministradores>> GetByAdministradorAsync(int administradorId)
+        {
+            using var connection = CreateConnection();
+            return await connection.QueryAsync<RefugioAdministradores>(
+                "SELECT * FROM sp_get_refugio_administradores() WHERE usuarioadminid = @p_id;",
+                new { p_id = administradorId });
+        }
+
         public async Task CreateAsync(RefugioAdministradores refugioAdministradores)
         {
             using var connection = CreateConnection();
@@ -46,7 +55,7 @@ namespace ProyectoAdoptBack.Repositories
                 new
                 {
                     p_refugioid = refugioAdministradores.RefugioID,
-                    p_usuarioadminid = refugioAdministradores.AdministradorID
+                    p_usuarioadminid = refugioAdministradores.UsuarioAdminID
                 });
         }
     }

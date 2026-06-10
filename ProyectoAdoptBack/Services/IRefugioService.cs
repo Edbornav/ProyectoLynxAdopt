@@ -9,6 +9,7 @@ namespace ProyectoAdoptBack.Services
         Task<List<RefugioDTO>> GetAllAsync();
         Task<RefugioDTO?> GetByIdAsync(int id);
         Task <int> CreateAsync(CreateRefugioDTO dto);
+        Task<int> CreateConLogoAsync(CreateRefugioConLogoRequest request);
         Task UpdateAsync(int id, UpdateRefugioDTO dto);
         Task DesactivarAsync(int id);
     }
@@ -16,10 +17,49 @@ namespace ProyectoAdoptBack.Services
     public class RefugioService : IRefugioService
     {
         private readonly IRefugioRepository _repository;
+        private readonly ISupabaseStorageService _storage;
+        private readonly IImagenRepository _imagenRepository;
 
-        public RefugioService(IRefugioRepository repository)
+        public RefugioService(IRefugioRepository repository, ISupabaseStorageService storage, IImagenRepository imagenRepository)
         {
             _repository = repository;
+            _storage = storage;
+            _imagenRepository = imagenRepository;
+        }
+
+        public async Task<int> CreateConLogoAsync(CreateRefugioConLogoRequest request)
+        {
+            var refugioId = await CreateAsync(new CreateRefugioDTO
+            {
+                Nombre = request.Nombre,
+                Descripcion = request.Descripcion,
+                Direccion = request.Direccion,
+                Telefono = request.Telefono,
+                Correo = request.Correo,
+                Estatus = request.Estatus
+            });
+
+            if (request.Logo != null && request.Logo.Length > 0)
+            {
+                using var stream = request.Logo.OpenReadStream();
+                var url = await _storage.UploadAsync(
+                    stream,
+                    request.Logo.FileName,
+                    request.Logo.ContentType,
+                    "Refugio"
+                );
+
+                await _imagenRepository.CreateAsync(new Imagen
+                {
+                    EntidadTipo = "Refugio",
+                    EntidadID = refugioId,
+                    Url = url,
+                    Orden = 1,
+                    NombreArchivo = request.Logo.FileName.Trim()
+                });
+            }
+
+            return refugioId;
         }
 
         public async Task<List<RefugioDTO>> GetAllAsync()

@@ -46,7 +46,7 @@ namespace ProyectoAdoptBack.Controllers
             var id = await _service.CreateAsync(dto);
             return Ok(new { usuarioID = id });
         }
-        [Authorize(Roles = "Administrador")]
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateUsuarioDTO dto)
         {

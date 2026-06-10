@@ -1,27 +1,32 @@
-const _session = JSON.parse(localStorage.getItem('session') || '{}');
-if (!_session.adoptanteId) { redirect('02_inicio_sesion'); }
-
 let _perfilData = null;
+let _adoptanteID = null;
+let _session = null;
 
-(async function() {
+window.initPerfilAdoptante = async function() {
+  _session = JSON.parse(localStorage.getItem('session') || '{}');
+  if (!_session.usuarioID) { redirect('02_inicio_sesion'); return; }
+
   try {
-    const [adoptante, perfiles] = await Promise.all([
-      apiGet(`/Adoptantes/${_session.adoptanteId}`),
+    const resp = await apiGet('/Adoptantes/por-usuario/' + _session.usuarioID);
+    if (!resp) { redirect('04_registro'); return; }
+    _adoptanteID = resp.adoptanteID;
+
+    const [perfiles] = await Promise.all([
       apiGet('/PerfilesAdoptante')
     ]);
 
     document.getElementById('profileName').textContent =
-      `${adoptante.nombre} ${adoptante.apellidoPaterno} ${adoptante.apellidoMaterno}`;
+      `${resp.nombre} ${resp.apellidoPaterno} ${resp.apellidoMaterno}`;
 
     document.getElementById('profileInfoGrid').innerHTML = `
-      <div class="fg"><label>Nombre</label><input id="edtNombre" value="${escapeHtml(adoptante.nombre)}"/></div>
-      <div class="fg"><label>Apellido Paterno</label><input id="edtApellidoP" value="${escapeHtml(adoptante.apellidoPaterno)}"/></div>
-      <div class="fg"><label>Apellido Materno</label><input id="edtApellidoM" value="${escapeHtml(adoptante.apellidoMaterno)}"/></div>
-      <div class="fg"><label>Teléfono</label><input id="edtTelefono" value="${escapeHtml(adoptante.telefono)}"/></div>
-      <div class="fg"><label>Fecha de Nacimiento</label><input id="edtFechaNac" type="date" value="${adoptante.fechaNacimiento ? adoptante.fechaNacimiento.split('T')[0] : ''}"/></div>
+      <div class="fg"><label>Nombre</label><input id="edtNombre" value="${escapeHtml(resp.nombre)}"/></div>
+      <div class="fg"><label>Apellido Paterno</label><input id="edtApellidoP" value="${escapeHtml(resp.apellidoPaterno)}"/></div>
+      <div class="fg"><label>Apellido Materno</label><input id="edtApellidoM" value="${escapeHtml(resp.apellidoMaterno)}"/></div>
+      <div class="fg"><label>Teléfono</label><input id="edtTelefono" value="${escapeHtml(resp.telefono)}"/></div>
+      <div class="fg"><label>Fecha de Nacimiento</label><input id="edtFechaNac" type="date" value="${resp.fechaNacimiento ? resp.fechaNacimiento.split('T')[0] : ''}"/></div>
     `;
 
-    _perfilData = perfiles.find(p => p.adoptanteUsuarioID === _session.usuarioId) || null;
+    _perfilData = perfiles.find(p => p.adoptanteUsuarioID === _adoptanteID) || null;
 
     document.getElementById('profilePerfilSection').innerHTML = `
       <div class="perfil-card">
@@ -39,13 +44,13 @@ let _perfilData = null;
     `;
 
     try {
-      const solicitudes = await apiGet(`/SolicitudesAdopcion/por-adoptante/${_session.adoptanteId}`);
+      const solicitudes = await apiGet(`/SolicitudesAdopcion/por-adoptante/${_adoptanteID}`);
       document.getElementById('statSolicitudes').textContent = solicitudes.length;
       document.getElementById('statAdoptados').textContent = solicitudes.filter(s => s.estatus === 'Aprobada' || s.estatus === 'Aprobado').length;
     } catch (e) {
       try {
         const todas = await apiGet('/SolicitudesAdopcion');
-        const misSol = todas.filter(s => s.adoptanteID === _session.adoptanteId);
+        const misSol = todas.filter(s => s.adoptanteID === _adoptanteID);
         document.getElementById('statSolicitudes').textContent = misSol.length;
         document.getElementById('statAdoptados').textContent = misSol.filter(s => s.estatus === 'Aprobada' || s.estatus === 'Aprobado').length;
       } catch (e2) {}
@@ -53,11 +58,15 @@ let _perfilData = null;
   } catch (e) {
     console.error('Error cargando perfil:', e);
   }
-})();
+};
 
 window.guardarCambios = async function() {
+  if (!_adoptanteID) {
+    alert('Perfil no cargado. Intenta de nuevo.');
+    return;
+  }
   try {
-    await apiPut(`/Adoptantes/${_session.adoptanteId}`, {
+    await apiPut(`/Adoptantes/${_adoptanteID}`, {
       nombre: document.getElementById('edtNombre').value.trim(),
       apellidoPaterno: document.getElementById('edtApellidoP').value.trim(),
       apellidoMaterno: document.getElementById('edtApellidoM').value.trim(),
@@ -74,7 +83,7 @@ window.guardarCambios = async function() {
     if (_perfilData) {
       await apiPut(`/PerfilesAdoptante/${_perfilData.perfilAdoptanteID}`, perfilDto);
     } else {
-      await apiPost('/PerfilesAdoptante', { ...perfilDto, adoptanteUsuarioID: _session.usuarioId });
+      await apiPost('/PerfilesAdoptante', { ...perfilDto, adoptanteUsuarioID: _adoptanteID });
     }
 
     alert('Cambios guardados correctamente');

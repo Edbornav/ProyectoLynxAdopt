@@ -9,7 +9,7 @@ namespace ProyectoAdoptBack.Repositories
         Task<IEnumerable<Raza>> GetAllAsync();
         Task<Raza?> GetbyIdAsync(int id);
         Task<IEnumerable<Raza>> GetByEspecieAsync(int especieId); 
-        Task<Raza> CreateAsync(Raza raza);
+        Task<int> CreateAsync(Raza raza);
         Task<Raza> UpdateAsync(Raza raza);
 
     }
@@ -47,16 +47,15 @@ namespace ProyectoAdoptBack.Repositories
             return await conn.QueryAsync<Raza>(sql, new { p_especieid = especieId }); 
         }
 
-        public async Task<Raza> CreateAsync(Raza raza)
+        public async Task<int> CreateAsync(Raza raza)
         {
             const string sql = @"SELECT sp_insert_raza(@p_especieid, @p_nombre);"; 
             using var conn = CreateConnection();
-            await conn.ExecuteAsync(sql, new
+            return await conn.ExecuteScalarAsync<int>(sql, new
             {
                 p_especieid = raza.EspecieID, 
                 p_nombre = raza.Nombre 
             });
-            return raza;
         }
 
         public async Task<Raza> UpdateAsync(Raza raza)

@@ -40,7 +40,7 @@ namespace ProyectoAdoptBack.Repositories
         public async Task<int> CreateAsync(Imagen imagen)
         {
             using var connection = CreateConnection();
-            await connection.ExecuteAsync( // cambio sp_insert_imagen retorna VOID, no debe usarse ExecuteScalar
+            return await connection.ExecuteScalarAsync<int>(
                 "SELECT sp_insert_imagen(@p_entidadtipo, @p_entidadid, @p_url, @p_orden, @p_nombrearchivo);", 
                 new
                 {
@@ -50,16 +50,14 @@ namespace ProyectoAdoptBack.Repositories
                     p_orden = imagen.Orden,
                     p_nombrearchivo = imagen.NombreArchivo
                 });
-            return imagen.ImagenID; // cambio se mantiene la firma sin esperar retorno de la funcion VOID
         }
 
         public async Task<Imagen?> DeleteAsync(int imagenId)
         {
             using var connection = CreateConnection();
-            await connection.ExecuteAsync(
-                "SELECT sp_delete_imagen(@p_id);", // cambio (sp_delete_imagen retorna VOID, no debe consultarse con SELECT *)
-                new { p_id = imagenId }); // cambio (parametro igual al script SQL)
-            return null; // cambio (la funcion SQL no devuelve imagen eliminada)
+            return await connection.QueryFirstOrDefaultAsync<Imagen>(
+                "DELETE FROM Imagenes WHERE ImagenID = @p_id RETURNING ImagenID, EntidadTipo, EntidadID, Url, Orden, NombreArchivo, FechaSubida;",
+                new { p_id = imagenId });
         }
 
         public async Task<IEnumerable<Imagen>> DeleteByEntidadAsync(string entidadTipo, int entidadId)

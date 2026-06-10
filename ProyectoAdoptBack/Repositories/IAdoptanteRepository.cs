@@ -8,6 +8,7 @@ namespace ProyectoAdoptBack.Repositories
     {
         Task<IEnumerable<Adoptante>> GetAllAsync();
         Task<Adoptante?> GetByIdAsync(int id);
+        Task<Adoptante?> GetByUsuarioAsync(int usuarioId);
         Task<int> CreateAsync(Adoptante adoptante);
         Task UpdateAsync(Adoptante adoptante);
         Task DesactivarAsync(int id);
@@ -39,6 +40,14 @@ namespace ProyectoAdoptBack.Repositories
 
             using var conn = CreateConnection();
             return await conn.QueryFirstOrDefaultAsync<Adoptante>(sql, new { p_id = id });
+        }
+
+        public async Task<Adoptante?> GetByUsuarioAsync(int usuarioId)
+        {
+            const string sql = "SELECT AdoptanteID, UsuarioID, Nombre, ApellidoPaterno, ApellidoMaterno, Telefono, FechaNacimiento FROM sp_get_adoptantes() WHERE usuarioid = @p_usuarioid;";
+
+            using var conn = CreateConnection();
+            return await conn.QueryFirstOrDefaultAsync<Adoptante>(sql, new { p_usuarioid = usuarioId });
         }
 
         public async Task<int> CreateAsync(Adoptante adoptante)

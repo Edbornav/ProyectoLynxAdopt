@@ -22,20 +22,28 @@ namespace ProyectoAdoptBack.Controllers
             var items = await _service.GetAllAsync();
             return Ok(items);
         }
-        [Authorize(Roles ="Administrador")]
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        [Authorize]
+        [HttpGet("por-adoptante/{adoptanteId}")]
+        public async Task<IActionResult> GetByAdoptante(int adoptanteId)
         {
-            var item = await _service.GetByIdAsync(id);
-            if (item == null) return NotFound();
-            return Ok(item);
+            var items = await _service.GetByAdoptanteAsync(adoptanteId);
+            return Ok(items);
         }
+
+        [Authorize(Roles = "Administrador")]
+        [HttpGet("por-refugio/{refugioId}")]
+        public async Task<IActionResult> GetByRefugio(int refugioId)
+        {
+            var items = await _service.GetByRefugioAsync(refugioId);
+            return Ok(items);
+        }
+
         [Authorize(Roles ="Adoptante")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateSolicitudAdopcionDTO dto)
         {
-            await _service.CreateAsync(dto);
-            return Ok();
+            var id = await _service.CreateAsync(dto);
+            return Ok(new { id });
         }
         [Authorize(Roles ="Administrador")]
         [HttpPut("{id}")]

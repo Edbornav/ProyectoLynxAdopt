@@ -9,7 +9,8 @@ namespace ProyectoAdoptBack.Repositories
         //Procesos que se debe implementar  si o si
         Task<IEnumerable<Administrador>> GetAllAsync();
         Task<Administrador?> GetByIdAsync(int id);
-        Task CreateAsync(Administrador administrador);
+        Task<Administrador?> GetByUsuarioAsync(int usuarioId);
+        Task<int> CreateAsync(Administrador administrador);
         Task UpdateAsync(int id, Administrador administrador);
         Task DesactivarAsync(int id);
     }
@@ -40,14 +41,22 @@ namespace ProyectoAdoptBack.Repositories
                 new { p_id = id });
         }
 
-        public async Task CreateAsync(Administrador administrador)
+        public async Task<Administrador?> GetByUsuarioAsync(int usuarioId)
         {
             using var connection = CreateConnection();
-            await connection.ExecuteAsync(
+            return await connection.QueryFirstOrDefaultAsync<Administrador>(
+                "SELECT AdministradorID, UsuarioID, Nombre, ApellidoPaterno, ApellidoMaterno, Telefono FROM sp_get_administradores() WHERE usuarioid = @p_usuarioid;",
+                new { p_usuarioid = usuarioId });
+        }
+
+        public async Task<int> CreateAsync(Administrador administrador)
+        {
+            using var connection = CreateConnection();
+            return await connection.ExecuteScalarAsync<int>(
                 "SELECT sp_insert_administrador(@p_usuarioid, @p_nombre, @p_apellidopaterno, @p_apellidomaterno, @p_telefono);", 
                 new
                 {
-                    p_usuarioid = administrador.UsuarioID, // cambio parametroww requerido por sp_insert_administrador
+                    p_usuarioid = administrador.UsuarioID,
                     p_nombre = administrador.Nombre,
                     p_apellidopaterno = administrador.ApellidoPaterno,
                     p_apellidomaterno = administrador.ApellidoMaterno,

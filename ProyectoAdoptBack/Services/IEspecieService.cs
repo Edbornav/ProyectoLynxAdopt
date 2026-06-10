@@ -7,7 +7,7 @@ namespace ProyectoAdoptBack.Services
     {
         Task<IEnumerable<EspecieDTO>> GetAllAsync();
         Task<EspecieDTO?> GetByIdAsync(int id);
-        Task CreateAsync(CreateEspecieDTO dto);
+        Task<int> CreateAsync(CreateEspecieDTO dto);
         Task UpdateAsync(int id, UpdateEspecieDTO dto);
 
     }
@@ -35,14 +35,14 @@ namespace ProyectoAdoptBack.Services
             return ToDTO(especie);
         }
 
-        public async Task CreateAsync(CreateEspecieDTO dto)
+        public async Task<int> CreateAsync(CreateEspecieDTO dto)
         {
             ValidateCreate(dto);
             var especie = new Especie
             {
                 Nombre = dto.Nombre.Trim()
             };
-            await _repository.CreateAsync(especie);
+            return await _repository.CreateAsync(especie);
         }
 
         public async Task UpdateAsync(int id, UpdateEspecieDTO dto)

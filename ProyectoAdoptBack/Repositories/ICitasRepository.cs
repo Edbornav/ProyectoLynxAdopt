@@ -9,7 +9,7 @@ namespace ProyectoAdoptBack.Repositories
         Task<IEnumerable<Citas>> GetAllAsync();
         Task<Citas?> GetByIdAsync(int id);
         Task<IEnumerable<Citas>> GetBySolicitudAsync(int solicitudId);
-        Task CreateAsync(Citas cita);
+        Task<int> CreateAsync(Citas cita);
         Task UpdateAsync(int id, Citas cita);
         Task UpdateEstadoAsync(int id, string estadoCita);
         Task DesactivarAsync(int id);
@@ -50,10 +50,10 @@ namespace ProyectoAdoptBack.Repositories
                 new { p_solicitudid = solicitudId });
         }
 
-        public async Task CreateAsync(Citas cita)
+        public async Task<int> CreateAsync(Citas cita)
         {
             using var connection = CreateConnection();
-            await connection.ExecuteAsync(
+            return await connection.ExecuteScalarAsync<int>(
                 "SELECT sp_insert_cita(@p_solicitudid, @p_fechahoracita, @p_estadocita);",
                 new
                 {

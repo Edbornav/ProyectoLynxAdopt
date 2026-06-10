@@ -1,18 +1,14 @@
 <div class="register-box">
   <div class="reg-logo">🐾 LynxAdopt</div>
-  <h2 class="reg-title">Crear cuenta</h2>
-  <p class="reg-subtitle">Únete y encuentra a tu compañero perfecto</p>
-
-  <div class="role-selector">
-    <div class="role-option selected" onclick="selectRole(this, 'Adoptante')">
-      <span class="role-emoji">👤</span>Adoptante
-    </div>
-    <div class="role-option" onclick="selectRole(this, 'Administrador')">
-      <span class="role-emoji">🏠</span>Administrador
-    </div>
-  </div>
+  <h2 class="reg-title">Completa tu perfil</h2>
+  <p class="reg-subtitle">Cuéntanos un poco sobre ti</p>
 
   <div class="form-grid">
+    <div class="fg full-col" style="text-align:center;margin-bottom:8px;">
+      <label>Foto de perfil (opcional)</label>
+      <div onclick="document.getElementById('regFoto').click()" style="width:100px;height:100px;border-radius:50%;border:3px dashed var(--beige-dark);margin:8px auto;display:flex;align-items:center;justify-content:center;font-size:2rem;cursor:pointer;overflow:hidden;background:var(--beige);" id="regFotoPreview">📷</div>
+      <input type="file" id="regFoto" accept="image/*" style="display:none" onchange="previewRegFoto(event)"/>
+    </div>
     <div class="fg">
       <label>Nombre(s)</label>
       <input type="text" id="regNombre" placeholder="Tu nombre..."/>
@@ -25,21 +21,9 @@
       <label>Apellido materno</label>
       <input type="text" id="regApellidoMaterno" placeholder="Apellido materno"/>
     </div>
-    <div class="fg" id="campoFechaNacimiento">
+    <div class="fg">
       <label>Fecha de nacimiento</label>
       <input type="date" id="regFechaNacimiento"/>
-    </div>
-    <div class="fg full-col">
-      <label>Correo electrónico</label>
-      <input type="email" id="regEmail" placeholder="correo@ejemplo.com"/>
-    </div>
-    <div class="fg">
-      <label>Contraseña</label>
-      <input type="password" id="regPassword" placeholder="Mínimo 8 caracteres"/>
-    </div>
-    <div class="fg">
-      <label>Confirmar contraseña</label>
-      <input type="password" id="regConfirmar" placeholder="Repetir contraseña"/>
     </div>
     <div class="fg full-col">
       <label>Teléfono de contacto</label>
@@ -47,10 +31,7 @@
     </div>
   </div>
 
-  <button class="btn-register" onclick="register()">Crear cuenta</button>
-  <p class="terms">
-    Al registrarte aceptas nuestros <a href="#">Términos de uso</a> y <a href="#">Política de privacidad</a>
-  </p>
+  <button class="btn-register" onclick="register()">Guardar perfil</button>
   <p class="login-link">
     ¿Ya tienes cuenta? <a href="#02_inicio_sesion">Inicia sesión</a>
   </p>

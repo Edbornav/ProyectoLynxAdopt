@@ -8,6 +8,7 @@ namespace ProyectoAdoptBack.Services
     {
         Task<List<RefugioAdministradoresDTO>> GetAllAsync();
         Task<List<RefugioAdministradoresDTO>> GetByRefugioAsync(int refugioId);
+        Task<List<RefugioAdministradoresDTO>> GetByAdministradorAsync(int administradorId);
         Task CreateAsync(CreateRefugioAdministradoresDTO dto);
     }
 
@@ -29,10 +30,19 @@ namespace ProyectoAdoptBack.Services
         public async Task<List<RefugioAdministradoresDTO>> GetByRefugioAsync(int refugioId)
         {
             if (refugioId <= 0)
-                throw new ArgumentException("RefugioID no valido."); // error: id invalido
+                throw new ArgumentException("RefugioID no valido.");
 
-            var registros = await _repository.GetAllAsync(); // error: repository no tiene GetByRefugioAsync
-            return registros.Where(r => r.RefugioID == refugioId).Select(MapToDto).ToList();
+            var registros = await _repository.GetByRefugioAsync(refugioId);
+            return registros.Select(MapToDto).ToList();
+        }
+
+        public async Task<List<RefugioAdministradoresDTO>> GetByAdministradorAsync(int administradorId)
+        {
+            if (administradorId <= 0)
+                throw new ArgumentException("AdministradorID no valido.");
+
+            var registros = await _repository.GetByAdministradorAsync(administradorId);
+            return registros.Select(MapToDto).ToList();
         }
 
         public async Task CreateAsync(CreateRefugioAdministradoresDTO dto)
@@ -41,7 +51,7 @@ namespace ProyectoAdoptBack.Services
             var model = new RefugioAdministradores
             {
                 RefugioID = dto.RefugioID,
-                AdministradorID = dto.AdministradorID // error: el DTO usa AdministradorID, no UsuarioAdminID
+                UsuarioAdminID = dto.UsuarioAdminID
             };
             await _repository.CreateAsync(model);
         }
@@ -49,15 +59,15 @@ namespace ProyectoAdoptBack.Services
         private static RefugioAdministradoresDTO MapToDto(RefugioAdministradores model) => new()
         {
             RefugioID = model.RefugioID,
-            AdministradorID = model.AdministradorID // error: el modelo usa AdministradorID, no UsuarioAdminID
+            UsuarioAdminID = model.UsuarioAdminID
         };
 
         private static void ValidateCreate(CreateRefugioAdministradoresDTO dto)
         {
             if (dto.RefugioID <= 0)
-                throw new ArgumentException("RefugioID es obligatorio."); // error: id obligatorio
-            if (dto.AdministradorID <= 0)
-                throw new ArgumentException("AdministradorID es obligatorio."); // error: propiedad correcta
+                throw new ArgumentException("RefugioID es obligatorio.");
+            if (dto.UsuarioAdminID <= 0)
+                throw new ArgumentException("UsuarioAdminID es obligatorio.");
         }
     }
 }

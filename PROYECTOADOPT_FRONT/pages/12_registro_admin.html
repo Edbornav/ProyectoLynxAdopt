@@ -1,0 +1,59 @@
+<div class="register-box">
+  <div class="reg-logo">🐾 LynxAdopt</div>
+  <h2 class="reg-title">Registro de Administrador</h2>
+  <p class="reg-subtitle">Completa tus datos y los del refugio</p>
+
+  <h3 style="font-family:'Fredoka One',cursive;font-size:1.2rem;color:var(--brown);margin-bottom:12px;">👤 Tus datos</h3>
+  <div class="form-grid">
+    <div class="fg">
+      <label>Nombre(s)</label>
+      <input type="text" id="regNombre" placeholder="Tu nombre..."/>
+    </div>
+    <div class="fg">
+      <label>Apellido paterno</label>
+      <input type="text" id="regApellidoPaterno" placeholder="Apellido paterno"/>
+    </div>
+    <div class="fg">
+      <label>Apellido materno</label>
+      <input type="text" id="regApellidoMaterno" placeholder="Apellido materno"/>
+    </div>
+    <div class="fg full-col">
+      <label>Teléfono de contacto</label>
+      <input type="tel" id="regTelefono" placeholder="10 dígitos"/>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Fredoka One',cursive;font-size:1.2rem;color:var(--brown);margin:24px 0 12px;">🏠 Datos del refugio</h3>
+  <div class="form-grid">
+    <div class="fg full-col" style="text-align:center;margin-bottom:8px;">
+      <label>Logo del refugio (opcional)</label>
+      <div onclick="document.getElementById('refLogoInput').click()" style="width:120px;height:120px;border-radius:12px;border:3px dashed var(--beige-dark);margin:8px auto;display:flex;align-items:center;justify-content:center;font-size:3rem;cursor:pointer;overflow:hidden;background:var(--beige);" id="refLogoPreview">🏠</div>
+      <input type="file" id="refLogoInput" accept="image/*" style="display:none" onchange="previewRefLogo(event)"/>
+    </div>
+    <div class="fg full-col">
+      <label>Nombre del refugio</label>
+      <input type="text" id="refNombre" placeholder="Nombre del refugio"/>
+    </div>
+    <div class="fg full-col">
+      <label>Descripción</label>
+      <textarea id="refDescripcion" rows="3" style="width:100%;border-radius:var(--radius);border:2px solid var(--beige-dark);padding:10px;font-family:inherit;resize:vertical;"></textarea>
+    </div>
+    <div class="fg full-col">
+      <label>Dirección</label>
+      <input type="text" id="refDireccion" placeholder="Calle, número, colonia, ciudad"/>
+    </div>
+    <div class="fg">
+      <label>Teléfono del refugio</label>
+      <input type="tel" id="refTelefono" placeholder="10 dígitos"/>
+    </div>
+    <div class="fg">
+      <label>Correo electrónico</label>
+      <input type="email" id="refCorreo" placeholder="refugio@ejemplo.com"/>
+    </div>
+  </div>
+
+  <button class="btn-register" onclick="registerAdmin()" style="margin-top:24px;">Crear refugio</button>
+  <p class="login-link">
+    ¿Ya tienes cuenta? <a href="#02_inicio_sesion">Inicia sesión</a>
+  </p>
+</div>

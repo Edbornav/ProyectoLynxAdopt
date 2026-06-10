@@ -24,10 +24,11 @@ async function login() {
         //denemos de tener en cuenta que esto solo funcionara despues de registrar al usuario como un adoptante o administratdor por eso el de registrarse no tiene esta condicion...
         if (respuesta.tipoUsuario === 'Adoptante'){
             redirect('03_catalogo_adoptante');
+            return;
         } else if(respuesta.tipoUsuario === 'Administrador'){
-            redirect('06_inicio_refugio')
-        } 
-        redirect('01_seleccion_rol');
+            redirect('06_inicio_refugio');
+            return;
+        }
     } catch (error) {
         console.error('Error en el inicio de sesion', error);
         alert('Los datos son invalidos, vuelve a intentarlo.');

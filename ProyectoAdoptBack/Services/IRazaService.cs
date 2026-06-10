@@ -9,7 +9,7 @@ namespace ProyectoAdoptBack.Services
         Task<List<RazaDTO>> GetAllAsync();
         Task<RazaDTO?> GetByIdAsync(int id);
         Task<List<RazaDTO>> GetByEspecieAsync(int especieId);
-        Task CreateAsync(CreateRazaDTO dto);
+        Task<int> CreateAsync(CreateRazaDTO dto);
         Task UpdateAsync(int id, UpdateRazaDTO dto);
     }
 
@@ -42,7 +42,7 @@ namespace ProyectoAdoptBack.Services
             return razas.Select(MapToDto).ToList();
         }
 
-        public async Task CreateAsync(CreateRazaDTO dto)
+        public async Task<int> CreateAsync(CreateRazaDTO dto)
         {
             ValidateCreate(dto);
             var model = new Raza
@@ -50,7 +50,7 @@ namespace ProyectoAdoptBack.Services
                 EspecieID = dto.EspecieID,
                 Nombre = dto.Nombre.Trim()
             };
-            await _repository.CreateAsync(model);
+            return await _repository.CreateAsync(model);
         }
 
         public async Task UpdateAsync(int id, UpdateRazaDTO dto)

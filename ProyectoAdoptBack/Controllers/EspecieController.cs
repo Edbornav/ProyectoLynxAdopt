@@ -15,14 +15,14 @@ namespace ProyectoAdoptBack.Controllers
         {
             _service = service;
         }
-        [Authorize]
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var items = await _service.GetAllAsync();
             return Ok(items);
         }
-        [Authorize]
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -34,8 +34,8 @@ namespace ProyectoAdoptBack.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateEspecieDTO dto)
         {
-            await _service.CreateAsync(dto);
-            return Ok();
+            var id = await _service.CreateAsync(dto);
+            return Ok(new { id });
         }
         [Authorize(Roles ="Administrador")]
         [HttpPut("{id}")]

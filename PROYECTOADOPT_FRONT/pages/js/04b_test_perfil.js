@@ -91,15 +91,12 @@ function pasoAnterior() {
 }
 
 //Guardar perfil en API 
-//envía las respuestas del usuario al servidor para crear el perfil del adoptante, asociándolo con el ID del usuario que se obtuvo al iniciar sesión
 async function guardarPerfil() {
-    // Obtiene el ID del usuario adoptante desde el almacenamiento local o de sesión
-    const adoptanteUsuarioID = localStorage.getItem('adoptanteUsuarioID') //
-                            || sessionStorage.getItem('adoptanteUsuarioID');
+    const session = JSON.parse(localStorage.getItem('session') || '{}');
 
-    if (!adoptanteUsuarioID) {
+    if (!session.usuarioID) {
         alert('No se encontró tu sesión. Por favor inicia sesión de nuevo.');
-        window.location.href = '#02_inicio_sesion';
+        redirect('02_inicio_sesion');
         return;
     }
 
@@ -107,28 +104,23 @@ async function guardarPerfil() {
     btnNext.disabled    = true;
     btnNext.textContent = 'Guardando...';
 
-    // Envía las respuestas al servidor para crear el perfil del adoptante
     try {
-        const res = await fetch(`${API_BASE_URL}/PerfilesAdoptante`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                adoptanteUsuarioID:                 parseInt(adoptanteUsuarioID),
-                descripcionCasa:                    respuestas.descripcionCasa,
-                descripcionMascotas:                respuestas.descripcionMascotas,
-                descripcionExperienciaConMascotas:  respuestas.descripcionExperienciaConMascotas
-            })
-        });
-
-        if (!res.ok) {
-            alert('Error al guardar el perfil. Intenta de nuevo.');
-            btnNext.disabled    = false;
-            btnNext.textContent = 'Guardar perfil ';
+        const adoptante = await apiGet('/Adoptantes/por-usuario/' + session.usuarioID);
+        if (!adoptante) {
+            alert('Completa tu registro de adoptante primero.');
+            redirect('04_registro');
             return;
         }
 
+        await apiPost('/PerfilesAdoptante', {
+            adoptanteUsuarioID:                 adoptante.adoptanteID,
+            descripcionCasa:                    respuestas.descripcionCasa,
+            descripcionMascotas:                respuestas.descripcionMascotas,
+            descripcionExperienciaConMascotas:  respuestas.descripcionExperienciaConMascotas
+        });
+
         alert(' Perfil guardado correctamente.');
-        window.location.href = '#03_catalogo_adoptante';
+        redirect('03_catalogo_adoptante');
 
     } catch (err) {
         console.error('Error guardando perfil:', err);
@@ -139,6 +131,6 @@ async function guardarPerfil() {
 }
 
 //  Init 
-document.addEventListener('DOMContentLoaded', () => {
+window.initTestPerfil = function() {
     renderPregunta();
-});
+};

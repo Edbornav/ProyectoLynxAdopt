@@ -9,7 +9,7 @@ namespace ProyectoAdoptBack.Services
         Task<List<CitasDTO>> GetAllAsync(); 
         Task<CitasDTO?> GetByIdAsync(int id); 
         Task<List<CitasDTO>> GetBySolicitudAsync(int solicitudId); 
-        Task CreateAsync(CreateCitasDTO dto); 
+        Task<int> CreateAsync(CreateCitasDTO dto); 
         Task UpdateAsync(int id, UpdateCitasDTO dto); 
         Task UpdateEstadoAsync(int id, UpdateCitasDTO dto); 
         Task DesactivarAsync(int id);
@@ -44,7 +44,7 @@ namespace ProyectoAdoptBack.Services
             return citas.Select(MapToDto).ToList();
         }
 
-        public async Task CreateAsync(CreateCitasDTO dto) 
+        public async Task<int> CreateAsync(CreateCitasDTO dto) 
         {
             ValidateCreate(dto);
             var model = new Citas 
@@ -53,7 +53,7 @@ namespace ProyectoAdoptBack.Services
                 FechaHoraCita = dto.FechaHoraCita,
                 EstadoCita = dto.EstadoCita.Trim()
             };
-            await _repository.CreateAsync(model);
+            return await _repository.CreateAsync(model);
         }
 
         public async Task UpdateAsync(int id, UpdateCitasDTO dto) 

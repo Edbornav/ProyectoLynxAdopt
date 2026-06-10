@@ -1,12 +1,12 @@
-const _refugioId = parseInt(routeParams.refugioId, 10);
-if (!_refugioId) { document.getElementById('refNombre').textContent = 'Refugio no especificado'; }
+window.initPerfilRefugio = async function() {
+  const refugioId = parseInt(routeParams.refugioId || routeParams.id, 10);
+  if (!refugioId) { document.getElementById('refNombre').textContent = 'Refugio no especificado'; return; }
 
-(async function() {
   try {
     const [refugio, animales, miembros] = await Promise.all([
-      apiGet(`/Refugios/${_refugioId}`),
-      apiGet(`/Animales/por-refugio/${_refugioId}`),
-      apiGet(`/RefugioAdministradores/${_refugioId}`)
+      apiGet(`/Refugios/${refugioId}`),
+      apiGet(`/Animales/por-refugio/${refugioId}`),
+      apiGet(`/RefugioAdministradores/${refugioId}`)
     ]);
 
     document.getElementById('refNombre').textContent = refugio.nombre;
@@ -33,7 +33,7 @@ if (!_refugioId) { document.getElementById('refNombre').textContent = 'Refugio n
         const edad = a.fechaNacimiento ? calcularEdad(a.fechaNacimiento) : 'Desconocida';
         const emoji = a.sexo === 'Hembra' ? '🐱' : '🐶';
         return `
-          <a href="#05_detalle_mascota?animalId=${a.animalID}" class="pet-card">
+          <a href="#05_detalle_mascota?id=${a.animalID}" class="pet-card">
             <div class="pet-card-img">${emoji}</div>
             <div class="pet-card-body">
               <div class="pet-name">${escapeHtml(a.nombre)}</div>
@@ -47,7 +47,7 @@ if (!_refugioId) { document.getElementById('refNombre').textContent = 'Refugio n
     console.error('Error cargando refugio:', e);
     document.getElementById('refNombre').textContent = 'Error al cargar';
   }
-})();
+};
 
 function calcularEdad(fechaStr) {
   const nac = new Date(fechaStr);

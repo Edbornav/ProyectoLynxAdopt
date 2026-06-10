@@ -1,6 +1,18 @@
 const app = document.getElementById('app');
 let routeParams = {};
 
+const pageInits = {
+  '03_catalogo_adoptante': 'initCatalogo',
+  '04b_test_perfil': 'initTestPerfil',
+  '05_detalle_mascota': 'initDetalle',
+  '06_inicio_refugio': 'initInicioRefugio',
+  '07_solicitudes_refugio': 'initSolicitudesRefugio',
+  '08_mis_solicitudes': 'initMisSolicitudes',
+  '09_perfil_adoptante': 'initPerfilAdoptante',
+  '10_agregar_mascota': 'initAgregarMascota',
+  '11_perfil_refugio': 'initPerfilRefugio'
+};
+
 function redirect(page) {
   history.pushState(null, '', '#' + page);
   navigate('#' + page);
@@ -24,7 +36,7 @@ function loadFragment(url) {
     });
 }
 
-const centeredPages = ['01_seleccion_rol', '02_inicio_sesion', '02_Registrarse', '04_registro'];
+const centeredPages = ['01_seleccion_rol', '02_inicio_sesion', '02_Registrarse', '04_registro', '12_registro_admin'];
 
 function navigate(hash) {
   const cleaned = hash.replace('#', '');
@@ -43,7 +55,10 @@ function navigate(hash) {
   } else {
     app.classList.remove('centered');
   }
-  loadFragment('pages/' + page + '.html');
+  loadFragment('pages/' + page + '.html').then(() => {
+    const fnName = pageInits[page];
+    if (fnName && window[fnName]) window[fnName]();
+  });
 }
 
 document.addEventListener('click', e => {
@@ -58,4 +73,4 @@ document.addEventListener('click', e => {
 
 window.addEventListener('popstate', () => navigate(window.location.hash));
 
-navigate(window.location.hash || '#01_seleccion_rol');
+navigate(window.location.hash || '#02_inicio_sesion');

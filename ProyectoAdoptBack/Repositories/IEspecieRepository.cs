@@ -8,7 +8,7 @@ namespace ProyectoAdoptBack.Repositories
     {
         Task<IEnumerable<Especie>> GetAllAsync();
         Task<Especie?> GetByIdAsync(int id);
-        Task CreateAsync(Especie especie);
+        Task<int> CreateAsync(Especie especie);
         Task UpdateAsync(int id, Especie especie);
     }
 
@@ -39,10 +39,10 @@ namespace ProyectoAdoptBack.Repositories
                 new { p_id = id });
         }
 
-        public async Task CreateAsync(Especie especie)
+        public async Task<int> CreateAsync(Especie especie)
         {
             using var connection = CreateConnection();
-            await connection.ExecuteAsync(
+            return await connection.ExecuteScalarAsync<int>(
                 "SELECT sp_insert_especie(@p_nombre);",
                 new { p_nombre = especie.Nombre });
         }

@@ -58,6 +58,9 @@ builder.Services.AddScoped<ISolicitudAnimalesService, SolicitudAnimalesService>(
 //imagen
 builder.Services.AddScoped<IImagenRepository, ImagenRepository>();
 builder.Services.AddScoped<IImagenService, ImagenService>();
+//supabase storage
+builder.Services.AddScoped<ISupabaseStorageService, SupabaseStorageService>();
+builder.Services.AddHttpClient<ISupabaseStorageService, SupabaseStorageService>();
 //raza
 builder.Services.AddScoped<IRazaRepository, RazaRepository>();
 builder.Services.AddScoped<IRazaService, RazaService>();

@@ -16,7 +16,7 @@ namespace ProyectoAdoptBack.Controllers
         {
             _service = service;
         }
-        [Authorize]
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetByEntidad([FromQuery] string entidadTipo, [FromQuery] int entidadId)
         {
@@ -27,9 +27,9 @@ namespace ProyectoAdoptBack.Controllers
         }
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateImagenDTO dto)
+        public async Task<IActionResult> Create([FromForm] CreateImagenRequest request)
         {
-            var id = await _service.CreateAsync(dto);
+            var id = await _service.CreateConArchivoAsync(request);
             return Ok(new { id });
         }
         [Authorize]

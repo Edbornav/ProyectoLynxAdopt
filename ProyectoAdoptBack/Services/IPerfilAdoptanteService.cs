@@ -7,7 +7,7 @@ namespace ProyectoAdoptBack.Services
     {
         Task<IEnumerable<PerfilAdoptanteDTO>> GetAllAsync();
         Task<PerfilAdoptanteDTO?> GetByIdAsync(int id);
-        Task CreateAsync(CreatePerfilAdoptanteDTO dto);
+        Task<int> CreateAsync(CreatePerfilAdoptanteDTO dto);
         Task UpdateAsync(int id, UpdatePerfilAdoptanteDTO dto);
     }
 
@@ -33,7 +33,7 @@ namespace ProyectoAdoptBack.Services
             return ToDTO(perfil);
         }
 
-        public async Task CreateAsync(CreatePerfilAdoptanteDTO dto)
+        public async Task<int> CreateAsync(CreatePerfilAdoptanteDTO dto)
         {
             ValidateCreate(dto);
             var perfil = new PerfilAdoptante
@@ -44,7 +44,7 @@ namespace ProyectoAdoptBack.Services
                 DescripcionExperienciaConMascotas = dto.DescripcionExperienciaConMascotas.Trim()
             };
 
-            await _repository.CreateAsync(perfil);
+            return await _repository.CreateAsync(perfil);
         }
 
         public async Task UpdateAsync(int id, UpdatePerfilAdoptanteDTO dto)

@@ -7,7 +7,9 @@ namespace ProyectoAdoptBack.Services
     {
         Task<IEnumerable<AdoptanteDTO>> GetAllAsync();
         Task<AdoptanteDTO?> GetByIdAsync(int id);
+        Task<AdoptanteDTO?> GetByUsuarioAsync(int usuarioId);
         Task<int> CreateAsync(CreateAdoptanteDTO dto);// Necesitamos retornar el id de adoptante para crear solicitud de adopcion :DD
+        Task<int> CreateConFotoAsync(CreateAdoptanteConFotoRequest request);
         Task UpdateAsync(int id, UpdateAdoptanteDTO dto);
         Task DesactivarAsync(int id);
     }
@@ -15,10 +17,49 @@ namespace ProyectoAdoptBack.Services
     public class AdoptanteService: IAdoptanteService
     {
         private readonly IAdoptanteRepository _repository;
+        private readonly ISupabaseStorageService _storage;
+        private readonly IImagenRepository _imagenRepository;
 
-        public AdoptanteService(IAdoptanteRepository repository)
+        public AdoptanteService(IAdoptanteRepository repository, ISupabaseStorageService storage, IImagenRepository imagenRepository)
         {
             _repository = repository;
+            _storage = storage;
+            _imagenRepository = imagenRepository;
+        }
+
+        public async Task<int> CreateConFotoAsync(CreateAdoptanteConFotoRequest request)
+        {
+            var adoptanteId = await CreateAsync(new CreateAdoptanteDTO
+            {
+                UsuarioID = request.UsuarioID,
+                Nombre = request.Nombre,
+                ApellidoPaterno = request.ApellidoPaterno,
+                ApellidoMaterno = request.ApellidoMaterno,
+                Telefono = request.Telefono,
+                FechaNacimiento = request.FechaNacimiento
+            });
+
+            if (request.Foto != null && request.Foto.Length > 0)
+            {
+                using var stream = request.Foto.OpenReadStream();
+                var url = await _storage.UploadAsync(
+                    stream,
+                    request.Foto.FileName,
+                    request.Foto.ContentType,
+                    "Adoptante"
+                );
+
+                await _imagenRepository.CreateAsync(new Imagen
+                {
+                    EntidadTipo = "Adoptante",
+                    EntidadID = adoptanteId,
+                    Url = url,
+                    Orden = 1,
+                    NombreArchivo = request.Foto.FileName.Trim()
+                });
+            }
+
+            return adoptanteId;
         }
 
       public async Task<IEnumerable<AdoptanteDTO>> GetAllAsync()
@@ -30,6 +71,13 @@ namespace ProyectoAdoptBack.Services
         public async Task<AdoptanteDTO?> GetByIdAsync(int id)
         {
             var adoptante = await _repository.GetByIdAsync(id);
+            if (adoptante == null) return null;
+            return ToDTO(adoptante);
+        }
+
+        public async Task<AdoptanteDTO?> GetByUsuarioAsync(int usuarioId)
+        {
+            var adoptante = await _repository.GetByUsuarioAsync(usuarioId);
             if (adoptante == null) return null;
             return ToDTO(adoptante);
         }

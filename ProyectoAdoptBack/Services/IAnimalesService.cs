@@ -10,7 +10,7 @@ namespace ProyectoAdoptBack.Services
         Task<AnimalesDTO?> GetByIdAsync(int id);
         Task<List<AnimalesDTO>> GetByRefugioAsync(int refugioId);
         Task<List<AnimalesDTO>> GetDisponiblesAsync();
-        Task CreateAsync(CreateAnimalesDTO dto);
+        Task<int> CreateAsync(CreateAnimalesDTO dto);
         Task UpdateAsync(int id, UpdateAnimalesDTO dto);
         Task DesactivarAsync(int id);
     }
@@ -50,7 +50,7 @@ namespace ProyectoAdoptBack.Services
             return animales.Select(MapToDto).ToList();
         }
 
-        public async Task CreateAsync(CreateAnimalesDTO dto)
+        public async Task<int> CreateAsync(CreateAnimalesDTO dto)
         {
             ValidateCreate(dto);
             var model = new Animales
@@ -63,7 +63,7 @@ namespace ProyectoAdoptBack.Services
                 Descripcion = dto.Descripcion.Trim(),
                 Estatus = dto.Estatus.Trim()
             };
-            await _repository.CreateAsync(model);
+            return await _repository.CreateAsync(model);
         }
 
         public async Task UpdateAsync(int id, UpdateAnimalesDTO dto)

@@ -8,7 +8,7 @@ namespace ProyectoAdoptBack.Repositories
     {
         Task<IEnumerable<PerfilAdoptante>> GetAllAsync();
         Task<PerfilAdoptante?> GetByIdAsync(int id);
-        Task CreateAsync(PerfilAdoptante perfil);
+        Task<int> CreateAsync(PerfilAdoptante perfil);
         Task UpdateAsync(int id, PerfilAdoptante perfil);
     }
 
@@ -39,10 +39,10 @@ namespace ProyectoAdoptBack.Repositories
                 new { p_id = id });
         }
 
-        public async Task CreateAsync(PerfilAdoptante perfil)
+        public async Task<int> CreateAsync(PerfilAdoptante perfil)
         {
             using var connection = CreateConnection();
-            await connection.ExecuteAsync(
+            return await connection.ExecuteScalarAsync<int>(
                 "SELECT sp_insert_perfil_adoptante(@p_adoptanteid, @p_descripcioncasa, @p_descripcionmascotas, @p_descripcionexperienciaconmascotas);",
                 new
                 {

@@ -3,28 +3,36 @@
 let todosLosAnimales =[]; //guarda a los animales que se obtiene de la api 
 let refugioActivo=null; // 
 let especiesFiltradas=[]; 
+let _razas = [];
+let _refugios = [];
 
 async function fetchAnimales() {
-    const res = await fetch ('${API_BASE_URL}/Animales');
+    const res = await fetch (`${API_BASE_URL}/Animales`);
     return await res.json();
 
 }
 
 async function fetchRefugios() {
-    const res =await fetch ('${API_BASE_URL}/Refugios');
+    const res =await fetch (`${API_BASE_URL}/Refugios`);
     return await res.json();
 
 }
 
 async function fetchEspecies(){
-    const res = await fetch ('${API_BASE_URL}/Especies');
+    const res = await fetch (`${API_BASE_URL}/Especies`);
+    return await res.json();
+
+}
+
+async function fetchRazas(){
+    const res = await fetch (`${API_BASE_URL}/Razas`);
     return await res.json();
 
 }
 
 // Renderiza los refugios como chips seleccionables en la interfaz 
 function renderRefugios(refugios){
-    const container = document.getElementById('RefugioSelector');
+    const container = document.getElementById('refugioSelector');
     container.innerHTML='';
 
     const chipTodos = document.createElement('div');
@@ -37,7 +45,7 @@ function renderRefugios(refugios){
         const chip = document.createElement('div');
         chip.className = 'refugio-chip';
         chip.textContent = refugio.nombre;
-        chip.onclick = () => seleccionarRefugio(refugio, chip);
+        chip.onclick = () => seleccionarRefugio(refugio.refugioID, chip);
         container.appendChild(chip);
 
     });
@@ -47,7 +55,7 @@ function renderRefugios(refugios){
 // Renderiza los animales filtrados en la interfaz segun el refugio seleccionado
 function seleccionarRefugio(id, chip){
     refugioActivo = id;
-    document.querySelectorAll('.refugio_chip').forEach(c=> c.classList.remove('active'));
+    document.querySelectorAll('.refugio-chip').forEach(c=> c.classList.remove('active'));
     chip.classList.add('active');
     renderAnimales(filtrarAnimales());
 
@@ -55,16 +63,36 @@ function seleccionarRefugio(id, chip){
 
 // Renderiza las especies como checkboxes para filtrar los animales por especie
 function renderEspeciesFiltros(especies){
-    const container = document.getElementById('especiesFiltos');
+    const container = document.getElementById('especiesFiltros');
     container.innerHTML='';
 
     especies.forEach(e =>{
         const label =document.createElement('label');
         label.className='especie-filtro';
-        label.innerHTML='<input type="checkbox" value="${e.especieId}" onchange="onEspecieChange()"/>${e.nombre}';
+        label.innerHTML=`<input type="checkbox" value="${e.especieID}" onchange="onEspecieChange()"/>${e.nombre}`;
         container.appendChild(label);
     });
 }
+
+function verDetalle(animalID){
+    redirect('05_detalle_mascota?id=' + animalID);
+}
+
+window.initCatalogo = async function init(){
+    try {
+        const [animales, refugios, especies, razas] = await Promise.all([
+            fetchAnimales(), fetchRefugios(), fetchEspecies(), fetchRazas()
+        ]);
+        todosLosAnimales = animales;
+        _razas = razas;
+        _refugios = refugios;
+        renderRefugios(refugios);
+        renderEspeciesFiltros(especies);
+        renderAnimales(animales);
+    } catch (error) {
+        console.error('Error al cargar el catálogo:', error);
+    }
+};
 
 // Filtra los animales segun el refugio activo y las especies seleccionadas
 function onEspecieChange(){
@@ -73,13 +101,15 @@ function onEspecieChange(){
 
 //logica para filtrar los animales segun el refugio activo, las especies seleccionadas y la edad máxima ingresada por el usuario
 function filtrarAnimales(){
-    const edadMax = parseInt(document.getElementById('edadMax').value) || Infinity;
+    const edadMax = parseInt(document.getElementById('ageRange').value) || Infinity;
+
+    const razasDeEspecies = new Set(_razas.filter(r => especiesFiltradas.includes(r.especieID)).map(r => r.razaID));
 
     return todosLosAnimales.filter(a=>{
-    const porREfugio = refugioActivo === null || a.refugioId === refugioActivo; // Si no hay refugio activo, mostrar todos, sino filtrar por el refugio seleccionado
-    const porEspecie = especiesFiltradas.length ===0 || especiesFiltradas.includes(a.razaId); // Si no hay especies filtradas, mostrar todas, sino filtrar por las especies seleccionadas
-    const edad = a.fechaNacimiento ? calcularEdad(a.fechaNacimiento):0; // Si no hay fecha de nacimiento, asumir edad 0 para que no se excluya por edad
-    const porEdad = edad <= edadMax; // Filtrar por edad máxima
+    const porRefugio = refugioActivo === null || a.refugioID === refugioActivo;
+    const porEspecie = especiesFiltradas.length ===0 || razasDeEspecies.has(a.razaID);
+    const edad = a.fechaNacimiento ? calcularEdad(a.fechaNacimiento):0;
+    const porEdad = edad <= edadMax;
     return porRefugio && porEspecie && porEdad;
     
     });
@@ -102,16 +132,15 @@ function renderAnimales(animales){
     const grid = document.getElementById('petsGrid');
     grid.innerHTML='';
 
-     if (animales.length === 0) {
+    if (animales.length === 0) {
         grid.innerHTML = `
             <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-mid);">
             No se encontraron animales con esos filtros.
             </div>`;
         return;
     }
-}
 
- animales.forEach(a => {
+    animales.forEach(a => {
         const card = document.createElement('div');
         card.className = 'pet-card';
         card.innerHTML = `
@@ -132,38 +161,10 @@ function renderAnimales(animales){
                 <button class="btn-solicitar" onclick="verDetalle(${a.animalID})">
                     Ver detalle
                 </button>
-            </div>
-        `;
+                <a href="#11_perfil_refugio?refugioId=${a.refugioID}" class="btn-solicitar" style="display:inline-block;text-align:center;margin-top:6px;background:var(--beige);color:var(--text-dark);text-decoration:none;">
+                    🏠 Ver refugio
+                </a>
+            </div>`;
         grid.appendChild(card);
     });
-
-    function verDetalle(animalId){
-    console.log('Ver detalle del animal con ID:', animalId);
-        // Aquí puedes redirigir a una página de detalle o mostrar un modal con la información del animal
-    
-    }
-
-
-    async function init(){
-    try {
-        //hace varias peticiones al mismo tiempo para obtener los animales, refugios y especies, y luego renderiza la interfaz con esos datos   
-        const [animales, refugios, especies] = await Promise.all([
-            fetchAnimales(),
-            fetchRefugios(),
-            fetchEspecies()
-        ]);
-        todosLosAnimales = animales;
-        renderRefugios(refugios);
-        renderEspeciesFiltros(especies);
-        renderAnimales(todosLosAnimales);
-    } catch (error) {
-        console.error('Error al cargar los datos:', error);
-        const grid = document.getElementById('petsGrid');
-        grid.innerHTML = `
-            <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-mid);">
-            Ocurrió un error al cargar los animales. Por favor, intenta nuevamente más tarde.
-            </div>`;
-    
-    }
 }
-document.addEventListener('DOMContentLoaded', init);

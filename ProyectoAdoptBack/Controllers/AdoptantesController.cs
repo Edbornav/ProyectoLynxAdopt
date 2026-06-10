@@ -22,7 +22,7 @@ namespace ProyectoAdoptBack.Controllers
             var items = await _service.GetAllAsync();
             return Ok(items);
         }
-        [Authorize(Roles ="Administrador")]
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -31,13 +31,29 @@ namespace ProyectoAdoptBack.Controllers
             return Ok(item);
         }
         [AllowAnonymous]
+        [HttpGet("por-usuario/{usuarioId}")]
+        public async Task<IActionResult> GetByUsuario(int usuarioId)
+        {
+            var item = await _service.GetByUsuarioAsync(usuarioId);
+            if (item == null) return NotFound();
+            return Ok(item);
+        }
+
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateAdoptanteDTO dto)
         {
             var item = await _service.CreateAsync(dto);
             return Ok(item);
         }
-        [Authorize(Roles ="Administrador")]
+        [AllowAnonymous]
+        [HttpPost("con-foto")]
+        public async Task<IActionResult> CreateConFoto([FromForm] CreateAdoptanteConFotoRequest request)
+        {
+            var id = await _service.CreateConFotoAsync(request);
+            return Ok(new { id });
+        }
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateAdoptanteDTO dto)
         {
