@@ -43,8 +43,8 @@ namespace ProyectoAdoptBack.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateUsuarioDTO dto)
         {
-            await _service.CreateAsync(dto);
-            return Ok();
+            var id = await _service.CreateAsync(dto);
+            return Ok(new { usuarioID = id });
         }
         [Authorize(Roles = "Administrador")]
         [HttpPut("{id}")]

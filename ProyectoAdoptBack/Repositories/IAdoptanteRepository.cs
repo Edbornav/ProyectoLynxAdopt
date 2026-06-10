@@ -46,7 +46,7 @@ namespace ProyectoAdoptBack.Repositories
             using var connection = CreateConnection();
         
             return await connection.ExecuteScalarAsync<int>(
-                "SELECT sp_insert_adoptante(@p_usuarioid, @p_nombre, @p_apellidopaterno, @p_apellidomaterno, @p_telefono, @p_fechanacimiento);",
+                "SELECT sp_insert_adoptante(@p_usuarioid, @p_nombre, @p_apellidopaterno, @p_apellidomaterno, @p_telefono, CAST(@p_fechanacimiento AS DATE));",
                 new
             {
                 p_usuarioid = adoptante.UsuarioID,
