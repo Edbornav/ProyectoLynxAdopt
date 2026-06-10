@@ -24,7 +24,7 @@ function loadFragment(url) {
     });
 }
 
-const centeredPages = ['01_seleccion_rol', '02_inicio_sesion', '04_registro'];
+const centeredPages = ['01_seleccion_rol', '02_inicio_sesion', '02_Registrarse', '04_registro'];
 
 function navigate(hash) {
   const cleaned = hash.replace('#', '');
