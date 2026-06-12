@@ -61,7 +61,7 @@ namespace ProyectoAdoptBack.Services
                 AdoptanteID = dto.AdoptanteID,
                 MensajeAdoptante = dto.MensajeAdoptante.Trim() 
             };
-            return await _repository.CreateAsync(model);
+            return await _repository.CreateCompletaAsync(model, dto.AnimalID);
         }
 
         public async Task UpdateEstatusAsync(int id, UpdateSolicitudAdopcionDTO dto)
@@ -94,6 +94,8 @@ namespace ProyectoAdoptBack.Services
                 throw new ArgumentException("RefugioID es obligatorio."); // error: id obligatorio
             if (dto.AdoptanteID <= 0)
                 throw new ArgumentException("AdoptanteID es obligatorio."); // error: id obligatorio
+            if (dto.AnimalID <= 0)
+                throw new ArgumentException("AnimalID es obligatorio."); // error: id obligatorio
             if (string.IsNullOrWhiteSpace(dto.MensajeAdoptante))
                 throw new ArgumentException("El mensaje es obligatorio."); // error: mensaje obligatorio
         }

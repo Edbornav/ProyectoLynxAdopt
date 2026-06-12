@@ -11,9 +11,19 @@ window.initPerfilAdoptante = async function() {
     if (!resp) { redirect('04_registro'); return; }
     _adoptanteID = resp.adoptanteID;
 
-    const [perfiles] = await Promise.all([
-      apiGet('/PerfilesAdoptante')
-    ]);
+    try {
+      _perfilData = await apiGet('/PerfilesAdoptante/por-adoptante/' + _adoptanteID);
+    } catch (e) {
+      _perfilData = null;
+    }
+
+    try {
+      const fotos = await apiGet(`/Imagen?entidadTipo=Adoptante&entidadId=${_adoptanteID}`);
+      if (fotos.length > 0) {
+        document.getElementById('avatarBig').innerHTML =
+          `<img src="${fotos[0].url}" alt="Foto" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.outerHTML='👤'"/>`;
+      }
+    } catch (e) {}
 
     document.getElementById('profileName').textContent =
       `${resp.nombre} ${resp.apellidoPaterno} ${resp.apellidoMaterno}`;
@@ -25,8 +35,6 @@ window.initPerfilAdoptante = async function() {
       <div class="fg"><label>Teléfono</label><input id="edtTelefono" value="${escapeHtml(resp.telefono)}"/></div>
       <div class="fg"><label>Fecha de Nacimiento</label><input id="edtFechaNac" type="date" value="${resp.fechaNacimiento ? resp.fechaNacimiento.split('T')[0] : ''}"/></div>
     `;
-
-    _perfilData = perfiles.find(p => p.adoptanteUsuarioID === _adoptanteID) || null;
 
     document.getElementById('profilePerfilSection').innerHTML = `
       <div class="perfil-card">
@@ -94,7 +102,7 @@ window.guardarCambios = async function() {
 
 window.cerrarSesion = function() {
   localStorage.removeItem('session');
-  redirect('01_seleccion_rol');
+  redirect('02_inicio_sesion');
 };
 
 function escapeHtml(str) {

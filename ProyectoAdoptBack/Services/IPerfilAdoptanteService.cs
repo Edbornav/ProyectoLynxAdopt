@@ -7,6 +7,7 @@ namespace ProyectoAdoptBack.Services
     {
         Task<IEnumerable<PerfilAdoptanteDTO>> GetAllAsync();
         Task<PerfilAdoptanteDTO?> GetByIdAsync(int id);
+        Task<PerfilAdoptanteDTO?> GetByAdoptanteUsuarioIdAsync(int adoptanteUsuarioId);
         Task<int> CreateAsync(CreatePerfilAdoptanteDTO dto);
         Task UpdateAsync(int id, UpdatePerfilAdoptanteDTO dto);
     }
@@ -31,6 +32,12 @@ namespace ProyectoAdoptBack.Services
             var perfil = await _repository.GetByIdAsync(id); // cambio (se corrigio nombre del repository)
             if (perfil == null) return null;
             return ToDTO(perfil);
+        }
+
+        public async Task<PerfilAdoptanteDTO?> GetByAdoptanteUsuarioIdAsync(int adoptanteUsuarioId)
+        {
+            var perfil = await _repository.GetByAdoptanteUsuarioIdAsync(adoptanteUsuarioId);
+            return perfil is null ? null : ToDTO(perfil);
         }
 
         public async Task<int> CreateAsync(CreatePerfilAdoptanteDTO dto)

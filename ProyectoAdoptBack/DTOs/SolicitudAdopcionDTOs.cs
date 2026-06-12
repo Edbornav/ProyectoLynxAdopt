@@ -15,6 +15,7 @@ namespace ProyectoAdoptBack.DTOs
         public int RefugioID { get; set; }
         public int AdoptanteID { get; set; }
         public string MensajeAdoptante { get; set; } = string.Empty;
+        public int AnimalID { get; set; }
     }
 
     public class UpdateSolicitudAdopcionDTO

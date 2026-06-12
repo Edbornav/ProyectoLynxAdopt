@@ -97,7 +97,8 @@ namespace ProyectoAdoptBack.Services
             FechaNacimiento = model.FechaNacimiento,
             Descripcion = model.Descripcion,
             Estatus = model.Estatus,
-            FechaRegistro = model.FechaRegistro
+            FechaRegistro = model.FechaRegistro,
+            FotoUrl = model.FotoUrl
         };
 
         private static void ValidateCreate(CreateAnimalesDTO dto)

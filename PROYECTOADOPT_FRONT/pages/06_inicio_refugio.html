@@ -24,17 +24,13 @@
         <a href="#06_inicio_refugio" class="sidebar-item active">🏠 Mi refugio</a>
         <a href="#07_solicitudes_refugio" class="sidebar-item">📋 Solicitudes</a>
         <a href="#10_agregar_mascota" class="sidebar-item">➕ Agregar mascota</a>
-        <a href="#" class="sidebar-item">✏️ Editar información</a>
-        <a href="#01_seleccion_rol" class="sidebar-item" style="color:var(--red)">🚪 Cerrar sesión</a>
+        <a href="#02_inicio_sesion" class="sidebar-item" style="color:var(--red)" onclick="localStorage.removeItem('session')">🚪 Cerrar sesión</a>
       </div>
     </div>
 
     <div class="refugio-content">
       <div class="about-section">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-          <div class="section-title" style="margin:0;">Sobre nosotros</div>
-          <button class="btn btn-light btn-sm">✏️ Editar</button>
-        </div>
+        <div class="section-title" style="margin:0 0 16px 0;">Sobre nosotros</div>
         <div class="about-grid">
           <div class="about-text-col">
             <p class="about-description" id="refDescripcion">--</p>

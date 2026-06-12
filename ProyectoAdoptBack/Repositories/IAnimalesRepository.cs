@@ -27,18 +27,21 @@ namespace ProyectoAdoptBack.Repositories
         private NpgsqlConnection CreateConnection()
             => new(_configuration.GetConnectionString("PostgreSQL"));
 
+        private const string Columnas = "a.AnimalID, a.RefugioID, a.RazaID, a.Nombre, a.Sexo, a.FechaNacimiento, a.Descripcion, a.Estatus, a.FechaRegistro";
+        private const string FotoUrlSubquery = "(SELECT i.Url FROM Imagenes i WHERE i.EntidadTipo='Animal' AND i.EntidadID=a.AnimalID ORDER BY i.Orden LIMIT 1) AS FotoUrl";
+
         public async Task<IEnumerable<Animales>> GetAllAsync()
         {
             using var connection = CreateConnection();
             return await connection.QueryAsync<Animales>(
-                "SELECT AnimalID, RefugioID, RazaID, Nombre, Sexo, FechaNacimiento, Descripcion, Estatus, FechaRegistro FROM sp_get_animales();"); 
+                $"SELECT {Columnas}, {FotoUrlSubquery} FROM Animales a;"); 
         }
 
         public async Task<Animales?> GetByIdAsync(int id)
         {
             using var connection = CreateConnection();
             return await connection.QueryFirstOrDefaultAsync<Animales>( 
-                "SELECT AnimalID, RefugioID, RazaID, Nombre, Sexo, FechaNacimiento, Descripcion, Estatus, FechaRegistro FROM sp_get_animal_by_id(@p_id);", 
+                $"SELECT {Columnas}, {FotoUrlSubquery} FROM Animales a WHERE a.AnimalID = @p_id;", 
                 new { p_id = id });
         }
 
@@ -46,7 +49,7 @@ namespace ProyectoAdoptBack.Repositories
         {
             using var connection = CreateConnection();
             return await connection.QueryAsync<Animales>(
-                "SELECT AnimalID, RefugioID, RazaID, Nombre, Sexo, FechaNacimiento, Descripcion, Estatus, FechaRegistro FROM sp_get_animales_by_refugio(@p_refugioid);", 
+                $"SELECT {Columnas}, {FotoUrlSubquery} FROM Animales a WHERE a.RefugioID = @p_refugioid;", 
                 new { p_refugioid = refugioId });
         }
 
@@ -54,7 +57,7 @@ namespace ProyectoAdoptBack.Repositories
         {
             using var connection = CreateConnection();
             return await connection.QueryAsync<Animales>(
-                "SELECT AnimalID, RefugioID, RazaID, Nombre, Sexo, FechaNacimiento, Descripcion, Estatus, FechaRegistro FROM sp_get_animales_disponibles();"); 
+                $"SELECT {Columnas}, {FotoUrlSubquery} FROM Animales a WHERE a.Estatus = 'Disponible';"); 
         }
 
         public async Task<int> CreateAsync(Animales animales)

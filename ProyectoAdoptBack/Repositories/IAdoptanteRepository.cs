@@ -71,7 +71,7 @@ namespace ProyectoAdoptBack.Repositories
 
         public async Task UpdateAsync(Adoptante adoptante)
         {
-            const string sql = @"SELECT sp_update_adoptante(@p_id, @p_nombre, @p_apellidopaterno, @p_apellidomaterno, @p_telefono, @p_fechanacimiento);"; // cambio sqlQL
+            const string sql = @"SELECT sp_update_adoptante(@p_id, @p_nombre, @p_apellidopaterno, @p_apellidomaterno, @p_telefono, CAST(@p_fechanacimiento AS DATE));"; // cambio sqlQL
 
             using var conn = CreateConnection();
             await conn.ExecuteAsync(sql, new

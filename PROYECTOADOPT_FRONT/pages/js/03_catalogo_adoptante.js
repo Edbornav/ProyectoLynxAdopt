@@ -19,7 +19,7 @@ async function fetchRefugios() {
 }
 
 async function fetchEspecies(){
-    const res = await fetch (`${API_BASE_URL}/Especies`);
+    const res = await fetch (`${API_BASE_URL}/Especie`);
     return await res.json();
 
 }
@@ -67,9 +67,20 @@ function renderEspeciesFiltros(especies){
     container.innerHTML='';
 
     especies.forEach(e =>{
-        const label =document.createElement('label');
+        const label = document.createElement('label');
         label.className='especie-filtro';
-        label.innerHTML=`<input type="checkbox" value="${e.especieID}" onchange="onEspecieChange()"/>${e.nombre}`;
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = e.especieID;
+        checkbox.addEventListener('change', function() {
+            especiesFiltradas = Array.from(
+                document.querySelectorAll('#especiesFiltros input:checked')
+            ).map(i => parseInt(i.value));
+        });
+
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(' ' + e.nombre));
         container.appendChild(label);
     });
 }
@@ -94,25 +105,22 @@ window.initCatalogo = async function init(){
     }
 };
 
-// Filtra los animales segun el refugio activo y las especies seleccionadas
-function onEspecieChange(){
-    especiesFiltradas = Array.from(document.querySelectorAll('#especiesFiltros input:checked')).map(i=>parseInt(i.value));
-}
-
 //logica para filtrar los animales segun el refugio activo, las especies seleccionadas y la edad máxima ingresada por el usuario
 function filtrarAnimales(){
     const edadMax = parseInt(document.getElementById('ageRange').value) || Infinity;
-
     const razasDeEspecies = new Set(_razas.filter(r => especiesFiltradas.includes(r.especieID)).map(r => r.razaID));
 
-    return todosLosAnimales.filter(a=>{
+    const filtrados = todosLosAnimales.filter(a=>{
     const porRefugio = refugioActivo === null || a.refugioID === refugioActivo;
     const porEspecie = especiesFiltradas.length ===0 || razasDeEspecies.has(a.razaID);
-    const edad = a.fechaNacimiento ? calcularEdad(a.fechaNacimiento):0;
+    const edad = a.fechaNacimiento ? parseInt(calcularEdad(a.fechaNacimiento)) : 0;
     const porEdad = edad <= edadMax;
+    if (a.animalID <= 3) console.log('DEBUG filter check', a.animalID, {porRefugio, porEspecie, porEdad, refugioActivo, a_refugioID: a.refugioID, especiesFiltradas, razasDeEspecies: [...razasDeEspecies], edadMax, edad, fechaNacimiento: a.fechaNacimiento});
     return porRefugio && porEspecie && porEdad;
     
     });
+    console.log('DEBUG filtrados retornados:', filtrados.length);
+    return filtrados;
 
 }
 
@@ -129,6 +137,7 @@ function calcularEdad(fechaNacimiento){
 }
 
 function renderAnimales(animales){
+    console.log('DEBUG renderAnimales recibe:', animales.length);
     const grid = document.getElementById('petsGrid');
     grid.innerHTML='';
 
@@ -146,7 +155,7 @@ function renderAnimales(animales){
         card.innerHTML = `
             <div class="pet-img">
                 ${a.fotoUrl
-                    ? `<img src="${a.fotoUrl}" alt="${a.nombre}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;"/>`
+                    ? `<img src="${a.fotoUrl}" alt="${a.nombre}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" onerror="this.outerHTML='🐾'"/>`
                     : '🐾'}
             </div>
             <div class="pet-info">

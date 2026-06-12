@@ -84,6 +84,10 @@ namespace ProyectoAdoptBack.Services
 
         public async Task<int> CreateAsync(CreateAdoptanteDTO dto)
         {
+            var existente = await _repository.GetByUsuarioAsync(dto.UsuarioID);
+            if (existente != null)
+                throw new InvalidOperationException($"El usuario {dto.UsuarioID} ya tiene un perfil de adoptante.");
+
             var model = new Adoptante
             {
                 UsuarioID = dto.UsuarioID,
@@ -94,8 +98,6 @@ namespace ProyectoAdoptBack.Services
                 FechaNacimiento = dto.FechaNacimiento
             };
             return await _repository.CreateAsync(model);
-
-
         }
 
         public async Task UpdateAsync(int id, UpdateAdoptanteDTO dto)

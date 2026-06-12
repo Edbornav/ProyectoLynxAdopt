@@ -1,5 +1,5 @@
 let _especies = [];
-let _razas = [];
+let _razasMascota = [];
 let _imagenFile = null;
 
 window.initAgregarMascota = async function() {
@@ -10,8 +10,8 @@ window.initAgregarMascota = async function() {
         const admin = await apiGet('/Administradores/por-usuario/' + session.usuarioID);
         if (!admin) { redirect('02_inicio_sesion'); return; }
 
-        _especies = await apiGet('/Especies');
-        _razas = await apiGet('/Razas');
+        _especies = await apiGet('/Especie');
+        _razasMascota = await apiGet('/Razas');
 
         const selEspecie = document.getElementById('petEspecie');
         selEspecie.innerHTML = '<option value="">Selecciona especie</option>';
@@ -33,7 +33,7 @@ window.cargarRazas = function() {
 
     if (!especieID) return;
 
-    const filtradas = _razas.filter(r => r.especieID === especieID);
+    const filtradas = _razasMascota.filter(r => r.especieID === especieID);
     filtradas.forEach(r => {
         const opt = document.createElement('option');
         opt.value = r.razaID;
@@ -58,7 +58,7 @@ window.publishPet = async function() {
     const session = JSON.parse(localStorage.getItem('session') || '{}');
     if (!session.usuarioID) { alert('Sesión no encontrada.'); return; }
 
-    const nombre = document.getElementById('petNameTitle').textContent.trim();
+    const nombre = document.getElementById('petNameTitle').value.trim();
     const especieID = parseInt(document.getElementById('petEspecie').value);
     const razaID = parseInt(document.getElementById('petRaza').value);
     const sexo = document.getElementById('petSexo').value;
@@ -102,7 +102,7 @@ window.publishPet = async function() {
             formData.append('entidadTipo', 'Animal');
             formData.append('entidadID', animalID);
             formData.append('orden', '1');
-            await apiUploadFile('/Imagenes', formData);
+            await apiUploadFile('/Imagen', formData);
         }
 
         // Save health check flags as part of description or tags

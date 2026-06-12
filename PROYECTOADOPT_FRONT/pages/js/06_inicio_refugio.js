@@ -15,6 +15,16 @@ window.initInicioRefugio = async function() {
         document.getElementById('refNombre').textContent = refugio.nombre;
         document.getElementById('refDescripcion').textContent = refugio.descripcion || 'Sin descripción';
 
+        try {
+            const imagenesRef = await apiGet(`/Imagen?entidadTipo=Refugio&entidadId=${refugioID}`);
+            if (imagenesRef.length > 0) {
+                const logoEl = document.getElementById('refLogo');
+                if (logoEl) logoEl.innerHTML = `<img src="${imagenesRef[0].url}" alt="${refugio.nombre}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;" onerror="this.outerHTML='🏠'"/>`;
+                const photoEl = document.getElementById('refPhotoCol');
+                if (photoEl) photoEl.innerHTML = `<img src="${imagenesRef[0].url}" alt="${refugio.nombre}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;" onerror="this.outerHTML='🐾'"/>`;
+            }
+        } catch (e) {}
+
         const animales = await apiGet('/Animales/por-refugio/' + refugioID);
         document.getElementById('statMascotas').textContent = animales.length;
         document.getElementById('statAdoptados').textContent = animales.filter(a => a.estatus === 'Adoptado').length;
@@ -28,7 +38,7 @@ window.initInicioRefugio = async function() {
         animales.forEach(a => {
             const card = document.createElement('div');
             card.className = 'pet-card';
-            card.innerHTML = '<div class="pet-img">🐾</div>' +
+            card.innerHTML = '<div class="pet-img">' + (a.fotoUrl ? '<img src="' + a.fotoUrl + '" alt="' + a.nombre + '" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" onerror="this.outerHTML=\'🐾\'"/>' : '🐾') + '</div>' +
                 '<div class="pet-info">' +
                 '<div class="pet-name">' + a.nombre + '</div>' +
                 '<div class="pet-meta"><span>' + a.sexo + '</span></div>' +

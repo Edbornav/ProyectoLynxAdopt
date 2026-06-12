@@ -11,11 +11,15 @@ window.initDetalle = async function() {
         const refugio = await apiGet('/Refugios/' + animal.refugioID);
         document.getElementById('detailRefugioBadge').textContent = '🏠 ' + refugio.nombre;
 
-        const imagenes = await apiGet('/Imagenes?entidadTipo=Animal&entidadId=' + animalID);
-        if (imagenes.length > 0) {
-            document.getElementById('detailImgCol').innerHTML =
-                '<img src="' + imagenes[0].url + '" alt="' + animal.nombre + '" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;"/>' +
-                '<div class="refugio-badge" id="detailRefugioBadge">🏠 ' + refugio.nombre + '</div>';
+        try {
+            const imagenes = await apiGet('/Imagen?entidadTipo=Animal&entidadId=' + animalID);
+            if (imagenes.length > 0) {
+                document.getElementById('detailImgCol').innerHTML =
+                    '<img src="' + imagenes[0].url + '" alt="' + animal.nombre + '" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;"/>' +
+                    '<div class="refugio-badge" id="detailRefugioBadge">🏠 ' + refugio.nombre + '</div>';
+            }
+        } catch (e) {
+            console.warn('Error cargando imágenes:', e);
         }
 
         const razas = await apiGet('/Razas');
@@ -48,6 +52,12 @@ window.enviarSolicitud = async function() {
         return;
     }
 
+    if (_detalleAnimal.estatus !== 'Disponible') {
+        alert('Este animal ya no esta disponible para adopción.');
+        cerrarModal();
+        return;
+    }
+
     try {
         const adoptante = await apiGet('/Adoptantes/por-usuario/' + session.usuarioID);
         if (!adoptante) {
@@ -56,14 +66,10 @@ window.enviarSolicitud = async function() {
             return;
         }
 
-        const res = await apiPost('/SolicitudesAdopcion', {
+        await apiPost('/SolicitudesAdopcion', {
             refugioID: _detalleAnimal.refugioID,
             adoptanteID: adoptante.adoptanteID,
-            mensajeAdoptante: 'Solicitud de adopción para ' + _detalleAnimal.nombre
-        });
-
-        await apiPost('/SolicitudesAnimales', {
-            solicitudID: res.id,
+            mensajeAdoptante: 'Solicitud de adopción para ' + _detalleAnimal.nombre,
             animalID: _detalleAnimal.animalID
         });
 
@@ -72,7 +78,10 @@ window.enviarSolicitud = async function() {
         redirect('08_mis_solicitudes');
     } catch (e) {
         console.error('Error al enviar solicitud:', e);
-        alert('Error al enviar la solicitud. Intenta de nuevo.');
+        const msg = e.message && e.message.includes('no esta disponible') ? 'Este animal ya no esta disponible.' :
+                    e.message && e.message.includes('Ya existe') ? 'Ya enviaste una solicitud para este animal.' :
+                    'Error al enviar la solicitud. Intenta de nuevo.';
+        alert(msg);
     }
 };
 

@@ -11,7 +11,7 @@ namespace ProyectoAdoptBack.Services
         Task<UsuarioDTO?> GetByIdAsync(int id);
         Task<LoginResponseDTO?> LoginAsync(LoginDTO dto); //ahora con la implementraciojn del LoginReponse debemos de regresar el token ademas de los datos del usuario
         Task<int> CreateAsync(CreateUsuarioDTO dto); //uso de int para retornar el id del usuario
-        Task UpdateAsync(int id, UpdateUsuarioDTO dto);
+        Task<string> UpdateAsync(int id, UpdateUsuarioDTO dto);
         Task DesactivarAsync(int id);
     }
 
@@ -72,7 +72,6 @@ namespace ProyectoAdoptBack.Services
             {
                 Correo = dto.Correo.Trim(),
                 PasswordHash = passwordHash, //Se asigna el hash generado
-                TipoUsuario = dto.TipoUsuario.Trim(),
                 Estatus = dto.Estatus.Trim(),
                 FechaRegistro = DateTime.UtcNow
             };
@@ -80,18 +79,21 @@ namespace ProyectoAdoptBack.Services
             return await _repository.CreateAsync(model);
         }
 
-        public async Task UpdateAsync(int id, UpdateUsuarioDTO dto)
+        public async Task<string> UpdateAsync(int id, UpdateUsuarioDTO dto)
         {
             ValidateUpdate(dto);
 
             var model = new Usuario
             {
                 Correo = dto.Correo.Trim(),
-                TipoUsuario = dto.TipoUsuario.Trim(),
+                TipoUsuario = dto.TipoUsuario?.Trim(),
                 Estatus = dto.Estatus.Trim()
             };
 
             await _repository.UpdateAsync(id, model);
+
+            var updated = await _repository.GetByIdAsync(id);
+            return _tokenservice.GenerarToken(updated!);
         }
 
         public async Task DesactivarAsync(int id)
@@ -105,7 +107,7 @@ namespace ProyectoAdoptBack.Services
             {
                 UsuarioID = model.UsuarioID,
                 Correo = model.Correo,
-                TipoUsuario = model.TipoUsuario,
+                TipoUsuario = model.TipoUsuario ?? string.Empty,
                 Estatus = model.Estatus,
                 FechaRegistro = model.FechaRegistro
             };
@@ -114,16 +116,13 @@ namespace ProyectoAdoptBack.Services
         private static void ValidateCreate(CreateUsuarioDTO dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Correo) ||
-                string.IsNullOrWhiteSpace(dto.TipoUsuario) ||
+                
                 string.IsNullOrWhiteSpace(dto.Estatus))
                 throw new ArgumentException("Agrega todos los campos, son obligatorios.");
 
             if (!dto.Correo.Contains('@') || !dto.Correo.Contains('.'))
                 throw new ArgumentException("El correo no tiene un formato válido.");
 
-            var tiposValidos = new[] { "Administrador", "Adoptante", "Refugio" };
-            if (!tiposValidos.Contains(dto.TipoUsuario.Trim()))
-                throw new ArgumentException("TipoUsuario no válido.");
 
             var estatusValidos = new[] { "Activo", "Inactivo" };
             if (!estatusValidos.Contains(dto.Estatus.Trim()))
@@ -133,20 +132,22 @@ namespace ProyectoAdoptBack.Services
         private static void ValidateUpdate(UpdateUsuarioDTO dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Correo) ||
-                string.IsNullOrWhiteSpace(dto.TipoUsuario) ||
                 string.IsNullOrWhiteSpace(dto.Estatus))
                 throw new ArgumentException("Agrega todos los campos, son obligatorios.");
 
             if (!dto.Correo.Contains('@') || !dto.Correo.Contains('.'))
                 throw new ArgumentException("El correo no tiene un formato válido.");
 
-            var tiposValidos = new[] { "Administrador", "Adoptante", "Refugio" };
-            if (!tiposValidos.Contains(dto.TipoUsuario.Trim()))
-                throw new ArgumentException("TipoUsuario no válido.");
-
             var estatusValidos = new[] { "Activo", "Inactivo" };
             if (!estatusValidos.Contains(dto.Estatus.Trim()))
                 throw new ArgumentException("Estatus no válido.");
+
+            if (!string.IsNullOrWhiteSpace(dto.TipoUsuario))
+            {
+                var tiposValidos = new[] { "Adoptante", "Refugio", "Administrador" };
+                if (!tiposValidos.Contains(dto.TipoUsuario.Trim()))
+                    throw new ArgumentException("Tipo de usuario no válido.");
+            }
         }
     }
 }

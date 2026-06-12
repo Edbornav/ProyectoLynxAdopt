@@ -3,13 +3,20 @@ window.initPerfilRefugio = async function() {
   if (!refugioId) { document.getElementById('refNombre').textContent = 'Refugio no especificado'; return; }
 
   try {
-    const [refugio, animales, miembros] = await Promise.all([
+    const [refugio, animales, miembros, imagenesRefugio] = await Promise.all([
       apiGet(`/Refugios/${refugioId}`),
       apiGet(`/Animales/por-refugio/${refugioId}`),
-      apiGet(`/RefugioAdministradores/${refugioId}`)
+      apiGet(`/RefugioAdministradores/${refugioId}`),
+      apiGet(`/Imagen?entidadTipo=Refugio&entidadId=${refugioId}`).catch(() => [])
     ]);
 
     document.getElementById('refNombre').textContent = refugio.nombre;
+
+    const logo = imagenesRefugio.length > 0 ? imagenesRefugio[0].url : null;
+    const logoEl = document.getElementById('refLogo');
+    if (logo && logoEl) {
+      logoEl.innerHTML = `<img src="${logo}" alt="${refugio.nombre}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;" onerror="this.outerHTML='🏠'"/>`;
+    }
     document.getElementById('refDireccion').textContent = refugio.direccion;
     document.getElementById('refTelefono').textContent = refugio.telefono;
     document.getElementById('refEmail').textContent = refugio.correo;
@@ -34,7 +41,7 @@ window.initPerfilRefugio = async function() {
         const emoji = a.sexo === 'Hembra' ? '🐱' : '🐶';
         return `
           <a href="#05_detalle_mascota?id=${a.animalID}" class="pet-card">
-            <div class="pet-card-img">${emoji}</div>
+            <div class="pet-card-img">${a.fotoUrl ? `<img src="${a.fotoUrl}" alt="${a.nombre}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" onerror="this.outerHTML='${emoji}'"/>` : emoji}</div>
             <div class="pet-card-body">
               <div class="pet-name">${escapeHtml(a.nombre)}</div>
               <div class="pet-meta">${raza ? escapeHtml(raza.nombre) : 'Raza desconocida'} · ${edad}</div>

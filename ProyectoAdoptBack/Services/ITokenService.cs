@@ -21,12 +21,14 @@ namespace ProyectoAdoptBack.Services
         }
         public string GenerarToken(Usuario usuario)
         {
-            var claims = new []
+            var claims = new List<Claim>
             {
                new Claim (ClaimTypes.NameIdentifier, usuario.UsuarioID.ToString()),
                new Claim (ClaimTypes.Email, usuario.Correo),
-               new Claim(ClaimTypes.Role, usuario.TipoUsuario)
             };
+
+            if (!string.IsNullOrWhiteSpace(usuario.TipoUsuario))
+                claims.Add(new Claim(ClaimTypes.Role, usuario.TipoUsuario));
 
             var key = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_JwtSettings.SecretKey) );

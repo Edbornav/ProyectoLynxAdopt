@@ -13,7 +13,7 @@
   <div class="profile-card">
     <div class="profile-left">
       <div class="avatar-wrap">
-        <div class="avatar-big">👤</div>
+        <div class="avatar-big" id="avatarBig">👤</div>
         <div class="avatar-edit">✏️</div>
       </div>
       <div class="profile-name" id="profileName">--</div>
@@ -25,7 +25,7 @@
       </div>
       <div class="divider"></div>
       <button class="btn btn-orange btn-sm" style="width:100%" onclick="redirect('04b_test_perfil')">✏️ Editar perfil</button>
-      <button class="btn btn-light btn-sm" style="width:100%" onclick="redirect('01_seleccion_rol')">Cerrar sesión</button>
+      <button class="btn btn-light btn-sm" style="width:100%" onclick="cerrarSesion()">Cerrar sesión</button>
     </div>
 
     <div class="profile-right">
@@ -35,7 +35,6 @@
       <div id="profilePerfilSection"></div>
       <div class="edit-btn-row">
         <button class="btn btn-primary" onclick="guardarCambios()">💾 Guardar cambios</button>
-        <button class="btn btn-light">Cancelar</button>
       </div>
     </div>
   </div>

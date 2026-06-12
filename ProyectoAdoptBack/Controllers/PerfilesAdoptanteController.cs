@@ -39,11 +39,20 @@ namespace ProyectoAdoptBack.Controllers
             return Ok(new { id });
         }
         [Authorize(Roles ="Adoptante")]
+        [HttpGet("por-adoptante/{adoptanteId}")]
+        public async Task<IActionResult> GetByAdoptante(int adoptanteId)
+        {
+            var item = await _service.GetByAdoptanteUsuarioIdAsync(adoptanteId);
+            if (item == null) return NotFound();
+            return Ok(item);
+        }
+
+        [Authorize(Roles ="Adoptante")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdatePerfilAdoptanteDTO dto)
         {
             await _service.UpdateAsync(id, dto);
-            return NoContent();
+            return Ok(new { });
         }
     }
 }

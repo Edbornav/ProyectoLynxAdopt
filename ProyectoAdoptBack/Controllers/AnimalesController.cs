@@ -49,7 +49,7 @@ namespace ProyectoAdoptBack.Controllers
         public async Task<IActionResult> Update(int id, [FromBody] UpdateAnimalesDTO dto)
         {
             await _service.UpdateAsync(id, dto);
-            return NoContent();
+            return Ok(new { });
         }
         [Authorize(Roles = "Administrador")]
         [HttpPatch("{id}/desactivar")]

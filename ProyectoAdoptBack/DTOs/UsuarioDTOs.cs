@@ -13,14 +13,13 @@ namespace ProyectoAdoptBack.DTOs
     {
         public string Correo { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
-        public string TipoUsuario { get; set; } = string.Empty;
         public string Estatus { get; set; } = string.Empty;
     }
 
     public class UpdateUsuarioDTO
     {
         public string Correo { get; set; } = string.Empty;
-        public string TipoUsuario { get; set; } = string.Empty;
+        public string? TipoUsuario { get; set; }
         public string Estatus { get; set; } = string.Empty;
     }
 
@@ -34,7 +33,7 @@ namespace ProyectoAdoptBack.DTOs
         public string Token {get; set;}= string.Empty;
         public int UsuarioID {get; set;}
         public string Correo {get; set;}= string.Empty;
-        public string TipoUsuario {get; set;}= string.Empty;
+        public string? TipoUsuario {get; set;}
 
     }
     

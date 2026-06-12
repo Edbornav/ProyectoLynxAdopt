@@ -43,7 +43,7 @@ namespace ProyectoAdoptBack.Controllers
         public async Task<IActionResult> Create([FromBody] CreateRefugioAdministradoresDTO dto)
         {
             await _service.CreateAsync(dto);
-            return Ok();
+            return Ok(new { });
         }
     }
 }

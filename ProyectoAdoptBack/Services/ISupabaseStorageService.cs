@@ -11,7 +11,7 @@ namespace ProyectoAdoptBack.Services
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl;
         private readonly string _serviceRoleKey;
-        private const string Bucket = "imagenes";
+        private const string Bucket = "Imagenes";
 
         public SupabaseStorageService(HttpClient httpClient, IConfiguration configuration)
         {

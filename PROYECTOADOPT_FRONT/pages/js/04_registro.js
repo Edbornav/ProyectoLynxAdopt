@@ -43,6 +43,16 @@ async function register() {
 
         await apiUploadFile('/Adoptantes/con-foto', formData);
 
+        const resToken = await apiPut('/Usuarios/' + session.usuarioID, {
+            correo: session.correo,
+            tipoUsuario: 'Adoptante',
+            estatus: 'Activo'
+        });
+
+        session.token = resToken.token;
+        session.tipoUsuario = 'Adoptante';
+        localStorage.setItem('session', JSON.stringify(session));
+
         redirect('03_catalogo_adoptante');
     } catch (error) {
         console.error('Error al crear adoptante:', error);

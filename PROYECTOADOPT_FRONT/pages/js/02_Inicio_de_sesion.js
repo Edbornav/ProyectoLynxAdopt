@@ -17,16 +17,21 @@ async function login() {
             token : respuesta.token,
             usuarioID : respuesta.usuarioID,
             correo : respuesta.correo,
-            tipoUsuario : respuesta.tipoUsuario
+            tipoUsuario : respuesta.tipoUsuario || null
         }
 
         localStorage.setItem('session', JSON.stringify(sesion))
-        //denemos de tener en cuenta que esto solo funcionara despues de registrar al usuario como un adoptante o administratdor por eso el de registrarse no tiene esta condicion...
         if (respuesta.tipoUsuario === 'Adoptante'){
             redirect('03_catalogo_adoptante');
             return;
         } else if(respuesta.tipoUsuario === 'Administrador'){
             redirect('06_inicio_refugio');
+            return;
+        } else if(respuesta.tipoUsuario === 'Refugio'){
+            redirect('06_inicio_refugio');
+            return;
+        } else {
+            redirect('01_seleccion_rol');
             return;
         }
     } catch (error) {
@@ -59,7 +64,6 @@ async function registrarse() {
         await apiPost('/Usuarios', {
             correo: correo,
             password: password,
-            tipoUsuario: 'Adoptante',
             estatus: 'Activo'
         });
 
@@ -67,6 +71,7 @@ async function registrarse() {
         const respuesta = await apiPost('/Usuarios/login', {
             correo: correo,
             password: password
+            
         });
 
      
@@ -74,7 +79,7 @@ async function registrarse() {
             token: respuesta.token,
             usuarioID: respuesta.usuarioID,
             correo: respuesta.correo,
-            tipoUsuario: respuesta.tipoUsuario
+            tipoUsuario: respuesta.tipoUsuario || null
         };
         localStorage.setItem('session', JSON.stringify(sesion));
         redirect('01_seleccion_rol');

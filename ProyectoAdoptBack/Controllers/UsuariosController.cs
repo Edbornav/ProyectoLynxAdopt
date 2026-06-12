@@ -50,8 +50,8 @@ namespace ProyectoAdoptBack.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateUsuarioDTO dto)
         {
-            await _service.UpdateAsync(id, dto);
-            return NoContent();
+            var token = await _service.UpdateAsync(id, dto);
+            return Ok(new { token });
         }
         [Authorize(Roles ="Administrador")]
         [HttpPatch("{id}/desactivar")]

@@ -40,6 +40,16 @@ async function registerAdmin() {
     }
 
     try {
+        const resToken = await apiPut('/Usuarios/' + session.usuarioID, {
+            correo:     session.correo,
+            tipoUsuario: 'Administrador',
+            estatus:    'Activo'
+        });
+
+        session.token = resToken.token;
+        session.tipoUsuario = 'Administrador';
+        localStorage.setItem('session', JSON.stringify(session));
+
         const resAdmin = await apiPost('/Administradores', {
             usuarioID:       session.usuarioID,
             nombre:          nombre,
@@ -67,15 +77,6 @@ async function registerAdmin() {
             refugioID:       refugioID,
             usuarioAdminID:  administradorID
         });
-
-        await apiPut('/Usuarios/' + session.usuarioID, {
-            correo:     session.correo,
-            tipoUsuario: 'Administrador',
-            estatus:    'Activo'
-        });
-
-        session.tipoUsuario = 'Administrador';
-        localStorage.setItem('session', JSON.stringify(session));
 
         redirect('06_inicio_refugio');
     } catch (error) {

@@ -27,7 +27,7 @@ namespace ProyectoAdoptBack.Controllers
         public async Task<IActionResult> Create([FromBody] CreateSolicitudAnimalesDTO dto)
         {
             await _service.CreateAsync(dto);
-            return Ok();
+            return Ok(new { });
         }
     }
 }
