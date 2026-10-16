@@ -1,35 +1,58 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProyectoAdoptBack.DTOs;
+using ProyectoAdoptBack.Services;
 
 namespace ProyectoAdoptBack.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+   
     public class PerfilesAdoptanteController : ControllerBase
     {
+        private readonly IPerfilAdoptanteService _service;
+
+        public PerfilesAdoptanteController(IPerfilAdoptanteService service)
+        {
+            _service = service;
+        }
+        [Authorize(Roles ="Administrador")]
         [HttpGet]
-        public ActionResult<List<PerfilAdoptanteDTO>> GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            return Ok(new List<PerfilAdoptanteDTO>());
+            var items = await _service.GetAllAsync();
+            return Ok(items);
         }
-
+         [Authorize(Roles ="Administrador")]
         [HttpGet("{id}")]
-        public ActionResult<PerfilAdoptanteDTO> GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            return NotFound();
+            var item = await _service.GetByIdAsync(id);
+            if (item == null) return NotFound();
+            return Ok(item);
         }
-
+        [Authorize(Roles ="Adoptante")]
         [HttpPost]
-        public ActionResult<PerfilAdoptanteDTO> Create([FromBody] CreatePerfilAdoptanteDTO dto)
+        public async Task<IActionResult> Create([FromBody] CreatePerfilAdoptanteDTO dto)
         {
-            return Ok(new PerfilAdoptanteDTO());
+            var id = await _service.CreateAsync(dto);
+            return Ok(new { id });
+        }
+        [Authorize(Roles ="Adoptante")]
+        [HttpGet("por-adoptante/{adoptanteId}")]
+        public async Task<IActionResult> GetByAdoptante(int adoptanteId)
+        {
+            var item = await _service.GetByAdoptanteUsuarioIdAsync(adoptanteId);
+            if (item == null) return NotFound();
+            return Ok(item);
         }
 
+        [Authorize(Roles ="Adoptante")]
         [HttpPut("{id}")]
-        public ActionResult Update(int id, [FromBody] UpdatePerfilAdoptanteDTO dto)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdatePerfilAdoptanteDTO dto)
         {
-            return NoContent();
+            await _service.UpdateAsync(id, dto);
+            return Ok(new { });
         }
-
     }
 }

@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProyectoAdoptBack.DTOs;
+using ProyectoAdoptBack.Services;
 
 namespace ProyectoAdoptBack.Controllers
 {
@@ -7,23 +9,25 @@ namespace ProyectoAdoptBack.Controllers
     [ApiController]
     public class SolicitudesAnimalesController : ControllerBase
     {
-        [HttpGet]
-        public ActionResult<List<SolicitudAnimalesDTO>> GetAll()
-        {
-            return Ok(new List<SolicitudAnimalesDTO>());
-        }
+        private readonly ISolicitudAnimalesService _service;
 
-        [HttpGet("{solicitudId}/{animalId}")]
-        public ActionResult<SolicitudAnimalesDTO> GetById(int solicitudId, int animalId)
+        public SolicitudesAnimalesController(ISolicitudAnimalesService service)
         {
-            return NotFound();
+            _service = service;
         }
-
+        [Authorize]
+        [HttpGet("{solicitudId}")]
+        public async Task<IActionResult> GetBySolicitud(int solicitudId)
+        {
+            var items = await _service.GetBySolicitudAsync(solicitudId);
+            return Ok(items);
+        }
+        [Authorize(Roles ="Adoptante")]
         [HttpPost]
-        public ActionResult<SolicitudAnimalesDTO> Create([FromBody] CreateSolicitudAnimalesDTO dto)
+        public async Task<IActionResult> Create([FromBody] CreateSolicitudAnimalesDTO dto)
         {
-            return Ok(new SolicitudAnimalesDTO());
+            await _service.CreateAsync(dto);
+            return Ok(new { });
         }
-
     }
 }

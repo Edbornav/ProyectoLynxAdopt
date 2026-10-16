@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProyectoAdoptBack.DTOs;
+using ProyectoAdoptBack.Services;
 
 namespace ProyectoAdoptBack.Controllers
 {
@@ -7,33 +9,46 @@ namespace ProyectoAdoptBack.Controllers
     [ApiController]
     public class CitasController : ControllerBase
     {
+        private readonly ICitasService _service;
+
+        public CitasController(ICitasService service)
+        {
+            _service = service;
+        }
+        [Authorize]
         [HttpGet]
-        public ActionResult<List<CitasDTO>> GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            return Ok(new List<CitasDTO>());
+            var items = await _service.GetAllAsync();
+            return Ok(items);
         }
-
+        [Authorize(Roles = "Administrador")]
         [HttpGet("{id}")]
-        public ActionResult<CitasDTO> GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            return NotFound();
+            var item = await _service.GetByIdAsync(id);
+            if (item == null) return NotFound();
+            return Ok(item);
         }
-
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
-        public ActionResult<CitasDTO> Create([FromBody] CreateCitasDTO dto)
+        public async Task<IActionResult> Create([FromBody] CreateCitasDTO dto)
         {
-            return Ok(new CitasDTO());
+            var id = await _service.CreateAsync(dto);
+            return Ok(new { id });
         }
-
+        [Authorize(Roles = "Administrador")]
         [HttpPut("{id}")]
-        public ActionResult Update(int id, [FromBody] UpdateCitasDTO dto)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateCitasDTO dto)
         {
+            await _service.UpdateAsync(id, dto);
             return NoContent();
         }
-
+        [Authorize]
         [HttpPatch("{id}/desactivar")]
-        public ActionResult Desactivar(int id)
+        public async Task<IActionResult> Desactivar(int id)
         {
+            await _service.DesactivarAsync(id);
             return NoContent();
         }
     }

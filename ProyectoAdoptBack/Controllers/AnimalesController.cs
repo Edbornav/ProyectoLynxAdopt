@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProyectoAdoptBack.DTOs;
+using ProyectoAdoptBack.Services;
 
 namespace ProyectoAdoptBack.Controllers
 {
@@ -7,33 +9,53 @@ namespace ProyectoAdoptBack.Controllers
     [ApiController]
     public class AnimalesController : ControllerBase
     {
+        private readonly IAnimalesService _service;
+
+        public AnimalesController(IAnimalesService service)
+        {
+            _service = service;
+        }
+        [AllowAnonymous]
         [HttpGet]
-        public ActionResult<List<AnimalesDTO>> GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            return Ok(new List<AnimalesDTO>());
+            var items = await _service.GetAllAsync();
+            return Ok(items);
         }
-
+        [AllowAnonymous]
+        [HttpGet("por-refugio/{refugioId}")]
+        public async Task<IActionResult> GetByRefugio(int refugioId)
+        {
+            var items = await _service.GetByRefugioAsync(refugioId);
+            return Ok(items);
+        }
+        [AllowAnonymous]
         [HttpGet("{id}")]
-        public ActionResult<AnimalesDTO> GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            return NotFound();
+            var item = await _service.GetByIdAsync(id);
+            if (item == null) return NotFound();
+            return Ok(item);
         }
-
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
-        public ActionResult<AnimalesDTO> Create([FromBody] CreateAnimalesDTO dto)
+        public async Task<IActionResult> Create([FromBody] CreateAnimalesDTO dto)
         {
-            return Ok(new AnimalesDTO());
+            var id = await _service.CreateAsync(dto);
+            return Ok(new { id });
         }
-
+        [Authorize(Roles = "Administrador")]
         [HttpPut("{id}")]
-        public ActionResult Update(int id, [FromBody] UpdateAnimalesDTO dto)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateAnimalesDTO dto)
         {
-            return NoContent();
+            await _service.UpdateAsync(id, dto);
+            return Ok(new { });
         }
-
+        [Authorize(Roles = "Administrador")]
         [HttpPatch("{id}/desactivar")]
-        public ActionResult Desactivar(int id)
+        public async Task<IActionResult> Desactivar(int id)
         {
+            await _service.DesactivarAsync(id);
             return NoContent();
         }
     }

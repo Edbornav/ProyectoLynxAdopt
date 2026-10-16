@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProyectoAdoptBack.DTOs;
+using ProyectoAdoptBack.Services;
 
 namespace ProyectoAdoptBack.Controllers
 {
@@ -7,33 +9,55 @@ namespace ProyectoAdoptBack.Controllers
     [ApiController]
     public class UsuariosController : ControllerBase
     {
+        private readonly IUsuarioService _service;
+
+        public UsuariosController(IUsuarioService service)
+        {
+            _service = service;
+        }
+        [Authorize(Roles = "Administrador")]
         [HttpGet]
-        public ActionResult<List<UsuarioDTO>> GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            return Ok(new List<UsuarioDTO>());
+            var items = await _service.GetAllAsync();
+            return Ok(items);
         }
-
+        [Authorize(Roles = "Administrador")]
         [HttpGet("{id}")]
-        public ActionResult<UsuarioDTO> GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            return NotFound();
+            var item = await _service.GetByIdAsync(id);
+            if (item == null) return NotFound();
+            return Ok(item);
         }
-
+        [AllowAnonymous]
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDTO dto)
+        {
+            var resultado = await _service.LoginAsync(dto);
+            if (resultado == null)
+                return Unauthorized(new { mensaje = "Credenciales inválidas" });
+            return Ok(resultado);
+        }
+        [AllowAnonymous]
         [HttpPost]
-        public ActionResult<UsuarioDTO> Create([FromBody] CreateUsuarioDTO dto)
+        public async Task<IActionResult> Create([FromBody] CreateUsuarioDTO dto)
         {
-            return Ok(new UsuarioDTO());
+            var id = await _service.CreateAsync(dto);
+            return Ok(new { usuarioID = id });
         }
-
+        [Authorize]
         [HttpPut("{id}")]
-        public ActionResult Update(int id, [FromBody] UpdateUsuarioDTO dto)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateUsuarioDTO dto)
         {
-            return NoContent();
+            var token = await _service.UpdateAsync(id, dto);
+            return Ok(new { token });
         }
-
+        [Authorize(Roles ="Administrador")]
         [HttpPatch("{id}/desactivar")]
-        public ActionResult Desactivar(int id)
+        public async Task<IActionResult> Desactivar(int id)
         {
+            await _service.DesactivarAsync(id);
             return NoContent();
         }
     }

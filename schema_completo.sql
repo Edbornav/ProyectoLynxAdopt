@@ -21,10 +21,11 @@ CREATE TABLE Raza (
 );
 
 CREATE TABLE Usuarios (
-    UsuarioID     INT          GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
-    Correo        VARCHAR(50)  NOT NULL,
-    TipoUsuario   VARCHAR(50)  NOT NULL CHECK (TipoUsuario IN ('Adoptante', 'Administrador')),
-    Estatus       VARCHAR(50)  NOT NULL CHECK (Estatus IN ('Activo', 'Inactivo')),
+    UsuarioID     INT           GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
+    Correo        VARCHAR(50)   UNIQUE NOT NULL,
+    PasswordHash  VARCHAR(255)  NOT NULL,
+    TipoUsuario   VARCHAR(50)   CHECK (TipoUsuario IN ('Adoptante', 'Refugio', 'Administrador')),
+    Estatus       VARCHAR(50)   NOT NULL CHECK (Estatus IN ('Activo', 'Inactivo')),
     FechaRegistro DATE
 );
 
@@ -139,10 +140,15 @@ BEGIN
 END; $$;
 
 CREATE OR REPLACE FUNCTION sp_insert_especie(p_nombre VARCHAR)
-RETURNS VOID
-LANGUAGE plpgsql AS $$
+RETURNS INTEGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    p_id INTEGER;
 BEGIN
-    INSERT INTO Especie (Nombre) VALUES (p_nombre);
+    INSERT INTO Especie (Nombre) VALUES (p_nombre)
+    RETURNING EspecieID INTO p_id;
+    RETURN p_id;
 END; $$;
 
 CREATE OR REPLACE FUNCTION sp_update_especie(p_id INT, p_nombre VARCHAR)
@@ -179,10 +185,15 @@ BEGIN
 END; $$;
 
 CREATE OR REPLACE FUNCTION sp_insert_raza(p_especieid INT, p_nombre VARCHAR)
-RETURNS VOID
-LANGUAGE plpgsql AS $$
+RETURNS INTEGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    p_id INTEGER;
 BEGIN
-    INSERT INTO Raza (EspecieID, Nombre) VALUES (p_especieid, p_nombre);
+    INSERT INTO Raza (EspecieID, Nombre) VALUES (p_especieid, p_nombre)
+    RETURNING RazaID INTO p_id;
+    RETURN p_id;
 END; $$;
 
 CREATE OR REPLACE FUNCTION sp_update_raza(p_id INT, p_especieid INT, p_nombre VARCHAR)
@@ -212,15 +223,21 @@ BEGIN
 END; $$;
 
 CREATE OR REPLACE FUNCTION sp_insert_usuario(
-    p_correo      VARCHAR,
-    p_tipousuario VARCHAR,
-    p_estatus     VARCHAR
+    p_correo       VARCHAR,
+    p_passwordhash VARCHAR,
+    p_estatus      VARCHAR
 )
-RETURNS VOID
-LANGUAGE plpgsql AS $$
+RETURNS INTEGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    p_id INTEGER;
 BEGIN
-    INSERT INTO Usuarios (Correo, TipoUsuario, Estatus, FechaRegistro)
-    VALUES (p_correo, p_tipousuario, p_estatus, CURRENT_DATE);
+    INSERT INTO Usuarios (Correo, PasswordHash, Estatus, FechaRegistro)
+    VALUES (p_correo, p_passwordhash, p_estatus, CURRENT_DATE)
+    RETURNING UsuarioID INTO p_id;
+
+    RETURN p_id;
 END; $$;
 
 CREATE OR REPLACE FUNCTION sp_update_usuario(
@@ -242,6 +259,15 @@ RETURNS VOID
 LANGUAGE plpgsql AS $$
 BEGIN
     UPDATE Usuarios SET Estatus = 'Inactivo' WHERE UsuarioID = p_id;
+END; $$;
+
+CREATE OR REPLACE FUNCTION sp_login(p_correo VARCHAR)
+RETURNS TABLE (UsuarioID INT, Correo VARCHAR, PasswordHash VARCHAR, TipoUsuario VARCHAR, Estatus VARCHAR)
+LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT u.UsuarioID, u.Correo, u.PasswordHash, u.TipoUsuario, u.Estatus
+    FROM Usuarios u WHERE u.Correo = p_correo AND u.Estatus = 'Activo';
 END; $$;
 
 
@@ -287,11 +313,17 @@ CREATE OR REPLACE FUNCTION sp_insert_adoptante(
     p_telefono        VARCHAR,
     p_fechanacimiento DATE
 )
-RETURNS VOID
-LANGUAGE plpgsql AS $$
+RETURNS INTEGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    p_id INTEGER;
 BEGIN
     INSERT INTO Adoptante (UsuarioID, Nombre, ApellidoPaterno, ApellidoMaterno, Telefono, FechaNacimiento)
-    VALUES (p_usuarioid, p_nombre, p_apellidopaterno, p_apellidomaterno, p_telefono, p_fechanacimiento);
+    VALUES (p_usuarioid, p_nombre, p_apellidopaterno, p_apellidomaterno, p_telefono, p_fechanacimiento)
+    RETURNING AdoptanteID INTO p_id;
+
+    RETURN p_id;
 END; $$;
 
 CREATE OR REPLACE FUNCTION sp_update_adoptante(
@@ -352,7 +384,21 @@ BEGIN
     RETURN QUERY
     SELECT p.PerfilAdoptanteID, p.AdoptanteUsuarioID, p.DescripcionCasa,
            p.DescripcionMascotas, p.DescripcionExperienciaConMascotas
-    FROM PerfilAdoptante p WHERE p.AdoptanteUsuarioID = p_id;
+    FROM PerfilAdoptante p WHERE p.PerfilAdoptanteID = p_id;
+END; $$;
+
+CREATE OR REPLACE FUNCTION sp_get_perfil_adoptante_by_adoptante(p_adoptanteid INT)
+RETURNS TABLE (
+    PerfilAdoptanteID INT, AdoptanteUsuarioID INT,
+    DescripcionCasa VARCHAR, DescripcionMascotas VARCHAR,
+    DescripcionExperienciaConMascotas VARCHAR
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT p.PerfilAdoptanteID, p.AdoptanteUsuarioID, p.DescripcionCasa,
+           p.DescripcionMascotas, p.DescripcionExperienciaConMascotas
+    FROM PerfilAdoptante p WHERE p.AdoptanteUsuarioID = p_adoptanteid;
 END; $$;
 
 CREATE OR REPLACE FUNCTION sp_insert_perfil_adoptante(
@@ -361,11 +407,16 @@ CREATE OR REPLACE FUNCTION sp_insert_perfil_adoptante(
     p_descripcionmascotas               VARCHAR,
     p_descripcionexperienciaconmascotas VARCHAR
 )
-RETURNS VOID
-LANGUAGE plpgsql AS $$
+RETURNS INTEGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    p_id INTEGER;
 BEGIN
     INSERT INTO PerfilAdoptante (AdoptanteUsuarioID, DescripcionCasa, DescripcionMascotas, DescripcionExperienciaConMascotas)
-    VALUES (p_adoptanteid, p_descripcioncasa, p_descripcionmascotas, p_descripcionexperienciaconmascotas);
+    VALUES (p_adoptanteid, p_descripcioncasa, p_descripcionmascotas, p_descripcionexperienciaconmascotas)
+    RETURNING PerfilAdoptanteID INTO p_id;
+    RETURN p_id;
 END; $$;
 
 CREATE OR REPLACE FUNCTION sp_update_perfil_adoptante(
@@ -426,11 +477,16 @@ CREATE OR REPLACE FUNCTION sp_insert_administrador(
     p_apellidomaterno VARCHAR,
     p_telefono        VARCHAR
 )
-RETURNS VOID
-LANGUAGE plpgsql AS $$
+RETURNS INTEGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    p_id INTEGER;
 BEGIN
     INSERT INTO Administrador (UsuarioID, Nombre, ApellidoPaterno, ApellidoMaterno, Telefono)
-    VALUES (p_usuarioid, p_nombre, p_apellidopaterno, p_apellidomaterno, p_telefono);
+    VALUES (p_usuarioid, p_nombre, p_apellidopaterno, p_apellidomaterno, p_telefono)
+    RETURNING AdministradorID INTO p_id;
+    RETURN p_id;
 END; $$;
 
 CREATE OR REPLACE FUNCTION sp_update_administrador(
@@ -500,11 +556,17 @@ CREATE OR REPLACE FUNCTION sp_insert_refugio(
     p_correo      VARCHAR,
     p_estatus     VARCHAR
 )
-RETURNS VOID
-LANGUAGE plpgsql AS $$
+RETURNS INTEGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    p_id INTEGER;
 BEGIN
     INSERT INTO Refugio (Nombre, Descripcion, Direccion, Telefono, Correo, Estatus, FechaDeRegistro)
-    VALUES (p_nombre, p_descripcion, p_direccion, p_telefono, p_correo, p_estatus, CURRENT_DATE);
+    VALUES (p_nombre, p_descripcion, p_direccion, p_telefono, p_correo, p_estatus, CURRENT_DATE)
+    RETURNING RefugioID INTO p_id;
+
+    RETURN p_id;
 END; $$;
 
 CREATE OR REPLACE FUNCTION sp_update_refugio(
@@ -569,63 +631,71 @@ END; $$;
 -- SP: ANIMALES
 -- -------------------------------------------
 
+DROP FUNCTION IF EXISTS sp_get_animales() CASCADE;
 CREATE OR REPLACE FUNCTION sp_get_animales()
 RETURNS TABLE (
     AnimalID INT, RefugioID INT, RazaID INT, Nombre VARCHAR,
     Sexo VARCHAR, FechaNacimiento DATE, Descripcion VARCHAR,
-    Estatus VARCHAR, FechaRegistro DATE
+    Estatus VARCHAR, FechaRegistro DATE, FotoUrl VARCHAR
 )
 LANGUAGE plpgsql AS $$
 BEGIN
     RETURN QUERY
     SELECT a.AnimalID, a.RefugioID, a.RazaID, a.Nombre,
            a.Sexo, a.FechaNacimiento, a.Descripcion,
-           a.Estatus, a.FechaRegistro
+           a.Estatus, a.FechaRegistro,
+           (SELECT i.Url FROM Imagenes i WHERE i.EntidadTipo = 'Animal' AND i.EntidadID = a.AnimalID ORDER BY i.Orden LIMIT 1) AS FotoUrl
     FROM Animales a;
 END; $$;
 
+DROP FUNCTION IF EXISTS sp_get_animal_by_id(p_id INT) CASCADE;
 CREATE OR REPLACE FUNCTION sp_get_animal_by_id(p_id INT)
 RETURNS TABLE (
     AnimalID INT, RefugioID INT, RazaID INT, Nombre VARCHAR,
     Sexo VARCHAR, FechaNacimiento DATE, Descripcion VARCHAR,
-    Estatus VARCHAR, FechaRegistro DATE
+    Estatus VARCHAR, FechaRegistro DATE, FotoUrl VARCHAR
 )
 LANGUAGE plpgsql AS $$
 BEGIN
     RETURN QUERY
     SELECT a.AnimalID, a.RefugioID, a.RazaID, a.Nombre,
            a.Sexo, a.FechaNacimiento, a.Descripcion,
-           a.Estatus, a.FechaRegistro
+           a.Estatus, a.FechaRegistro,
+           (SELECT i.Url FROM Imagenes i WHERE i.EntidadTipo = 'Animal' AND i.EntidadID = a.AnimalID ORDER BY i.Orden LIMIT 1) AS FotoUrl
     FROM Animales a WHERE a.AnimalID = p_id;
 END; $$;
 
+DROP FUNCTION IF EXISTS sp_get_animales_by_refugio(p_refugioid INT) CASCADE;
 CREATE OR REPLACE FUNCTION sp_get_animales_by_refugio(p_refugioid INT)
 RETURNS TABLE (
     AnimalID INT, RefugioID INT, RazaID INT, Nombre VARCHAR,
     Sexo VARCHAR, FechaNacimiento DATE, Descripcion VARCHAR,
-    Estatus VARCHAR, FechaRegistro DATE
+    Estatus VARCHAR, FechaRegistro DATE, FotoUrl VARCHAR
 )
 LANGUAGE plpgsql AS $$
 BEGIN
     RETURN QUERY
     SELECT a.AnimalID, a.RefugioID, a.RazaID, a.Nombre,
            a.Sexo, a.FechaNacimiento, a.Descripcion,
-           a.Estatus, a.FechaRegistro
+           a.Estatus, a.FechaRegistro,
+           (SELECT i.Url FROM Imagenes i WHERE i.EntidadTipo = 'Animal' AND i.EntidadID = a.AnimalID ORDER BY i.Orden LIMIT 1) AS FotoUrl
     FROM Animales a WHERE a.RefugioID = p_refugioid;
 END; $$;
 
+DROP FUNCTION IF EXISTS sp_get_animales_disponibles() CASCADE;
 CREATE OR REPLACE FUNCTION sp_get_animales_disponibles()
 RETURNS TABLE (
     AnimalID INT, RefugioID INT, RazaID INT, Nombre VARCHAR,
     Sexo VARCHAR, FechaNacimiento DATE, Descripcion VARCHAR,
-    Estatus VARCHAR, FechaRegistro DATE
+    Estatus VARCHAR, FechaRegistro DATE, FotoUrl VARCHAR
 )
 LANGUAGE plpgsql AS $$
 BEGIN
     RETURN QUERY
     SELECT a.AnimalID, a.RefugioID, a.RazaID, a.Nombre,
            a.Sexo, a.FechaNacimiento, a.Descripcion,
-           a.Estatus, a.FechaRegistro
+           a.Estatus, a.FechaRegistro,
+           (SELECT i.Url FROM Imagenes i WHERE i.EntidadTipo = 'Animal' AND i.EntidadID = a.AnimalID ORDER BY i.Orden LIMIT 1) AS FotoUrl
     FROM Animales a WHERE a.Estatus = 'Disponible';
 END; $$;
 
@@ -638,11 +708,16 @@ CREATE OR REPLACE FUNCTION sp_insert_animal(
     p_descripcion     VARCHAR,
     p_estatus         VARCHAR
 )
-RETURNS VOID
-LANGUAGE plpgsql AS $$
+RETURNS INTEGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    p_id INTEGER;
 BEGIN
     INSERT INTO Animales (RefugioID, RazaID, Nombre, Sexo, FechaNacimiento, Descripcion, Estatus, FechaRegistro)
-    VALUES (p_refugioid, p_razaid, p_nombre, p_sexo, p_fechanacimiento, p_descripcion, p_estatus, CURRENT_DATE);
+    VALUES (p_refugioid, p_razaid, p_nombre, p_sexo, p_fechanacimiento, p_descripcion, p_estatus, CURRENT_DATE)
+    RETURNING AnimalID INTO p_id;
+    RETURN p_id;
 END; $$;
 
 CREATE OR REPLACE FUNCTION sp_update_animal(
@@ -733,11 +808,59 @@ CREATE OR REPLACE FUNCTION sp_insert_solicitud(
     p_adoptanteid      INT,
     p_mensajeadoptante VARCHAR
 )
-RETURNS VOID
-LANGUAGE plpgsql AS $$
+RETURNS INTEGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    p_id INTEGER;
 BEGIN
     INSERT INTO SolicitudAdopcion (RefugioID, AdoptanteID, MensajeAdoptante)
-    VALUES (p_refugioid, p_adoptanteid, p_mensajeadoptante);
+    VALUES (p_refugioid, p_adoptanteid, p_mensajeadoptante)
+    RETURNING SolicitudID INTO p_id;
+
+    RETURN p_id;
+END; $$;
+
+CREATE OR REPLACE FUNCTION sp_insert_solicitud_completa(
+    p_refugioid INT,
+    p_adoptanteid INT,
+    p_mensajeadoptante VARCHAR,
+    p_animalid INT
+)
+RETURNS INTEGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    p_solicitudid INTEGER;
+    v_estatus VARCHAR;
+BEGIN
+    SELECT Estatus INTO v_estatus FROM Animales WHERE AnimalID = p_animalid;
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Animal no encontrado';
+    END IF;
+    IF v_estatus != 'Disponible' THEN
+        RAISE EXCEPTION 'El animal no esta disponible para adopcion';
+    END IF;
+
+    IF EXISTS (
+        SELECT 1 FROM SolicitudAdopcion sa
+        JOIN SolicitudAnimales san ON sa.SolicitudID = san.SolicitudID
+        WHERE sa.AdoptanteID = p_adoptanteid
+          AND san.AnimalID = p_animalid
+          AND sa.Estatus IN ('Pendiente', 'Aprobada')
+    ) THEN
+        RAISE EXCEPTION 'Ya existe una solicitud activa para este animal';
+    END IF;
+
+    INSERT INTO SolicitudAdopcion (RefugioID, AdoptanteID, MensajeAdoptante)
+    VALUES (p_refugioid, p_adoptanteid, p_mensajeadoptante)
+    RETURNING SolicitudID INTO p_solicitudid;
+
+    INSERT INTO SolicitudAnimales (SolicitudID, AnimalID) VALUES (p_solicitudid, p_animalid);
+
+    UPDATE Animales SET Estatus = 'En Proceso' WHERE AnimalID = p_animalid;
+
+    RETURN p_solicitudid;
 END; $$;
 
 CREATE OR REPLACE FUNCTION sp_update_estatus_solicitud(p_id INT, p_estatus VARCHAR)
@@ -745,6 +868,14 @@ RETURNS VOID
 LANGUAGE plpgsql AS $$
 BEGIN
     UPDATE SolicitudAdopcion SET Estatus = p_estatus WHERE SolicitudID = p_id;
+
+    IF p_estatus = 'Aprobada' THEN
+        UPDATE Animales SET Estatus = 'Adoptado'
+        WHERE AnimalID IN (SELECT AnimalID FROM SolicitudAnimales WHERE SolicitudID = p_id);
+    ELSIF p_estatus = 'Rechazada' THEN
+        UPDATE Animales SET Estatus = 'Disponible'
+        WHERE AnimalID IN (SELECT AnimalID FROM SolicitudAnimales WHERE SolicitudID = p_id);
+    END IF;
 END; $$;
 
 CREATE OR REPLACE FUNCTION sp_desactivar_solicitud(p_id INT)
@@ -752,6 +883,9 @@ RETURNS VOID
 LANGUAGE plpgsql AS $$
 BEGIN
     UPDATE SolicitudAdopcion SET Estatus = 'Rechazada' WHERE SolicitudID = p_id;
+
+    UPDATE Animales SET Estatus = 'Disponible'
+    WHERE AnimalID IN (SELECT AnimalID FROM SolicitudAnimales WHERE SolicitudID = p_id);
 END; $$;
 
 
@@ -771,8 +905,124 @@ END; $$;
 CREATE OR REPLACE FUNCTION sp_insert_solicitud_animal(p_solicitudid INT, p_animalid INT)
 RETURNS VOID
 LANGUAGE plpgsql AS $$
+DECLARE
+    v_estatus VARCHAR;
 BEGIN
+    SELECT Estatus INTO v_estatus FROM Animales WHERE AnimalID = p_animalid;
+    IF v_estatus IS NULL THEN
+        RAISE EXCEPTION 'Animal no encontrado';
+    END IF;
+    IF v_estatus IN ('Adoptado', 'En Proceso') THEN
+        RAISE EXCEPTION 'El animal no esta disponible';
+    END IF;
     INSERT INTO SolicitudAnimales (SolicitudID, AnimalID) VALUES (p_solicitudid, p_animalid);
+END; $$;
+
+
+-- -------------------------------------------
+-- TABLA: IMAGENES (polimórfica)
+-- -------------------------------------------
+
+CREATE TABLE Imagenes (
+    ImagenID      INT          GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
+    EntidadTipo   VARCHAR(50)  NOT NULL,
+    EntidadID     INT          NOT NULL,
+    Url           TEXT NOT NULL,
+    Orden         INT          NOT NULL DEFAULT 0,
+    NombreArchivo VARCHAR(255) NOT NULL,
+    FechaSubida   DATE         NOT NULL DEFAULT CURRENT_DATE
+);
+
+CREATE INDEX idx_imagenes_entidad ON Imagenes (EntidadTipo, EntidadID);
+
+
+-- -------------------------------------------
+-- SP: IMAGENES
+-- -------------------------------------------
+
+DROP FUNCTION IF EXISTS sp_get_imagenes() CASCADE;
+DROP FUNCTION IF EXISTS sp_get_imagen_by_id(INT) CASCADE;
+DROP FUNCTION IF EXISTS sp_get_imagenes_by_entidad(VARCHAR, INT) CASCADE;
+
+CREATE OR REPLACE FUNCTION sp_get_imagenes()
+RETURNS TABLE (
+    ImagenID INT, EntidadTipo VARCHAR, EntidadID INT,
+    Url TEXT, Orden INT, NombreArchivo VARCHAR, FechaSubida DATE
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT i.ImagenID, i.EntidadTipo, i.EntidadID,
+           i.Url, i.Orden, i.NombreArchivo, i.FechaSubida
+    FROM Imagenes i;
+END; $$;
+
+CREATE OR REPLACE FUNCTION sp_get_imagen_by_id(p_id INT)
+RETURNS TABLE (
+    ImagenID INT, EntidadTipo VARCHAR, EntidadID INT,
+    Url TEXT, Orden INT, NombreArchivo VARCHAR, FechaSubida DATE
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT i.ImagenID, i.EntidadTipo, i.EntidadID,
+           i.Url, i.Orden, i.NombreArchivo, i.FechaSubida
+    FROM Imagenes i WHERE i.ImagenID = p_id;
+END; $$;
+
+CREATE OR REPLACE FUNCTION sp_get_imagenes_by_entidad(p_entidadtipo VARCHAR, p_entidadid INT)
+RETURNS TABLE (
+    ImagenID INT, EntidadTipo VARCHAR, EntidadID INT,
+    Url TEXT, Orden INT, NombreArchivo VARCHAR, FechaSubida DATE
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT i.ImagenID, i.EntidadTipo, i.EntidadID,
+           i.Url, i.Orden, i.NombreArchivo, i.FechaSubida
+    FROM Imagenes i
+    WHERE i.EntidadTipo = p_entidadtipo AND i.EntidadID = p_entidadid
+    ORDER BY i.Orden;
+END; $$;
+
+CREATE OR REPLACE FUNCTION sp_insert_imagen(
+    p_entidadtipo  VARCHAR,
+    p_entidadid    INT,
+    p_url          VARCHAR,
+    p_orden        INT,
+    p_nombrearchivo VARCHAR
+)
+RETURNS INTEGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    p_id INTEGER;
+BEGIN
+    INSERT INTO Imagenes (EntidadTipo, EntidadID, Url, Orden, NombreArchivo)
+    VALUES (p_entidadtipo, p_entidadid, p_url, p_orden, p_nombrearchivo)
+    RETURNING ImagenID INTO p_id;
+    RETURN p_id;
+END; $$;
+
+CREATE OR REPLACE FUNCTION sp_update_imagen(
+    p_id           INT,
+    p_url          VARCHAR,
+    p_orden        INT,
+    p_nombrearchivo VARCHAR
+)
+RETURNS VOID
+LANGUAGE plpgsql AS $$
+BEGIN
+    UPDATE Imagenes
+    SET Url = p_url, Orden = p_orden, NombreArchivo = p_nombrearchivo
+    WHERE ImagenID = p_id;
+END; $$;
+
+CREATE OR REPLACE FUNCTION sp_delete_imagen(p_id INT)
+RETURNS VOID
+LANGUAGE plpgsql AS $$
+BEGIN
+    DELETE FROM Imagenes WHERE ImagenID = p_id;
 END; $$;
 
 
@@ -808,11 +1058,16 @@ CREATE OR REPLACE FUNCTION sp_insert_cita(
     p_fechahoracita TIMESTAMP,
     p_estadocita    VARCHAR
 )
-RETURNS VOID
-LANGUAGE plpgsql AS $$
+RETURNS INTEGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    p_id INTEGER;
 BEGIN
     INSERT INTO Citas (SolicitudID, FechaHoraCita, EstadoCita)
-    VALUES (p_solicitudid, p_fechahoracita, p_estadocita);
+    VALUES (p_solicitudid, p_fechahoracita, p_estadocita)
+    RETURNING CitaID INTO p_id;
+    RETURN p_id;
 END; $$;
 
 CREATE OR REPLACE FUNCTION sp_update_estado_cita(p_id INT, p_estadocita VARCHAR)

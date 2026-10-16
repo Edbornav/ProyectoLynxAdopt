@@ -1,0 +1,54 @@
+<nav class="navbar">
+  <a href="#03_catalogo_adoptante" class="navbar-logo">🐾 LynxAdopt</a>
+  <div class="navbar-links">
+    <a href="#03_catalogo_adoptante">🐾 Catálogo</a>
+    <a href="#08_mis_solicitudes">📋 Solicitudes</a>
+    <a href="#09_perfil_adoptante">👤 Mi perfil</a>
+  </div>
+  <div class="navbar-bell">🔔<span class="badge" id="notifBadge">0</span></div>
+</nav>
+
+<div class="page-wrap">
+  <div class="back-row">
+    <button class="back-btn" onclick="history.back()">◀ Volver</button>
+  </div>
+
+  <div class="ref-header-card">
+    <div class="ref-header-top">
+      <div class="ref-logo-big" id="refLogo">🏠</div>
+      <div class="ref-header-info">
+        <h1 id="refNombre">--</h1>
+        <div class="ref-meta">
+          <span>📍 <span id="refDireccion">--</span></span>
+          <span>📞 <span id="refTelefono">--</span></span>
+          <span>✉️ <span id="refEmail">--</span></span>
+        </div>
+      </div>
+    </div>
+    <div class="ref-stats-row">
+      <div class="ref-stat"><div class="num" id="refStatMascotas">0</div><div class="lbl">Mascotas</div></div>
+      <div class="ref-stat"><div class="num" id="refStatAdoptados">0</div><div class="lbl">Adoptados</div></div>
+      <div class="ref-stat"><div class="num" id="refStatMiembros">0</div><div class="lbl">Miembros</div></div>
+    </div>
+  </div>
+
+  <div class="ref-body-grid">
+    <div class="ref-section-card full">
+      <h3>📖 Sobre nosotros</h3>
+      <p class="desc-text" id="refDescripcion">--</p>
+      <div class="ref-photo-placeholder" id="refPhoto" style="margin-top:16px;">🐾</div>
+    </div>
+  </div>
+
+  <div class="ref-section-card" style="margin-bottom:24px;">
+    <h3>🐱 Animales en adopción</h3>
+    <div class="pets-grid-refugio" id="refPetsGrid"></div>
+  </div>
+
+  <div class="ref-footer-action">
+    <a href="#03_catalogo_adoptante" class="btn btn-primary">🐾 Ver todos los animales</a>
+  </div>
+</div>
+
+
+

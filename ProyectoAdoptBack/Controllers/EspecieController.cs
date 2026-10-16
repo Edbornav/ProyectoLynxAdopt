@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProyectoAdoptBack.DTOs;
+using ProyectoAdoptBack.Services;
 
 namespace ProyectoAdoptBack.Controllers
 {
@@ -7,29 +9,40 @@ namespace ProyectoAdoptBack.Controllers
     [ApiController]
     public class EspecieController : ControllerBase
     {
+        private readonly IEspecieService _service;
+
+        public EspecieController(IEspecieService service)
+        {
+            _service = service;
+        }
+        [AllowAnonymous]
         [HttpGet]
-        public ActionResult<List<EspecieDTO>> GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            return Ok(new List<EspecieDTO>());
+            var items = await _service.GetAllAsync();
+            return Ok(items);
         }
-
+        [AllowAnonymous]
         [HttpGet("{id}")]
-        public ActionResult<EspecieDTO> GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            return NotFound();
+            var item = await _service.GetByIdAsync(id);
+            if (item == null) return NotFound();
+            return Ok(item);
         }
-
+        [Authorize(Roles ="Administrador")]
         [HttpPost]
-        public ActionResult<EspecieDTO> Create([FromBody] CreateEspecieDTO dto)
+        public async Task<IActionResult> Create([FromBody] CreateEspecieDTO dto)
         {
-            return Ok(new EspecieDTO());
+            var id = await _service.CreateAsync(dto);
+            return Ok(new { id });
         }
-
+        [Authorize(Roles ="Administrador")]
         [HttpPut("{id}")]
-        public ActionResult Update(int id, [FromBody] UpdateEspecieDTO dto)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateEspecieDTO dto)
         {
+            await _service.UpdateAsync(id, dto);
             return NoContent();
         }
-
     }
 }

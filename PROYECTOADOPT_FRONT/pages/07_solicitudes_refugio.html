@@ -1,0 +1,49 @@
+<nav class="navbar">
+  <a href="#06_inicio_refugio" class="navbar-logo">🐾 LynxAdopt</a>
+  <div class="navbar-links">
+    <a href="#06_inicio_refugio">🏠 Inicio</a>
+    <a href="#07_solicitudes_refugio" class="active">📋 Solicitudes</a>
+    <a href="#10_agregar_mascota">➕ Agregar mascota</a>
+  </div>
+  <div class="navbar-bell">🔔<span class="badge" id="notifBadge">0</span></div>
+</nav>
+
+<div class="page-wrap">
+  <h1 class="page-title">Solicitudes Recibidas</h1>
+  <p class="page-subtitle">Revisa los perfiles de los adoptantes y asigna un estatus</p>
+  <div class="pet-filter-row" id="petFilterRow"></div>
+  <div class="table-header">
+    <div></div>
+    <div>Adoptante</div>
+    <div>Mascota</div>
+    <div>Ver perfil</div>
+    <div style="text-align:right;">Estatus</div>
+  </div>
+  <div id="solicitudesList"></div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <button class="modal-close" onclick="cerrarModalPerfil()">✕</button>
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+      <div class="sol-avatar" style="width:70px;height:70px;font-size:1.8rem;">👤</div>
+      <div>
+        <div class="modal-name" id="modalName" style="font-family:'Fredoka One',cursive;font-size:1.4rem;">--</div>
+        <span class="status-badge status-pending" id="modalStatus">Pendiente</span>
+      </div>
+    </div>
+    <div class="info-grid" id="modalInfoGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;margin-bottom:20px;"></div>
+    <div style="background:var(--beige);border-radius:var(--radius);padding:14px 18px;margin-bottom:20px;">
+      <h4 style="font-family:'Fredoka One',cursive;font-size:1rem;margin-bottom:8px;">💬 Motivo de adopción</h4>
+      <p id="modalMensaje" style="font-weight:600;color:var(--text-dark);">--</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-green" style="flex:1" onclick="aprobarSolicitud()">✅ Aprobar</button>
+      <button class="btn btn-red" style="flex:1" onclick="rechazarSolicitud()">❌ Rechazar</button>
+      <button class="btn btn-light" onclick="cerrarModalPerfil()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+
+

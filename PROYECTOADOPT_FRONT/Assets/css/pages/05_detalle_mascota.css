@@ -1,0 +1,82 @@
+.detail-wrapper { padding: 20px 32px 40px; max-width: 1100px; margin: 0 auto; }
+.back-row { margin-bottom: 16px; }
+.detail-card {
+  background: var(--beige-card);
+  border-radius: 28px;
+  overflow: hidden;
+  display: flex;
+  box-shadow: var(--shadow-lg);
+  animation: fadeInUp 0.4s ease both;
+}
+.detail-img-col {
+  width: 400px;
+  flex-shrink: 0;
+  background: var(--beige);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 120px;
+  min-height: 500px;
+  position: relative;
+}
+.refugio-badge {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--brown);
+  color: white;
+  padding: 8px 24px;
+  border-radius: var(--radius-pill);
+  font-family: 'Fredoka One', cursive;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+.detail-info-col { flex: 1; padding: 36px 40px; display: flex; flex-direction: column; }
+.pet-big-name {
+  font-family: 'Fredoka One', cursive;
+  font-size: 3rem;
+  color: var(--text-dark);
+  margin-bottom: 20px;
+}
+.info-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.info-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+.info-list li .info-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+.info-list li strong { color: var(--brown-dark); margin-right: 4px; }
+.health-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.health-tag {
+  color: white;
+  border-radius: var(--radius-pill);
+  padding: 5px 14px;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+.health-tag.verde { background: var(--green); }
+.health-tag.amarillo { background: var(--yellow); color: var(--text-dark); }
+.health-tag.marron { background: var(--brown); }
+.pet-story {
+  background: var(--beige);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  font-size: 0.93rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  line-height: 1.6;
+  margin-bottom: 28px;
+  flex: 1;
+}
+.adopt-section { display: flex; align-items: center; justify-content: flex-end; gap: 16px; }
+.adopt-question { font-family: 'Fredoka One', cursive; font-size: 1.2rem; color: var(--text-mid); }

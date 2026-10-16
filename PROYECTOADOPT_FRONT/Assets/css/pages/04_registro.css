@@ -1,0 +1,67 @@
+.register-box {
+  background: var(--beige-card);
+  border-radius: 28px;
+  padding: 48px 52px;
+  width: 600px;
+  max-width: 95vw;
+  box-shadow: var(--shadow-lg);
+  animation: fadeInUp 0.5s ease both;
+  margin: 40px auto;
+}
+.reg-logo {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.5rem;
+  color: var(--orange);
+  display: flex; align-items: center; gap: 6px;
+  margin-bottom: 6px;
+}
+.reg-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 2rem;
+  color: var(--text-dark);
+  margin-bottom: 8px;
+}
+.reg-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-mid);
+  font-weight: 600;
+  margin-bottom: 28px;
+}
+.role-selector { display: flex; gap: 12px; margin-bottom: 24px; }
+.role-option {
+  flex: 1;
+  padding: 12px;
+  border-radius: var(--radius);
+  border: 3px solid transparent;
+  background: var(--beige);
+  text-align: center;
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--text-mid);
+  transition: all 0.2s;
+}
+.role-option.selected {
+  border-color: var(--orange);
+  background: var(--orange);
+  color: white;
+}
+.role-option .role-emoji { font-size: 1.6rem; display: block; margin-bottom: 4px; }
+.btn-register {
+  width: 100%;
+  padding: 14px;
+  background: var(--brown);
+  color: white;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  margin-top: 8px;
+  transition: all 0.2s;
+}
+.btn-register:hover { background: var(--brown-dark); transform: translateY(-2px); box-shadow: var(--shadow); }
+.terms { font-size: 0.82rem; color: var(--text-mid); text-align: center; margin-top: 12px; }
+.terms a { color: var(--orange-dark); font-weight: 700; }
+.login-link { text-align: center; margin-top: 16px; font-size: 0.9rem; font-weight: 600; color: var(--text-mid); }
+.login-link a { color: var(--orange-dark); font-weight: 800; text-decoration: none; }

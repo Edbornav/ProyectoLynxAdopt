@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProyectoAdoptBack.DTOs;
+using ProyectoAdoptBack.Services;
 
 namespace ProyectoAdoptBack.Controllers
 {
@@ -7,33 +9,54 @@ namespace ProyectoAdoptBack.Controllers
     [ApiController]
     public class SolicitudesAdopcionController : ControllerBase
     {
+        private readonly ISolicitudAdopcionService _service;
+
+        public SolicitudesAdopcionController(ISolicitudAdopcionService service)
+        {
+            _service = service;
+        }
+        [Authorize(Roles = "Administrador")]
         [HttpGet]
-        public ActionResult<List<SolicitudAdopcionDTO>> GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            return Ok(new List<SolicitudAdopcionDTO>());
+            var items = await _service.GetAllAsync();
+            return Ok(items);
+        }
+        [Authorize]
+        [HttpGet("por-adoptante/{adoptanteId}")]
+        public async Task<IActionResult> GetByAdoptante(int adoptanteId)
+        {
+            var items = await _service.GetByAdoptanteAsync(adoptanteId);
+            return Ok(items);
         }
 
-        [HttpGet("{id}")]
-        public ActionResult<SolicitudAdopcionDTO> GetById(int id)
+        [Authorize(Roles = "Administrador")]
+        [HttpGet("por-refugio/{refugioId}")]
+        public async Task<IActionResult> GetByRefugio(int refugioId)
         {
-            return NotFound();
+            var items = await _service.GetByRefugioAsync(refugioId);
+            return Ok(items);
         }
 
+        [Authorize(Roles ="Adoptante")]
         [HttpPost]
-        public ActionResult<SolicitudAdopcionDTO> Create([FromBody] CreateSolicitudAdopcionDTO dto)
+        public async Task<IActionResult> Create([FromBody] CreateSolicitudAdopcionDTO dto)
         {
-            return Ok(new SolicitudAdopcionDTO());
+            var id = await _service.CreateAsync(dto);
+            return Ok(new { id });
         }
-
+        [Authorize(Roles ="Administrador")]
         [HttpPut("{id}")]
-        public ActionResult Update(int id, [FromBody] UpdateSolicitudAdopcionDTO dto)
+        public async Task<IActionResult> UpdateEstatus(int id, [FromBody] UpdateSolicitudAdopcionDTO dto)
         {
-            return NoContent();
+            await _service.UpdateEstatusAsync(id, dto);
+            return Ok(new { });
         }
-
+        [Authorize(Roles ="Administrador")]
         [HttpPatch("{id}/desactivar")]
-        public ActionResult Desactivar(int id)
+        public async Task<IActionResult> Desactivar(int id)
         {
+            await _service.DesactivarAsync(id);
             return NoContent();
         }
     }

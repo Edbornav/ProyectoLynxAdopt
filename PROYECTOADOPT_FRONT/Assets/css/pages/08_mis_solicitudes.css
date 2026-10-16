@@ -1,0 +1,41 @@
+.page-title { font-family: 'Fredoka One', cursive; font-size: 2.2rem; color: var(--white); margin-bottom: 24px; }
+.solicitud-row {
+  background: var(--beige-card);
+  border-radius: var(--radius-pill);
+  padding: 14px 22px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+  animation: fadeInUp 0.4s ease both;
+  transition: transform 0.2s;
+}
+.solicitud-row:hover { transform: translateX(4px); }
+.sol-avatar {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: var(--orange-light);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+.sol-name { font-family: 'Fredoka One', cursive; font-size: 1.2rem; color: var(--text-dark); flex: 1; }
+.sol-refugio { font-size: 0.82rem; font-weight: 600; color: var(--text-mid); }
+.sol-actions { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+.table-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 22px 10px;
+  font-weight: 800;
+  font-size: 0.88rem;
+  color: var(--white);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.th-name { flex: 1; }
+.th-right { margin-left: auto; display: flex; gap: 80px; }
+.empty-state { text-align: center; padding: 60px 0; color: var(--beige-light); }
+.empty-state .emoji { font-size: 4rem; display: block; margin-bottom: 12px; }
+.empty-state p { font-weight: 600; font-size: 1.1rem; }

@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProyectoAdoptBack.DTOs;
+using ProyectoAdoptBack.Services;
 
 namespace ProyectoAdoptBack.Controllers
 {
@@ -7,23 +9,41 @@ namespace ProyectoAdoptBack.Controllers
     [ApiController]
     public class RefugioAdministradoresController : ControllerBase
     {
+        private readonly IRefugioAdministradoresService _service;
+
+        public RefugioAdministradoresController(IRefugioAdministradoresService service)
+        {
+            _service = service;
+        }
+        [AllowAnonymous]
         [HttpGet]
-        public ActionResult<List<RefugioAdministradoresDTO>> GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            return Ok(new List<RefugioAdministradoresDTO>());
+            var items = await _service.GetAllAsync();
+            return Ok(items);
+        }
+        [AllowAnonymous]
+        [HttpGet("{refugioId}")]
+        public async Task<IActionResult> GetByRefugio(int refugioId)
+        {
+            var items = await _service.GetByRefugioAsync(refugioId);
+            return Ok(items);
         }
 
-        [HttpGet("{refugioId}/{adminId}")]
-        public ActionResult<RefugioAdministradoresDTO> GetById(int refugioId, int adminId)
+        [AllowAnonymous]
+        [HttpGet("por-administrador/{administradorId}")]
+        public async Task<IActionResult> GetByAdministrador(int administradorId)
         {
-            return NotFound();
+            var items = await _service.GetByAdministradorAsync(administradorId);
+            return Ok(items);
         }
 
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
-        public ActionResult<RefugioAdministradoresDTO> Create([FromBody] CreateRefugioAdministradoresDTO dto)
+        public async Task<IActionResult> Create([FromBody] CreateRefugioAdministradoresDTO dto)
         {
-            return Ok(new RefugioAdministradoresDTO());
+            await _service.CreateAsync(dto);
+            return Ok(new { });
         }
-
     }
 }

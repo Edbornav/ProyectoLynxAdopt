@@ -1,0 +1,54 @@
+<nav class="navbar">
+  <a href="#06_inicio_refugio" class="navbar-logo">🐾 LynxAdopt</a>
+  <div class="navbar-links">
+    <a href="#06_inicio_refugio" class="active">🏠 Inicio</a>
+    <a href="#07_solicitudes_refugio">📋 Solicitudes</a>
+    <a href="#10_agregar_mascota">➕ Agregar mascota</a>
+  </div>
+  <div class="navbar-bell">🔔<span class="badge" id="notifBadge">0</span></div>
+</nav>
+
+<div class="page-wrap">
+  <div class="refugio-layout">
+    <div class="refugio-info-card">
+      <div class="refugio-main-card">
+        <div class="refugio-logo" id="refLogo">🏠</div>
+        <div class="refugio-big-name" id="refNombre">--</div>
+        <div class="refugio-stats">
+          <div class="r-stat"><div class="num" id="statMascotas">0</div><div class="lbl">Mascotas</div></div>
+          <div class="r-stat"><div class="num" id="statAdoptados">0</div><div class="lbl">Adoptados</div></div>
+          <div class="r-stat"><div class="num" id="statSolicitudes">0</div><div class="lbl">Solicitudes</div></div>
+        </div>
+      </div>
+      <div class="refugio-nav">
+        <a href="#06_inicio_refugio" class="sidebar-item active">🏠 Mi refugio</a>
+        <a href="#07_solicitudes_refugio" class="sidebar-item">📋 Solicitudes</a>
+        <a href="#10_agregar_mascota" class="sidebar-item">➕ Agregar mascota</a>
+        <a href="#02_inicio_sesion" class="sidebar-item" style="color:var(--red)" onclick="localStorage.removeItem('session')">🚪 Cerrar sesión</a>
+      </div>
+    </div>
+
+    <div class="refugio-content">
+      <div class="about-section">
+        <div class="section-title" style="margin:0 0 16px 0;">Sobre nosotros</div>
+        <div class="about-grid">
+          <div class="about-text-col">
+            <p class="about-description" id="refDescripcion">--</p>
+          </div>
+          <div class="about-photo-col" id="refPhotoCol">🐾</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="mascotas-title-row">
+          <div class="section-title" style="margin:0;">Nuestras mascotas</div>
+          <a href="#10_agregar_mascota" class="btn btn-primary btn-sm">+ Agregar mascota</a>
+        </div>
+        <div class="pets-grid-refugio" id="refugioPetsGrid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+

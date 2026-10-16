@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Http;
+
 namespace ProyectoAdoptBack.DTOs
 {
     public class RefugioDTO
@@ -20,6 +22,17 @@ namespace ProyectoAdoptBack.DTOs
         public string Telefono { get; set; } = string.Empty;
         public string Correo { get; set; } = string.Empty;
         public string Estatus { get; set; } = string.Empty;
+    }
+
+    public class CreateRefugioConLogoRequest
+    {
+        public string Nombre { get; set; } = string.Empty;
+        public string Descripcion { get; set; } = string.Empty;
+        public string Direccion { get; set; } = string.Empty;
+        public string Telefono { get; set; } = string.Empty;
+        public string Correo { get; set; } = string.Empty;
+        public string Estatus { get; set; } = string.Empty;
+        public IFormFile? Logo { get; set; }
     }
 
     public class UpdateRefugioDTO

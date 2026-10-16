@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProyectoAdoptBack.DTOs;
+using ProyectoAdoptBack.Services;
 
 namespace ProyectoAdoptBack.Controllers
 {
@@ -7,29 +9,40 @@ namespace ProyectoAdoptBack.Controllers
     [ApiController]
     public class RazasController : ControllerBase
     {
+        private readonly IRazaService _service;
+
+        public RazasController(IRazaService service)
+        {
+            _service = service;
+        }
+        [AllowAnonymous]
         [HttpGet]
-        public ActionResult<List<RazaDTO>> GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            return Ok(new List<RazaDTO>());
+            var items = await _service.GetAllAsync();
+            return Ok(items);
         }
-
+        [AllowAnonymous]
         [HttpGet("{id}")]
-        public ActionResult<RazaDTO> GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            return NotFound();
+            var item = await _service.GetByIdAsync(id);
+            if (item == null) return NotFound();
+            return Ok(item);
         }
-
+        [Authorize(Roles ="Administrador")]
         [HttpPost]
-        public ActionResult<RazaDTO> Create([FromBody] CreateRazaDTO dto)
+        public async Task<IActionResult> Create([FromBody] CreateRazaDTO dto)
         {
-            return Ok(new RazaDTO());
+            var id = await _service.CreateAsync(dto);
+            return Ok(new { id });
         }
-
+         [Authorize(Roles ="Administrador")]
         [HttpPut("{id}")]
-        public ActionResult Update(int id, [FromBody] UpdateRazaDTO dto)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateRazaDTO dto)
         {
+            await _service.UpdateAsync(id, dto);
             return NoContent();
         }
-
     }
 }

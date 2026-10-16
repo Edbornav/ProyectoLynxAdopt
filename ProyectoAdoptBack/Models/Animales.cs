@@ -11,5 +11,6 @@
         public string Descripcion { get; set; } = string.Empty;
         public string Estatus { get; set; } = string.Empty;
         public DateTime? FechaRegistro { get; set; }
+        public string? FotoUrl { get; set; }
     }
 }

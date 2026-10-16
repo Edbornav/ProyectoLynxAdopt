@@ -1,0 +1,80 @@
+<nav class="navbar">
+  <a href="#06_inicio_refugio" class="navbar-logo">🐾 LynxAdopt</a>
+  <div class="navbar-links">
+    <a href="#06_inicio_refugio">🏠 Inicio</a>
+    <a href="#07_solicitudes_refugio">📋 Solicitudes</a>
+    <a href="#10_agregar_mascota" class="active">➕ Agregar mascota</a>
+  </div>
+  <div class="navbar-bell">🔔<span class="badge" id="notifBadge">0</span></div>
+</nav>
+
+<div class="page-wrap">
+  <div class="back-title-row">
+    <button class="back-btn" onclick="history.back()">◀</button>
+    <h1>Agregar mascota</h1>
+  </div>
+
+  <div class="form-card">
+    <div class="img-col">
+      <div class="img-placeholder" onclick="triggerUpload()" id="imgPlaceholder">📷</div>
+      <p class="img-hint">Haz clic para subir<br>una foto de la mascota</p>
+      <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="previewImg(event)"/>
+      <button class="btn btn-orange btn-sm" onclick="triggerUpload()">📂 Agregar imagen</button>
+    </div>
+
+    <div class="form-col">
+      <input class="form-title" type="text" id="petNameTitle" placeholder="Nombre de la mascota" style="font-size:1.4rem;font-weight:700;border:1px solid var(--border);border-radius:8px;padding:8px 12px;width:100%;box-sizing:border-box;"/>
+      <div class="form-grid">
+        <div class="fg">
+          <label>Especie</label>
+          <select id="petEspecie" onchange="cargarRazas()"><option value="">Selecciona especie</option></select>
+        </div>
+        <div class="fg">
+          <label>Raza</label>
+          <select id="petRaza"><option value="">Selecciona raza</option></select>
+        </div>
+        <div class="fg">
+          <label>Sexo</label>
+          <select id="petSexo"><option value="Macho">Macho</option><option value="Hembra">Hembra</option></select>
+        </div>
+        <div class="fg">
+          <label>Edad (años)</label>
+          <input type="number" id="petEdad" min="0" max="30" placeholder="Ej. 3"/>
+        </div>
+        <div class="fg">
+          <label>Color</label>
+          <input type="text" id="petColor" placeholder="Ej. Dorado"/>
+        </div>
+        <div class="fg">
+          <label>Estado</label>
+          <select id="petEstado"><option value="Disponible">Disponible</option><option value="En Proceso">En Proceso</option><option value="Adoptado">Adoptado</option></select>
+        </div>
+        <div class="fg full-col">
+          <label>Personalidad y comportamiento</label>
+          <input type="text" id="petPersonalidad" placeholder="Ej. Juguetón, amigable con niños, tranquilo..."/>
+        </div>
+        <div class="fg full-col">
+          <label>Estado de salud</label>
+          <div class="health-checks">
+            <label class="health-check"><input type="checkbox" id="healthVacunas" value="vacunas"/> Vacunas al día</label>
+            <label class="health-check"><input type="checkbox" id="healthEsterilizado" value="esterilizado"/> Esterilizado/a</label>
+            <label class="health-check"><input type="checkbox" id="healthDesparasitado" value="desparasitado"/> Desparasitado/a</label>
+            <label class="health-check"><input type="checkbox" id="healthMicrochip" value="microchip"/> Microchip</label>
+            <label class="health-check"><input type="checkbox" id="healthRevision" value="revision"/> Revisión veterinaria</label>
+          </div>
+        </div>
+        <div class="fg full-col">
+          <label>Descripción / Historia</label>
+          <textarea id="petDescripcion" placeholder="Cuéntanos la historia de esta mascota y por qué busca un hogar..."></textarea>
+        </div>
+        <div class="form-footer">
+          <button class="btn btn-light" onclick="history.back()">Cancelar</button>
+          <button class="btn btn-primary" onclick="publishPet()">📢 Publicar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
